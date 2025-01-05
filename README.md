@@ -1,4 +1,4 @@
-# ASCIIJOY
+# MUZIMAKE
 
 Just a plain C project exploring Sound Programming.
 Especially the AdLib Sound card.
