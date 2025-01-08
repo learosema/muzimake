@@ -3,11 +3,13 @@ CC = owcc
 LD = owcc
 CFLAGS = -zq -c -xc++ -bdos4g
 LDFLAGS = -zq -bdos4g
-CP = copy
-RM = del
 !ifdef __UNIX__
+CP = cp
+RM = rm
 DOS4GW_RUNTIME=$(%WATCOM)/binw/dos4gw.exe
 !else
+CP = copy
+RM = del
 DOS4GW_RUNTIME=$(%WATCOM)\binw\dos4gw.exe
 !endif
 

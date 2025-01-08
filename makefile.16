@@ -3,9 +3,13 @@ CC = owcc
 LD = owcc
 CFLAGS = -zq -c -xc++
 LDFLAGS = -zq
+!ifdef __UNIX__
+CP = cp
+RM = rm
+!else
 CP = copy
 RM = del
-
+!endif
 
 # Source files
 SRCS = main.cpp textmode.cpp mouse.cpp vga.cpp adlib.cpp
