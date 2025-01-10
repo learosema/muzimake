@@ -9,14 +9,13 @@ I want to build a basic composing tool with it.
 
 ## AdLib Programming
 
-All credits go to root42. I still have to dig through this myself to understand it better :D. All I did is watching the Youtube video and adapting the C sources to the Watcom C compiler I'm using.
-
 Rabbit Hole:
 
 - <https://codeberg.org/root42/dosadlib/>
 - <https://www.youtube.com/watch?v=kP2B9a7Btpk&list=PLGJnX2KGgaw2L7Uv5NThlL48G9y4rJx1X&index=39>
 - <https://cosmodoc.org/topics/adlib-functions/#anyway-heres-the-opl2>
 - <https://www.vgmpf.com/Wiki/images/4/48/AdLib_-_Programming_Guide.pdf>
+- OPL2 lib used from <https://github.com/Superilu/lib16>
 
 ## Building
 
