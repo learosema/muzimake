@@ -5,3 +5,4 @@ TEST.EXE
 *.exe
 *.obj
 *.OBJ
+*.o
