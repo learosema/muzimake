@@ -1,37 +1,50 @@
 # Compiler and linker settings
-CC = owcc
-LD = owcc
-CFLAGS = -zq -c -xc++
-LDFLAGS = -zq
+CC = wpp386
+LD = wlink
+SYSTEM=dos4g
+CFLAGS=-zq -zastd=c++0x
+LDFLAGS=
+
+# Source files
+SRCS = main.cpp textmode.cpp mouse.cpp vga.cpp adlib.cpp opl2.cpp bnkfile.cpp
+
 !ifdef __UNIX__
 CP = cp
 RM = rm
+OBJS = $(SRCS:.cpp=.o)
 !else
 CP = copy
 RM = del
+OBJS = $(SRCS:.cpp=.obj)
 !endif
 
-# Source files
-SRCS = main.cpp textmode.cpp mouse.cpp vga.cpp adlib.cpp
-
-# Object files
-OBJS = $(SRCS:.cpp=.obj)
-
 # Executable name
-TARGET = asciijoy.exe
+TARGET = muzimake.exe
 
 # Default target
 all: $(TARGET) .symbolic
 
 # Build rule for object files
+!ifdef __UNIX__
+.cpp.o: %.cpp
+	$(CC) $(CFLAGS) $<
+!else
 .cpp.obj: %.cpp
-	$(CC) $(CFLAGS) -o $@ $<
+	$(CC) $(CFLAGS) $<
+!endif
 
 # Link rule for the executable
 $(TARGET): $(OBJS)
-	$(LD) $(LDFLAGS) -o $@ $(OBJS)
+	$(LD) system $(SYSTEM) $(LDFLAGS) name $(TARGET) file { $(OBJS) }
+
+test: .symbolic
+	$(CC) $(CFLAGS) test.cpp bnkfile.cpp
+	$(LD) system $(SYSTEM) $(LDFLAGS) name test.exe file { test.o bnkfile.o }
 
 # Clean rule
 clean: .symbolic
+	$(RM) *.o
 	$(RM) *.obj
+	$(RM) *.OBJ
 	$(RM) *.exe
+	$(RM) *.EXE

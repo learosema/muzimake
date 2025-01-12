@@ -30,8 +30,13 @@ postbuild: .symbolic
 	$(CP) $(DOS4GW_RUNTIME) .
 
 # Build rule for object files
+!ifdef __UNIX__
 .cpp.o: %.cpp
 	$(CC) $(CFLAGS) $<
+!else
+.cpp.obj: %.cpp
+	$(CC) $(CFLAGS) $<
+!endif
 
 # Link rule for the executable
 $(TARGET): $(OBJS)
