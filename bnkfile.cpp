@@ -3,22 +3,41 @@
 
 #include "bnkfile.h"
 
-BNKFile * bnkfile_read(char * filename) {
+BNKFile * bnkfile_read(char * filename)
+{
 	FILE * fp;
 	BNKFile *bnkFile = NULL;
 	int i;
-	size_t len;
+	long len;
 
 	fp = fopen(filename, "rb");
 	if (fp == NULL) {
-		fprintf(stderr, "Unable to read bankfile: %s\n", filename);
+		bnkfile_last_error = BNK_ERR_READ_FAILED;
+		return NULL;
+	}
+
+	if (fseek(fp, 0L, SEEK_END) != 0) {
+		bnkfile_last_error = BNK_ERR_READ_FAILED;
+		return NULL;
+	}
+
+	len = ftell(fp);
+	if (len == -1) {
+		bnkfile_last_error = BNK_ERR_READ_FAILED;
+		return NULL;
+	}
+
+	if (fseek(fp, 0L, 0) != 0) {
+		bnkfile_last_error = BNK_ERR_READ_FAILED;
 		return NULL;
 	}
 
 	bnkFile = (BNKFile *)malloc(sizeof(BNKFile));
-	bnkFile->header = (BNKHeader *)malloc(sizeof(BNKHeader));
+	bnkFile->len = len;
+	bnkFile->buffer = (uint8_t *)malloc(len * sizeof(uint8_t));
+	fread(bnkFile->buffer, sizeof(uint8_t), len, fp);
 
-	fread(bnkFile->header, sizeof(BNKHeader), 1, fp);
+	bnkFile->header = (BNKHeader *)bnkFile->buffer;
 	printf("%s loaded :)\nversion %d\.%d %d instruments. total %d\noffset names: %d\noffset data: %d\n", filename,
 		bnkFile->header->versionMajor,
 		bnkFile->header->versionMinor,
@@ -26,30 +45,33 @@ BNKFile * bnkfile_read(char * filename) {
 		bnkFile->header->totalNumInstruments,
 		bnkFile->header->offsetNames,
 		bnkFile->header->offsetData
-		);
+	);
 
-	fseek(fp, bnkFile->header->offsetNames, SEEK_SET);
-	bnkFile->entries = (BNKEntry *)malloc(bnkFile->header->totalNumInstruments * sizeof(BNKEntry));
-	bnkFile->instruments = (BNKInstrument *)malloc(bnkFile->header->totalNumInstruments * sizeof(BNKInstrument));
-	fread(bnkFile->entries, sizeof(BNKEntry), bnkFile->header->totalNumInstruments, fp);
-	fseek(fp, bnkFile->header->offsetData, SEEK_SET);
-	fread(bnkFile->instruments, sizeof(BNKInstrument), bnkFile->header->totalNumInstruments, fp);
-	for (i = 0; i < bnkFile->header->totalNumInstruments; i++) {
-		printf("Instrument %d: %s\n", i, bnkFile->entries[i].name);
-	}
+	bnkFile->entries = (BNKEntry *)(bnkFile->buffer + bnkFile->header->offsetNames);
+	bnkFile->instruments = (BNKInstrument *)(bnkFile->buffer + bnkFile->header->offsetData);
 	fclose(fp);
 	return bnkFile;
 }
 
-void bnkfile_free(BNKFile * bnkFile) {
-	if (bnkFile->header) free(bnkFile->header);
-	if (bnkFile->entries) free(bnkFile->entries);
-	if (bnkFile->instruments) free(bnkFile->instruments);
+bool bnkfile_write(BNKFile * bnkFile, char *filename)
+{
+	FILE * fp = fopen(filename, "wb");
+	if (fp == NULL) {
+		bnkfile_last_error = BNK_ERR_WRITE_FAILED;
+		return false;
+	}
+	fwrite(bnkFile->buffer, sizeof(uint8_t), bnkFile->len, fp);
+	fclose(fp);
+	return true;
+}
+
+
+void bnkfile_free(BNKFile * bnkFile)
+{
+	if (bnkFile->header) free(bnkFile->buffer);
+	bnkFile->buffer = NULL;
 	bnkFile->header = NULL;
 	bnkFile->entries = NULL;
 	bnkFile->instruments = NULL;
 	free(bnkFile);
-
-
-
 }

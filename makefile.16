@@ -1,5 +1,5 @@
 # Compiler and linker settings
-CC = wpp386
+CC = wpp
 LD = wlink
 SYSTEM=dos4g
 CFLAGS=-zq -zastd=c++0x
