@@ -39,13 +39,13 @@ typedef struct OPLREGS {
 	uint8_t feedback;
 	uint8_t attack;
 	uint8_t sustain;
-	uint8_t eg;
+	uint8_t eg; /* ="hasSustain" */
 	uint8_t decay;
 	uint8_t releaseRate;
 	uint8_t totalLevel;
 	uint8_t am;  /* amplitude modulation/tremolo */
 	uint8_t vib; /* vibrato */
-	uint8_t ksr; /* key scaling/envelope rate*/
+	uint8_t ksr; /* key scaling/envelope rate = "hasEnvelopeScaling"*/
 	uint8_t con; /* connector */
 } OPLREGS;
 

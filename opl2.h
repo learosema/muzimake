@@ -21,6 +21,11 @@
 #ifndef __OPL2_H_
 #define __OPL2_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 #include <stdbool.h>
 #include <stdint.h>
 
@@ -169,4 +174,7 @@ void opl2_setVibrato(uint8_t channel, uint8_t operatorNum, bool enable);
 void opl2_setVolume(uint8_t channel, uint8_t operatorNum, uint8_t volume);
 void opl2_setWaveFormSelect(bool enable);
 
+#ifdef __cplusplus
+}
+#endif
 #endif  // __OPL2_H_

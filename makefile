@@ -45,8 +45,8 @@ $(TARGET): $(OBJS)
 	$(LD) system $(SYSTEM) $(LDFLAGS) name $(TARGET) file { $(OBJS) }
 
 test: .symbolic postbuild
-	$(CC) $(CFLAGS) test.cpp bnkfile.cpp
-	$(LD) system $(SYSTEM) $(LDFLAGS) name test.exe file { test$(OBJEXT) bnkfile$(OBJEXT) }
+	$(CC) $(CFLAGS) test.cpp bnkfile.cpp opl2.cpp
+	$(LD) system $(SYSTEM) $(LDFLAGS) name test.exe file { test$(OBJEXT) bnkfile$(OBJEXT) opl2$(OBJEXT) }
 
 # Clean rule
 clean: .symbolic
