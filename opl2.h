@@ -104,6 +104,8 @@ typedef struct __instrument {
     operator_t operators[2];
     uint8_t feedback;
     bool isAdditiveSynth;
+		bool isPercussive;
+		uint8_t drumType;
     uint8_t transpose;
 } instrument_t;
 
