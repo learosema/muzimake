@@ -48,7 +48,6 @@ BNKFile * bnkfile_read(char * filename)
 	);
 
 	bnkFile->entries = (BNKEntry *)(bnkFile->buffer + bnkFile->header->offsetNames);
-	// TODO: the instruments aren't necessarily in order!
 	bnkFile->instruments = (BNKInstrument *)(bnkFile->buffer + bnkFile->header->offsetData);
 	fclose(fp);
 	return bnkFile;
