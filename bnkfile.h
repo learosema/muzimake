@@ -28,7 +28,7 @@ typedef struct BNKHeader {
 
 typedef struct
 {
-	uint16_t offsetData;
+	uint16_t index;
 	uint8_t  isUsed;
 	char     name[9];
 } BNKEntry;
