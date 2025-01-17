@@ -67,7 +67,32 @@ er ct WT wt
 
 */
 
+/* STD3.bnk
 
+      KS ML FB A  S  EG D  R  TL AM VB
+00 00 00 01 07 07 0a 01 01 0e 16 00 00
+
+ER CT ks ml fb a  s  eg d  r  tl am vb
+00 01 00 01 07 08 09 01 01 0e 00 00 00
+
+er ct WT wt
+00 01 00 00
+
+      KS ML FB A  S  EG D  R  TL AM VB
+00 00 00 01 05 07 0a 01 01 0e 13 01 01
+
+ER CT ks ml fb a  s  eg d  r  tl am vb
+00 01 00 02 05 0f 08 01 00 0a 00 01 01
+
+00 01 00 01 00 00 00 01 05 07 0a 01 01 0e 13 01
+
+0100010001050f0f01000c0001010001000100000101050f0001020b2800010001000005050001020b0000010101000000000104070f0001
+
+
+
+
+
+*/
 
 
 void convert_to_instrument(BNKFile *bnkFile, int index, instrument_t * instr)
@@ -78,10 +103,10 @@ void convert_to_instrument(BNKFile *bnkFile, int index, instrument_t * instr)
 	instr->operators[0].decay = bnkInstr.oplModulator.decay & 15;
 	instr->operators[0].sustain = 15 - (bnkInstr.oplModulator.sustain & 15);
 	instr->operators[0].release = bnkInstr.oplModulator.releaseRate & 15;
-	instr->operators[0].keyScaleLevel = bnkInstr.oplModulator.ksl & 15;
+	instr->operators[0].keyScaleLevel = bnkInstr.oplModulator.ksl & 3;
 	instr->operators[0].frequencyMultiplier = bnkInstr.oplModulator.multiple & 15;
 	instr->operators[0].waveForm = bnkInstr.iModWaveSel & 3;
-	instr->operators[0].outputLevel = bnkInstr.oplModulator.totalLevel & 15;
+	instr->operators[0].outputLevel = bnkInstr.oplModulator.totalLevel & 63;
 	instr->operators[0].hasSustain = (bnkInstr.oplModulator.eg & 1) != 0;
 	instr->operators[0].hasEnvelopeScaling = (bnkInstr.oplModulator.ksr & 1) !=0;
 	instr->operators[0].hasTremolo = (bnkInstr.oplModulator.am & 1) != 0;
@@ -91,10 +116,10 @@ void convert_to_instrument(BNKFile *bnkFile, int index, instrument_t * instr)
 	instr->operators[1].decay = bnkInstr.oplCarrier.decay & 15;
 	instr->operators[1].sustain = 15 - (bnkInstr.oplCarrier.sustain & 15);
 	instr->operators[1].release = bnkInstr.oplCarrier.releaseRate & 15;
-	instr->operators[1].keyScaleLevel = bnkInstr.oplCarrier.ksl & 15;
+	instr->operators[1].keyScaleLevel = bnkInstr.oplCarrier.ksl & 3;
 	instr->operators[1].frequencyMultiplier = bnkInstr.oplCarrier.multiple & 15;
 	instr->operators[1].waveForm = bnkInstr.iCarWaveSel & 3;
-	instr->operators[1].outputLevel = bnkInstr.oplCarrier.totalLevel & 15;
+	instr->operators[1].outputLevel = bnkInstr.oplCarrier.totalLevel & 63;
 	instr->operators[1].hasSustain = (bnkInstr.oplCarrier.eg & 1) != 0;
 	instr->operators[1].hasEnvelopeScaling = (bnkInstr.oplCarrier.ksr & 1) !=0;
 	instr->operators[1].hasTremolo = (bnkInstr.oplCarrier.am & 1) != 0;
@@ -135,8 +160,9 @@ int main()
 		printf("No adlib present\n");
 		return -1;
 	}
+	bool escape = false;
 	opl2_reset();
-	BNKFile *bnkFile = bnkfile_read("STD2.BNK");
+	BNKFile *bnkFile = bnkfile_read("STD3.BNK");
 
 	assert(strncmp(bnkFile->header->signature, "ADLIB-", 6) == 0);
 	printf("bankfile loaded: %d instruments\n", bnkFile->header->numInstuments);
@@ -162,25 +188,39 @@ int main()
 		}
 		printf("\n");
 		convert_to_instrument(bnkFile, j, &inst);
-		printf("A:%02d D:%02d S:%02d R:%02d --- A:%02d D:%02d S:%02d R:%02d\n",
+
+		printf("A:%02d D:%02d S:%02d R:%02d K%d L%02d %s%s%s%s | A:%02d D:%02d S:%02d R:%02d K%d L%02d %s%s%s%s FB:%d\n",
 			inst.operators[1].attack,
 			inst.operators[1].decay,
 			inst.operators[1].sustain,
 			inst.operators[1].release,
+			inst.operators[1].keyScaleLevel,
+			inst.operators[1].outputLevel,
+			inst.operators[1].hasEnvelopeScaling?"E":" ",
+			inst.operators[1].hasSustain?"S":" ",
+			inst.operators[1].hasTremolo?"T":" ",
+			inst.operators[1].hasVibrato?"V":" ",
 			inst.operators[0].attack,
 			inst.operators[0].decay,
 			inst.operators[0].sustain,
-			inst.operators[0].release
+			inst.operators[0].release,
+			inst.operators[0].keyScaleLevel,
+			inst.operators[0].outputLevel,
+			inst.operators[0].hasEnvelopeScaling?"E":" ",
+			inst.operators[0].hasSustain?"S":" ",
+			inst.operators[0].hasTremolo?"T":" ",
+			inst.operators[0].hasVibrato?"V":" ",
+			inst.feedback
 		);
 		printf("\n");
 
 		opl2_setInstrument(0, &inst, 1);
-		if (bnkFile->instruments[j].isPercussive) {
+		if (inst.isPercussive) {
 			opl2_setDrumInstrument(&inst, inst.drumType, 1);
 		}
 
 		for(int i = 0; i < 2; i++) {
-			if (bnkFile->instruments[j].isPercussive) {
+			if (inst.isPercussive) {
 
 				opl2_playDrum(inst.drumType, i, 0);
 				delay(300);
@@ -197,10 +237,14 @@ int main()
 			opl2_setKeyOn(0, false);
 			delay(10);
 			if (kbhit()) {
-				break;
+				char ch = getch();
+				switch (ch) {
+					case 27: escape=true; break;
+					case 'r': opl2_reset(); break;
+				}
 			}
 		}
-		if (kbhit()) {
+		if (escape) {
 			break;
 		}
 	}
