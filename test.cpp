@@ -8,72 +8,9 @@
 #include "bnkfile.h"
 #include "opl2.h"
 
-void convert_to_instrument(BNKFile *bnkFile, int index, instrument_t * instr)
-{
-	BNKInstrument bnkInstr = bnkFile->instruments[index];
-
-	instr->operators[0].attack = bnkInstr.oplModulator.attack & 15;
-	instr->operators[0].decay = bnkInstr.oplModulator.decay & 15;
-	instr->operators[0].sustain = (bnkInstr.oplModulator.sustain & 15);
-
-	instr->operators[0].release = bnkInstr.oplModulator.releaseRate & 15;
-	instr->operators[0].keyScaleLevel = bnkInstr.oplModulator.ksl & 3;
-	instr->operators[0].frequencyMultiplier = bnkInstr.oplModulator.multiple & 15;
-	instr->operators[0].waveForm = bnkInstr.iModWaveSel & 3;
-	instr->operators[0].outputLevel = (bnkInstr.oplModulator.totalLevel & 63);
-
-	instr->operators[0].hasSustain = (bnkInstr.oplModulator.eg & 1) != 0;
-	instr->operators[0].hasEnvelopeScaling = (bnkInstr.oplModulator.ksr & 1) !=0;
-	instr->operators[0].hasTremolo = (bnkInstr.oplModulator.am & 1) != 0;
-	instr->operators[0].hasVibrato = (bnkInstr.oplModulator.vib & 1) != 0;
-
-	instr->operators[1].attack = bnkInstr.oplCarrier.attack & 15;
-	instr->operators[1].decay = bnkInstr.oplCarrier.decay & 15;
-	instr->operators[1].sustain = (bnkInstr.oplCarrier.sustain & 15);
-
-	instr->operators[1].release = bnkInstr.oplCarrier.releaseRate & 15;
-	instr->operators[1].keyScaleLevel = bnkInstr.oplCarrier.ksl & 3;
-	instr->operators[1].frequencyMultiplier = bnkInstr.oplCarrier.multiple & 15;
-	instr->operators[1].waveForm = bnkInstr.iCarWaveSel & 3;
-
-	instr->operators[1].outputLevel = (bnkInstr.oplCarrier.totalLevel & 63);
-	instr->operators[1].hasSustain = (bnkInstr.oplCarrier.eg & 1) != 0;
-	instr->operators[1].hasEnvelopeScaling = (bnkInstr.oplCarrier.ksr & 1) !=0;
-	instr->operators[1].hasTremolo = (bnkInstr.oplCarrier.am & 1) != 0;
-	instr->operators[1].hasVibrato = (bnkInstr.oplCarrier.vib & 1) != 0;
-	instr->feedback = bnkInstr.oplModulator.feedback & 0x07;
-	instr->isAdditiveSynth = (bnkInstr.oplModulator.con & 1) == 0;
-	instr->isPercussive = (bnkInstr.isPercussive & 1) != 0;
-	switch (bnkInstr.voiceNum) {
-		case 6:
-			instr->drumType = OPL2_DRUM_BASS;
-			break;
-
-		case 7:
-			instr->drumType = OPL2_DRUM_SNARE;
-			break;
-
-		case 8:
-			instr->drumType = OPL2_DRUM_TOM;
-			break;
-
-		case 9:
-			instr->drumType = OPL2_DRUM_CYMBAL;
-			break;
-
-		case 10:
-			instr->drumType = OPL2_DRUM_HI_HAT;
-			break;
-
-		default:
-			instr->drumType = 0;
-	}
-}
-
-
 int main()
 {
-	int idx = 0, tries =0;
+	int idx = 0, tries = 0;
 	for (tries = 0; tries < 3; tries++) {
 		// retry a couple times before just quitting.
 		// sometimes, adlib just has a monday and
@@ -91,12 +28,12 @@ int main()
 	bool escape = false;
 	opl2_reset();
 
-	BNKFile *bnkFile = bnkfile_read("STANDARD.BNK");
+	bnk_file_t *bnkFile = bnkfile_read("STANDARD.BNK");
 
 	assert(strncmp(bnkFile->header->signature, "ADLIB-", 6) == 0);
 	printf("bankfile loaded: %d instruments\n", bnkFile->header->numInstuments);
 
-	printf("sizeof(bnkinstrument) = %d\n", sizeof(BNKInstrument));
+	printf("sizeof(bnkinstrument) = %d\n", sizeof(bnk_instrument_t));
 	printf("\n\nNow testing all instruments. Sometimes it can get noisy.\n");
 	printf("Then, press R to make this program shut up.\n");
 	printf("Or ESC to cancel the test.\n\n");
@@ -104,20 +41,10 @@ int main()
 
 	instrument_t inst = {0};
 	for (int j = 0; j < bnkFile->header->numInstuments; j++) {
-		// if (!bnkFile->instruments[j].isPercussive) {
-		// 	continue;
-		// }
+		bnk_convert_to_instrument(bnkFile, j, &inst);
 		printf("Testing instrument %d: %s", j, bnkFile->entries[j].name);
 		idx = bnkFile->entries[j].index;
-		printf(" (%s)", bnkFile->instruments[idx].isPercussive ? "drum" : "melo");
-		printf(" (%d)", bnkFile->instruments[idx].voiceNum);
-		printf(" (con: %d)\n", bnkFile->instruments[idx].oplModulator.con);
-		for (size_t k = 0; k < 30; k++) {
-			uint8_t *ptr = (uint8_t *)&(bnkFile->instruments[idx]);
-			printf("%02x", ptr[k]);
-		}
-		printf("\n");
-		convert_to_instrument(bnkFile, idx, &inst);
+		printf(" (%s %s)\n", inst.isPercussive ? "drum" : "melo", inst.isAdditiveSynth?"as":"fm");
 
 		printf("A:%02d D:%02d S:%02d R:%02d K%d L%02d %s%s%s%s | A:%02d D:%02d S:%02d R:%02d K%d L%02d %s%s%s%s FB:%d\n",
 			inst.operators[1].attack,

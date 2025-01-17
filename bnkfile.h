@@ -6,16 +6,18 @@
 #define BNK_ERR_WRITE_FAILED 2
 
 #include <stdint.h>
+#include "opl2.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-static int bnkfile_last_error = 0;
+static int bnk_last_error = 0;
 
 // https://moddingwiki.shikadi.net/wiki/AdLib_Instrument_Bank_Format
 
-typedef struct BNKHeader {
+typedef struct __bnk_header
+{
 	uint8_t  versionMajor;
 	uint8_t  versionMinor;
 	char     signature[6];
@@ -24,16 +26,16 @@ typedef struct BNKHeader {
 	int32_t  offsetNames;
 	int32_t  offsetData;
 	char		 pad[8];
-} BNKHeader;
+} bnk_header_t;
 
-typedef struct
+typedef struct __bnk_entry
 {
 	uint16_t index;
 	uint8_t  isUsed;
 	char     name[9];
-} BNKEntry;
+} bnk_entry_t;
 
-typedef struct OPLREGS {
+typedef struct __bnk_operator {
 	uint8_t ksl;
 	uint8_t multiple;
 	uint8_t feedback;
@@ -47,29 +49,30 @@ typedef struct OPLREGS {
 	uint8_t vib; /* vibrato */
 	uint8_t ksr; /* key scaling/envelope rate = "hasEnvelopeScaling"*/
 	uint8_t con; /* connector */
-} OPLREGS;
+} bnk_operator_t;
 
-typedef struct BNKInstrument {
+typedef struct __bnk_instrument {
 	uint8_t isPercussive;
 	uint8_t voiceNum; /* 	Voice number (percussive only) */
-	OPLREGS oplModulator;
-	OPLREGS oplCarrier;
+	bnk_operator_t oplModulator;
+	bnk_operator_t oplCarrier;
 	uint8_t iModWaveSel;
 	uint8_t iCarWaveSel;
-} BNKInstrument;
+} bnk_instrument_t;
 
-typedef struct BNKFile {
+typedef struct __bnk_file {
 	uint8_t *buffer;
 	long len;
-	BNKHeader * header;
-	BNKEntry *entries;
-	BNKInstrument *instruments;
-} BNKFile;
+	bnk_header_t * header;
+	bnk_entry_t *entries;
+	bnk_instrument_t *instruments;
+} bnk_file_t;
 
 
-BNKFile * bnkfile_read(char * filename);
-bool bnkfile_write(BNKFile * bnkFile, char *filename);
-void bnkfile_free(BNKFile * bnkFile);
+bnk_file_t * bnkfile_read(char * filename);
+bool bnkfile_write(bnk_file_t * bnkFile, char *filename);
+void bnkfile_free(bnk_file_t * bnkFile);
+void bnk_convert_to_instrument(bnk_file_t *bnkFile, uint16_t entryIndex, instrument_t * instr);
 
 #ifdef __cplusplus
 }
