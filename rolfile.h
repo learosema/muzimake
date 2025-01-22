@@ -9,14 +9,6 @@
 extern "C" {
 #endif
 
-
-
-
-#ifdef __cplusplus
-}
-#endif
-
-
 typedef struct __rol_header {
 	uint16_t majorVersion; // usually 0
 	uint16_t minorVersion; // usually 4
@@ -31,11 +23,18 @@ typedef struct __rol_header {
 	uint8_t  filler[38];
 } rol_header_t;
 
+typedef struct __rol_tempo_event {
+	uint16_t atTick;
+	float tempoMultiplier;
+} rol_tempo_event_t;
+
 typedef struct __rol_tempo_track {
 	char trackName[15]; // usually "tempo"
 	float basicTempo;
-	uint16_t nEvents;
+	uint16_t numEvents;
+	rol_tempo_event_t *tempoEvents;
 } rol_tempo_track_t;
+
 
 /*
 
@@ -47,8 +46,13 @@ E_TEMPO[nEvents]	tempoEvents	Array of tempo events
 
 typedef struct __rol_file {
 	rol_header_t header;
-
+	rol_tempo_track_t tempoTrack;
 } rol_file_t;
+
+
+#ifdef __cplusplus
+}
+#endif
 
 
 
