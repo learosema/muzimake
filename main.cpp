@@ -1,7 +1,9 @@
 #include <stdio.h>
 #include <string.h>
+#if defined(__DOS__)
 #include <conio.h>
 #include <dos.h>
+#endif
 #include "mouse.h"
 #include "textmode.h"
 #include "adlib.h"

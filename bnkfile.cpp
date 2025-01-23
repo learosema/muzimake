@@ -79,26 +79,7 @@ bnk_file_t * bnkfile_read(char * filename)
 	long len;
 
 	fp = fopen(filename, "rb");
-	if (fp == NULL) {
-		bnk_last_error = BNK_ERR_READ_FAILED;
-		return NULL;
-	}
 
-	if (fseek(fp, 0L, SEEK_END) != 0) {
-		bnk_last_error = BNK_ERR_READ_FAILED;
-		return NULL;
-	}
-
-	len = ftell(fp);
-	if (len == -1) {
-		bnk_last_error = BNK_ERR_READ_FAILED;
-		return NULL;
-	}
-
-	if (fseek(fp, 0L, 0) != 0) {
-		bnk_last_error = BNK_ERR_READ_FAILED;
-		return NULL;
-	}
 
 	bnkFile = (bnk_file_t *)malloc(sizeof(bnk_file_t));
 	bnkFile->len = len;
