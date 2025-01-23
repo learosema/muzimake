@@ -13,10 +13,19 @@
 extern "C" {
 #endif
 
+typedef struct __rol_counters {
+	uint16_t numTicks[11];
+	uint16_t numTimbreEvents[11];
+	uint16_t numVolumeEvents[11];
+	uint16_t numPitchEvents[11];
+	uint16_t numTempoEvents;
+} rol_counters_t;
+
 /**
  * ROL Metadata
  */
-typedef struct __rol_header {
+typedef struct __rol_header
+{
 	uint16_t majorVersion; /** usually 0 */
 	uint16_t minorVersion; /** usually 4 */
 	char     signature[40]; /* usually "\roll\default" */
@@ -26,7 +35,7 @@ typedef struct __rol_header {
 	uint16_t scaleX; /** used by editor */
 	uint8_t  reserved; /** unused, set to 0 */
 	uint8_t  isMelodic; /** 1 if melodic, 0 if percussions are used */
-	uint16_t counters[45];
+	rol_counters_t counters[45];
 	uint8_t  filler[38]; /** filler zero-bytes */
 } rol_header_t;
 
@@ -77,17 +86,28 @@ typedef struct __rol_volume_track {
 	rol_volume_event_t *volumeEvents; /** array of volume events */
 } rol_volume_track_t;
 
+typedef struct __rol_pitch_event {
+	uint16_t atTick; /** Time of event, in ticks */
+	float pitch; /** Pitch variation (in range 0.0 - 2.0), nominal pitch value is 1.0 */
+} rol_pitch_event_t;
+
+typedef struct __rol_pitch_track {
+	char trackName[15]; /** track name, 0 term, usually "Pitch ##" */
+	uint16_t numEvents; /** number of events */
+	rol_pitch_event_t *pitchEvents; /** Array of pitch events */
+} rol_pitch_track_t;
 
 typedef struct __rol_file {
 	rol_header_t header;
 	rol_tempo_track_t tempoTrack;
+	rol_voice_track_t voiceTrack;
+	rol_timbre_track_t timbreTrack;
+	rol_volume_event_t volumeTrack;
+	rol_pitch_track_t pitchTrack;
 } rol_file_t;
 
 #ifdef __cplusplus
 }
 #endif
-
-
-
 
 #endif
