@@ -1,7 +1,13 @@
 #include <stdio.h>
+#if defined(__DOS__)
 #include <conio.h>
 #include <i86.h>
 #include <dos.h>
+#else
+void delay(int);
+bool kbhit();
+int getch();
+#endif
 #include <string.h>
 #include <assert.h>
 
@@ -41,7 +47,7 @@ int main()
 
 	instrument_t inst = {0};
 	for (int j = 0; j < bnkFile->header->numInstuments; j++) {
-		bnk_convert_to_instrument(bnkFile, j, &inst);
+		inst = bnk_convert_to_instrument(bnkFile->instruments[j]);
 		printf("Testing instrument %d: %s", j, bnkFile->entries[j].name);
 		idx = bnkFile->entries[j].index;
 		printf(" (%s %s)\n", inst.isPercussive ? "drum" : "melo", inst.isAdditiveSynth?"as":"fm");

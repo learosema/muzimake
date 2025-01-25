@@ -2,16 +2,17 @@
  * ROL File
  * implemented according to the documentation from here:
  * https://moddingwiki.shikadi.net/wiki/ROL_Format
- *
+ * kudos to Chris Holmes and binarymaster
+ * for reverse engineering it <3
  */
 #ifndef __ROLFILE_H__
 #define __ROLFILE_H__
-#include <stdint.h>
-
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+#include <stdint.h>
 
 #define NUM_VOICE_TRACKS 11
 #define NUM_TIMBRE_TRACKS 11
@@ -43,7 +44,7 @@ typedef struct __rol_header
 	uint16_t scaleX; /** used by editor */
 	uint8_t  reserved; /** unused, set to 0 */
 	uint8_t  isMelodic; /** 1 if melodic, 0 if percussions are used */
-	rol_counters_t counters[NUM_TRACKS];
+	rol_counters_t counters;
 	uint8_t  filler[38]; /** filler zero-bytes */
 } rol_header_t;
 
@@ -110,12 +111,14 @@ typedef struct __rol_file {
 	rol_tempo_track_t tempoTrack;
 	rol_voice_track_t voiceTrack[NUM_VOICE_TRACKS];
 	rol_timbre_track_t timbreTrack[NUM_TIMBRE_TRACKS];
-	rol_volume_event_t volumeTrack[NUM_VOLUME_TRACKS];
+	rol_volume_track_t volumeTrack[NUM_VOLUME_TRACKS];
 	rol_pitch_track_t pitchTrack[NUM_PITCH_TRACKS];
 } rol_file_t;
+
+bool rolfile_read(rol_file_t *rolFile, char *filename);
+void rolfile_dispose(rol_file_t *rolFile);
 
 #ifdef __cplusplus
 }
 #endif
-
 #endif

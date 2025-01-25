@@ -8,67 +8,69 @@
  * @param entryIndex the index of the instrument in the namelist
  * (beware, not necessarily the same as the instrument index)
  */
-void bnk_convert_to_instrument(bnk_file_t *bnkFile, uint16_t entryIndex, instrument_t * instr)
+instrument_t bnk_convert_to_instrument(bnk_instrument_t bnkInstr)
 {
-	uint16_t index = bnkFile->entries[entryIndex].index;
-	bnk_instrument_t bnkInstr = bnkFile->instruments[index];
+	instrument_t result = {0};
 
-	instr->operators[0].attack = bnkInstr.oplModulator.attack & 15;
-	instr->operators[0].decay = bnkInstr.oplModulator.decay & 15;
-	instr->operators[0].sustain = (bnkInstr.oplModulator.sustain & 15);
+	result.operators[0].attack = bnkInstr.oplModulator.attack & 15;
+	result.operators[0].decay = bnkInstr.oplModulator.decay & 15;
+	result.operators[0].sustain = (bnkInstr.oplModulator.sustain & 15);
 
-	instr->operators[0].release = bnkInstr.oplModulator.releaseRate & 15;
-	instr->operators[0].keyScaleLevel = bnkInstr.oplModulator.ksl & 3;
-	instr->operators[0].frequencyMultiplier = bnkInstr.oplModulator.multiple & 15;
-	instr->operators[0].waveForm = bnkInstr.iModWaveSel & 3;
-	instr->operators[0].outputLevel = (bnkInstr.oplModulator.totalLevel & 63);
+	result.operators[0].release = bnkInstr.oplModulator.releaseRate & 15;
+	result.operators[0].keyScaleLevel = bnkInstr.oplModulator.ksl & 3;
+	result.operators[0].frequencyMultiplier = bnkInstr.oplModulator.multiple & 15;
+	result.operators[0].waveForm = bnkInstr.iModWaveSel & 3;
+	result.operators[0].outputLevel = (bnkInstr.oplModulator.totalLevel & 63);
 
-	instr->operators[0].hasSustain = (bnkInstr.oplModulator.eg & 1) != 0;
-	instr->operators[0].hasEnvelopeScaling = (bnkInstr.oplModulator.ksr & 1) !=0;
-	instr->operators[0].hasTremolo = (bnkInstr.oplModulator.am & 1) != 0;
-	instr->operators[0].hasVibrato = (bnkInstr.oplModulator.vib & 1) != 0;
+	result.operators[0].hasSustain = (bnkInstr.oplModulator.eg & 1) != 0;
+	result.operators[0].hasEnvelopeScaling = (bnkInstr.oplModulator.ksr & 1) !=0;
+	result.operators[0].hasTremolo = (bnkInstr.oplModulator.am & 1) != 0;
+	result.operators[0].hasVibrato = (bnkInstr.oplModulator.vib & 1) != 0;
 
-	instr->operators[1].attack = bnkInstr.oplCarrier.attack & 15;
-	instr->operators[1].decay = bnkInstr.oplCarrier.decay & 15;
-	instr->operators[1].sustain = (bnkInstr.oplCarrier.sustain & 15);
+	result.operators[1].attack = bnkInstr.oplCarrier.attack & 15;
+	result.operators[1].decay = bnkInstr.oplCarrier.decay & 15;
+	result.operators[1].sustain = (bnkInstr.oplCarrier.sustain & 15);
 
-	instr->operators[1].release = bnkInstr.oplCarrier.releaseRate & 15;
-	instr->operators[1].keyScaleLevel = bnkInstr.oplCarrier.ksl & 3;
-	instr->operators[1].frequencyMultiplier = bnkInstr.oplCarrier.multiple & 15;
-	instr->operators[1].waveForm = bnkInstr.iCarWaveSel & 3;
+	result.operators[1].release = bnkInstr.oplCarrier.releaseRate & 15;
+	result.operators[1].keyScaleLevel = bnkInstr.oplCarrier.ksl & 3;
+	result.operators[1].frequencyMultiplier = bnkInstr.oplCarrier.multiple & 15;
+	result.operators[1].waveForm = bnkInstr.iCarWaveSel & 3;
 
-	instr->operators[1].outputLevel = (bnkInstr.oplCarrier.totalLevel & 63);
-	instr->operators[1].hasSustain = (bnkInstr.oplCarrier.eg & 1) != 0;
-	instr->operators[1].hasEnvelopeScaling = (bnkInstr.oplCarrier.ksr & 1) !=0;
-	instr->operators[1].hasTremolo = (bnkInstr.oplCarrier.am & 1) != 0;
-	instr->operators[1].hasVibrato = (bnkInstr.oplCarrier.vib & 1) != 0;
-	instr->feedback = bnkInstr.oplModulator.feedback & 0x07;
-	instr->isAdditiveSynth = (bnkInstr.oplModulator.con & 1) == 0;
-	instr->isPercussive = (bnkInstr.isPercussive & 1) != 0;
+	result.operators[1].outputLevel = (bnkInstr.oplCarrier.totalLevel & 63);
+	result.operators[1].hasSustain = (bnkInstr.oplCarrier.eg & 1) != 0;
+	result.operators[1].hasEnvelopeScaling = (bnkInstr.oplCarrier.ksr & 1) !=0;
+	result.operators[1].hasTremolo = (bnkInstr.oplCarrier.am & 1) != 0;
+	result.operators[1].hasVibrato = (bnkInstr.oplCarrier.vib & 1) != 0;
+	result.feedback = bnkInstr.oplModulator.feedback & 0x07;
+	result.isAdditiveSynth = (bnkInstr.oplModulator.con & 1) == 0;
+	result.isPercussive = (bnkInstr.isPercussive & 1) != 0;
+
 	switch (bnkInstr.voiceNum) {
 		case 6:
-			instr->drumType = OPL2_DRUM_BASS;
+			result.drumType = OPL2_DRUM_BASS;
 			break;
 
 		case 7:
-			instr->drumType = OPL2_DRUM_SNARE;
+			result.drumType = OPL2_DRUM_SNARE;
 			break;
 
 		case 8:
-			instr->drumType = OPL2_DRUM_TOM;
+			result.drumType = OPL2_DRUM_TOM;
 			break;
 
 		case 9:
-			instr->drumType = OPL2_DRUM_CYMBAL;
+			result.drumType = OPL2_DRUM_CYMBAL;
 			break;
 
 		case 10:
-			instr->drumType = OPL2_DRUM_HI_HAT;
+			result.drumType = OPL2_DRUM_HI_HAT;
 			break;
 
 		default:
-			instr->drumType = 0;
+			result.drumType = 0;
 	}
+
+	return result;
 }
 
 bnk_file_t * bnkfile_read(char * filename)

@@ -77,7 +77,7 @@ uint16_t file_read_u16be(FILEPTR fp)
 	uint16_t result = 0;
 	file_read(&result, sizeof(uint16_t), 1, fp);
 	#if __LITTLE_ENDIAN__ == 1
-	return byteswap16(result);
+	return byteswap_16(result);
 	#endif
 	return result;
 }
@@ -97,7 +97,7 @@ uint32_t file_read_u32be(FILEPTR fp)
 	uint32_t result = 0;
 	file_read(&result, sizeof(uint32_t), 1, fp);
 	#if __LITTLE_ENDIAN__ == 1
-	return byteswap32(result);
+	return byteswap_32(result);
 	#endif
 	return result;
 }
@@ -117,7 +117,7 @@ float file_read_f32be(FILEPTR fp)
 	float result = 0;
 	file_read(&result, sizeof(uint32_t), 1, fp);
 	#if __LITTLE_ENDIAN__ == 1
-	return (float)byteswap32((uint32_t)result);
+	return (float)byteswap_32((uint32_t)result);
 	#endif
 	return result;
 }

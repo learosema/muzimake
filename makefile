@@ -2,7 +2,7 @@
 CC = wpp386
 LD = wlink
 SYSTEM=dos4g
-CFLAGS=-zq -zastd=c++0x
+CFLAGS=-zq -zastd=c++0x -bt=dos
 LDFLAGS=
 
 # Source files
@@ -47,6 +47,10 @@ $(TARGET): $(OBJS)
 test: .symbolic postbuild
 	$(CC) $(CFLAGS) test.cpp bnkfile.cpp opl2.cpp
 	$(LD) system $(SYSTEM) $(LDFLAGS) name test.exe file { test$(OBJEXT) bnkfile$(OBJEXT) opl2$(OBJEXT) }
+
+test_rol: .symbolic postbuild
+	$(CC) $(CFLAGS) bnkfile.cpp opl2.cpp byteswap.cpp file.cpp rolfile.cpp test_rol.cpp
+	$(LD) system $(SYSTEM) $(LDFLAGS) name test_rol.exe file { test_rol$(OBJEXT) bnkfile$(OBJEXT) opl2$(OBJEXT) rolfile$(OBJEXT) file$(OBJEXT) byteswap$(OBJEXT) }
 
 # Clean rule
 clean: .symbolic
