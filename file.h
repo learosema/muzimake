@@ -41,7 +41,8 @@ uint16_t file_read_u16be(FILEPTR fp);
 uint32_t file_read_u32be(FILEPTR fp);
 float file_read_f32le(FILEPTR fp);
 float file_read_f32be(FILEPTR fp);
-
+uint16_t byteswap_16(uint16_t in);
+uint32_t byteswap_32(uint32_t in);
 
 
 #ifdef __cplusplus

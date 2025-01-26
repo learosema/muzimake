@@ -49,8 +49,8 @@ test: .symbolic postbuild
 	$(LD) system $(SYSTEM) $(LDFLAGS) name test.exe file { test$(OBJEXT) bnkfile$(OBJEXT) opl2$(OBJEXT) }
 
 test_rol: .symbolic postbuild
-	$(CC) $(CFLAGS) bnkfile.cpp opl2.cpp byteswap.cpp file.cpp rolfile.cpp test_rol.cpp
-	$(LD) system $(SYSTEM) $(LDFLAGS) name test_rol.exe file { test_rol$(OBJEXT) bnkfile$(OBJEXT) opl2$(OBJEXT) rolfile$(OBJEXT) file$(OBJEXT) byteswap$(OBJEXT) }
+	$(CC) $(CFLAGS) bnkfile.cpp opl2.cpp file.cpp rolfile.cpp test_rol.cpp
+	$(LD) system $(SYSTEM) $(LDFLAGS) name test_rol.exe file { test_rol$(OBJEXT) bnkfile$(OBJEXT) opl2$(OBJEXT) file$(OBJEXT) rolfile$(OBJEXT) }
 
 # Clean rule
 clean: .symbolic

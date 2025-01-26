@@ -68,6 +68,7 @@ typedef struct __rol_note_event {
 typedef struct __rol_voice_track {
 	char trackName[LEN_TRACK_NAME]; /** usually "Voix ## (voice no from 0)" */
 	uint16_t numTicks;
+	uint16_t numEvents; /** number of events, computed from numTicks, not part of the ROL file */
 	rol_note_event_t *noteEvents;
 } rol_voice_track_t;
 

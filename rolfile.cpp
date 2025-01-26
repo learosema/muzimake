@@ -8,6 +8,7 @@
 #include "rolfile.h"
 
 #define ALLOC_TYPE(T, N) ((T *)malloc(sizeof(T) * N))
+#define REALLOC_TYPE(P, T, N) ((T *)realloc(P, sizeof(T) * N))
 
 int rol_last_error = 0;
 
@@ -31,84 +32,83 @@ void rolfile_read_tempo_track(FILEPTR fp, rol_file_t *rolFile)
 /**
  * Read voice tracks. Allocates memory for the noteEvents arrays.
  */
-void rolfile_read_voice_tracks(FILEPTR fp, rol_file_t *rolFile)
+void rolfile_read_voice_tracks(FILEPTR fp, rol_file_t *rolFile, uint16_t trackIndex)
 {
-	for (int j = 0; j < NUM_VOICE_TRACKS; j++) {
-		file_read_chars(fp, rolFile->voiceTrack[j].trackName, LEN_TRACK_NAME);
-		rolFile->voiceTrack[j].numTicks = file_read_u16le(fp);
-		uint16_t numTicks = rolFile->voiceTrack[j].numTicks;
+	file_read_chars(fp, rolFile->voiceTrack[trackIndex].trackName, LEN_TRACK_NAME);
 
-		rolFile->voiceTrack[j].noteEvents = ALLOC_TYPE(rol_note_event_t, numTicks);
-		for (uint16_t i = 0; i < numTicks; i++) {
-			rol_note_event_t event;
-			event.note = file_read_u16le(fp);
-			event.duration = file_read_u16le(fp);
+	rolFile->voiceTrack[trackIndex].numTicks = file_read_u16le(fp);
 
-			rolFile->voiceTrack[j].noteEvents[i] = event;
-		}
+	uint16_t numTicks = rolFile->voiceTrack[trackIndex].numTicks;
+	uint16_t count = 0;
+	rol_note_event_t *events = ALLOC_TYPE(rol_note_event_t, numTicks);
+	for (uint16_t i = 0, tick = 0; tick < numTicks; i++) {
+		rol_note_event_t event;
+		event.note = file_read_u16le(fp);
+		event.duration = file_read_u16le(fp);
+		events[i] = event;
+
+		tick += event.duration;
+		count++;
 	}
+	rolFile->voiceTrack[trackIndex].noteEvents = REALLOC_TYPE(events, rol_note_event_t, count);
+	rolFile->voiceTrack[trackIndex].numEvents = count;
 }
 
 /**
  * Read timbre tracks and allocate memory for events
  */
-void rolfile_read_timbre_tracks(FILEPTR fp, rol_file_t *rolFile)
+void rolfile_read_timbre_track(FILEPTR fp, rol_file_t *rolFile, uint16_t trackIndex)
 {
-	for (int j = 0; j < NUM_TIMBRE_TRACKS; j++) {
-		file_read_chars(fp, rolFile->timbreTrack[j].trackName, LEN_TRACK_NAME);
-		rolFile->voiceTrack[j].numTicks = file_read_u16le(fp);
-		uint16_t numEvents = rolFile->timbreTrack[j].numEvents;
+	file_read_chars(fp, rolFile->timbreTrack[trackIndex].trackName, LEN_TRACK_NAME);
 
-		rolFile->timbreTrack[j].timbreEvents = ALLOC_TYPE(rol_timbre_event_t, numEvents);
-		for (uint16_t i = 0; i < numEvents; i++) {
-			rol_timbre_event_t event;
-			event.atTick = file_read_u16le(fp);
-			file_read_chars(fp, event.instrument, 9);
-			event.filler = file_read_u8(fp);
-			event.unknown = file_read_u16le(fp);
+	uint16_t numEvents = file_read_u16le(fp);
+	rolFile->timbreTrack[trackIndex].numEvents = numEvents;
 
-			rolFile->timbreTrack[j].timbreEvents[i] = event;
-		}
+	rolFile->timbreTrack[trackIndex].timbreEvents = ALLOC_TYPE(rol_timbre_event_t, numEvents);
+	for (uint16_t i = 0; i < numEvents; i++) {
+		rol_timbre_event_t event;
+		event.atTick = file_read_u16le(fp);
+		file_read_chars(fp, event.instrument, 9);
+		event.filler = file_read_u8(fp);
+		event.unknown = file_read_u16le(fp);
+
+		rolFile->timbreTrack[trackIndex].timbreEvents[i] = event;
 	}
 }
 
 /**
  * Read volume tracks and allocate memory for events
  */
-void rolfile_read_volume_tracks(FILEPTR fp, rol_file_t *rolFile)
+void rolfile_read_volume_track(FILEPTR fp, rol_file_t *rolFile, uint16_t trackIndex)
 {
-	for (int j = 0; j < NUM_VOLUME_TRACKS; j++) {
-		file_read_chars(fp, rolFile->volumeTrack[j].trackName, LEN_TRACK_NAME);
-		rolFile->volumeTrack[j].numEvents = file_read_u16le(fp);
-		uint16_t numEvents = rolFile->volumeTrack[j].numEvents;
-		rolFile->volumeTrack[j].volumeEvents = ALLOC_TYPE(rol_volume_event_t, numEvents);
+	file_read_chars(fp, rolFile->volumeTrack[trackIndex].trackName, LEN_TRACK_NAME);
+	uint16_t numEvents = file_read_u16le(fp);
+	rolFile->volumeTrack[trackIndex].numEvents = numEvents;
+	rolFile->volumeTrack[trackIndex].volumeEvents = ALLOC_TYPE(rol_volume_event_t, numEvents);
 
-		for (uint16_t i = 0; i < numEvents; i++) {
-			rol_volume_event_t event;
-			event.atTick = file_read_u16le(fp);
-			event.volume = file_read_f32le(fp);
-			rolFile->volumeTrack[j].volumeEvents[i] = event;
-		}
+	for (uint16_t i = 0; i < numEvents; i++) {
+		rol_volume_event_t event;
+		event.atTick = file_read_u16le(fp);
+		event.volume = file_read_f32le(fp);
+		rolFile->volumeTrack[trackIndex].volumeEvents[i] = event;
 	}
 }
 
 /**
  * Read pitch tracks
  */
-void rolfile_read_pitch_tracks(FILEPTR fp, rol_file_t *rolFile)
+void rolfile_read_pitch_track(FILEPTR fp, rol_file_t *rolFile, uint16_t trackIndex)
 {
-	for (int j = 0; j < NUM_PITCH_TRACKS; j++) {
-		file_read_chars(fp, rolFile->pitchTrack[j].trackName, LEN_TRACK_NAME);
-		uint16_t numEvents = file_read_u16le(fp);
-		rolFile->pitchTrack[j].numEvents = numEvents;
-		rolFile->pitchTrack[j].pitchEvents = ALLOC_TYPE(rol_pitch_event_t, numEvents);
-		for (uint16_t i = 0; i < numEvents; i++) {
-			rol_pitch_event_t event;
-			event.atTick = file_read_u16le(fp);
-			event.pitch = file_read_f32le(fp);
+	file_read_chars(fp, rolFile->pitchTrack[trackIndex].trackName, LEN_TRACK_NAME);
+	uint16_t numEvents = file_read_u16le(fp);
+	rolFile->pitchTrack[trackIndex].numEvents = numEvents;
+	rolFile->pitchTrack[trackIndex].pitchEvents = ALLOC_TYPE(rol_pitch_event_t, numEvents);
+	for (uint16_t i = 0; i < numEvents; i++) {
+		rol_pitch_event_t event;
+		event.atTick = file_read_u16le(fp);
+		event.pitch = file_read_f32le(fp);
 
-			rolFile->pitchTrack[j].pitchEvents[i] = event;
-		}
+		rolFile->pitchTrack[trackIndex].pitchEvents[i] = event;
 	}
 }
 
@@ -130,18 +130,26 @@ bool rolfile_read(rol_file_t *rolFile, char *filename)
 	}
 
 	rolfile_read_tempo_track(fp, rolFile);
-	rolfile_read_voice_tracks(fp, rolFile);
-	rolfile_read_timbre_tracks(fp, rolFile);
-	rolfile_read_pitch_tracks(fp, rolFile);
+
+	for (uint16_t trackIndex = 0; trackIndex < 11; trackIndex++) {
+		rolfile_read_voice_tracks(fp, rolFile, trackIndex);
+		rolfile_read_timbre_track(fp, rolFile, trackIndex);
+		rolfile_read_volume_track(fp, rolFile, trackIndex);
+		rolfile_read_pitch_track(fp, rolFile, trackIndex);
+	}
 
 	file_close(fp);
 	return true;
 }
 
+/**
+ * Dispose all allocated memory for tracks and fill the data structure
+ * with zeros.
+ */
 void rolfile_dispose(rol_file_t *rolFile)
 {
 	free(rolFile->tempoTrack.tempoEvents);
-	for (int i = 0; i < 11; i++) {
+	for (int i = 0; i < NUM_VOICE_TRACKS; i++) {
 		free(rolFile->voiceTrack[i].noteEvents);
 		free(rolFile->timbreTrack[i].timbreEvents);
 		free(rolFile->volumeTrack[i].volumeEvents);
