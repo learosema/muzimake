@@ -8,9 +8,11 @@
  * Modified from class- to function-style by SuperIlu:
  * https://github.com/SuperIlu/lib16/
  *
- * [...]
+ * Moved types into "instr.h", extended instruments to also store the drum type
+ * https://github.com/learosema/muzimake/
  *
- * Last updated 2021-01-23
+ * Last updated 2025-01-26
+ *
  * Most recent version of the library can be found at my GitHub: https://github.com/DhrBaksteen/ArduinoOPL2
  * Details about the YM3812 and YMF262 chips can be found at http://www.shikadi.net/moddingwiki/OPL_chip
  *
