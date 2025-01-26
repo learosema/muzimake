@@ -1,6 +1,32 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "bnkfile.h"
+
+#define ALLOC_TYPE(T, N) ((T *)malloc(sizeof(T) * N))
+
+uint8_t bnk_convert_voiceNum_to_drumType(uint8_t voiceNum) {
+	switch (voiceNum) {
+		case 6:
+			return OPL2_DRUM_BASS;
+
+		case 7:
+			return OPL2_DRUM_SNARE;
+
+		case 8:
+			return OPL2_DRUM_TOM;
+
+		case 9:
+			return OPL2_DRUM_CYMBAL;
+			break;
+
+		case 10:
+			return OPL2_DRUM_HI_HAT;
+
+		default:
+			return 0;
+	}
+}
 
 /**
  * Convert an instrument from the bnk file to an opl2.h instrument
@@ -45,32 +71,19 @@ instrument_t bnk_convert_to_instrument(bnk_instrument_t bnkInstr)
 	result.isAdditiveSynth = (bnkInstr.oplModulator.con & 1) == 0;
 	result.isPercussive = (bnkInstr.isPercussive & 1) != 0;
 
-	switch (bnkInstr.voiceNum) {
-		case 6:
-			result.drumType = OPL2_DRUM_BASS;
-			break;
-
-		case 7:
-			result.drumType = OPL2_DRUM_SNARE;
-			break;
-
-		case 8:
-			result.drumType = OPL2_DRUM_TOM;
-			break;
-
-		case 9:
-			result.drumType = OPL2_DRUM_CYMBAL;
-			break;
-
-		case 10:
-			result.drumType = OPL2_DRUM_HI_HAT;
-			break;
-
-		default:
-			result.drumType = 0;
-	}
+	result.drumType = bnk_convert_voiceNum_to_drumType(bnkInstr.voiceNum);
 
 	return result;
+}
+
+instrument_map_t bnkfile_create_instrument_map(bnk_file_t * bnkFile) {
+	instrument_map_t map;
+	map.entries = ALLOC_TYPE(instrument_map_entry_t, bnkFile->header->numInstuments);
+	for (uint16_t i = 0; i < bnkFile->header->numInstuments; i++) {
+		strcpy(map.entries[i].name, bnkFile->entries[i].name);
+		map.entries[i].instrument = bnk_convert_to_instrument(bnkFile->instruments[i]);
+	}
+	return map;
 }
 
 bnk_file_t * bnkfile_read(char * filename)
