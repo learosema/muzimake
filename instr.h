@@ -78,6 +78,15 @@ typedef struct __instrument {
     uint8_t transpose;
 } instrument_t;
 
+typedef struct __instrument_map_entry {
+	char name[9];
+	instrument_t instrument;
+} instrument_map_entry_t;
+
+typedef struct __instrument_map {
+	uint16_t numItems;
+	instrument_map_entry_t *entries;
+} instrument_map_t;
 
 #ifdef __cplusplus
 }
