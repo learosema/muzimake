@@ -6,3 +6,5 @@ TEST.EXE
 *.obj
 *.OBJ
 *.o
+
+.DS_Store
