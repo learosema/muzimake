@@ -4,11 +4,11 @@
 #ifdef __DOS__
 #include <dos.h>
 #endif
+#include "macros.h"
 #include "file.h"
 #include "rolfile.h"
 
-#define ALLOC_TYPE(T, N) ((T *)malloc(sizeof(T) * N))
-#define REALLOC_TYPE(P, T, N) ((T *)realloc(P, sizeof(T) * N))
+
 
 int rol_last_error = 0;
 

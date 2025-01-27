@@ -34,7 +34,7 @@ uint8_t bnk_convert_voiceNum_to_drumType(uint8_t voiceNum) {
  * @param entryIndex the index of the instrument in the namelist
  * (beware, not necessarily the same as the instrument index)
  */
-instrument_t bnk_convert_to_instrument(bnk_instrument_t bnkInstr)
+instrument_t bnkfile_convert_to_instrument(bnk_instrument_t bnkInstr)
 {
 	instrument_t result = {0};
 
@@ -76,12 +76,13 @@ instrument_t bnk_convert_to_instrument(bnk_instrument_t bnkInstr)
 	return result;
 }
 
-instrument_map_t bnkfile_create_instrument_map(bnk_file_t * bnkFile) {
-	instrument_map_t map;
-	map.entries = ALLOC_TYPE(instrument_map_entry_t, bnkFile->header->numInstuments);
-	for (uint16_t i = 0; i < bnkFile->header->numInstuments; i++) {
+instrument_map_t bnkfile_convert_to_map(bnk_file_t * bnkFile)
+{
+	instrument_map_t map = instrument_map_create(bnkFile->header->numInstuments);
+	for (uint16_t i = 0; i < bnkFile->header->numInstuments; i++)
+	{
 		strcpy(map.entries[i].name, bnkFile->entries[i].name);
-		map.entries[i].instrument = bnk_convert_to_instrument(bnkFile->instruments[i]);
+		map.entries[i].instrument = bnkfile_convert_to_instrument(bnkFile->instruments[i]);
 	}
 	return map;
 }
@@ -94,7 +95,6 @@ bnk_file_t * bnkfile_read(char * filename)
 	long len;
 
 	fp = fopen(filename, "rb");
-
 
 	bnkFile = (bnk_file_t *)malloc(sizeof(bnk_file_t));
 	bnkFile->len = len;

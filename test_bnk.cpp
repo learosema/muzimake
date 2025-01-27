@@ -4,7 +4,7 @@
 #include <i86.h>
 #include <dos.h>
 #else
-void delay(int);
+void delay(int) { /* stub */ }
 bool kbhit();
 int getch();
 #endif
@@ -47,7 +47,7 @@ int main()
 
 	instrument_t inst = {0};
 	for (int j = 0; j < bnkFile->header->numInstuments; j++) {
-		inst = bnk_convert_to_instrument(bnkFile->instruments[j]);
+		inst = bnkfile_convert_to_instrument(bnkFile->instruments[j]);
 		printf("Testing instrument %d: %s", j, bnkFile->entries[j].name);
 		idx = bnkFile->entries[j].index;
 		printf(" (%s %s)\n", inst.isPercussive ? "drum" : "melo", inst.isAdditiveSynth?"as":"fm");

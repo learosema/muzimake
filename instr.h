@@ -6,6 +6,7 @@ extern "C" {
 #endif
 
 #include <stdint.h>
+//#include "bnkfile.h"
 
 // Generic OPL2 definitions.
 #define OPL2_NUM_CHANNELS 9
@@ -87,6 +88,11 @@ typedef struct __instrument_map {
 	uint16_t numItems;
 	instrument_map_entry_t *entries;
 } instrument_map_t;
+
+instrument_map_t instrument_map_create(uint16_t numInstruments);
+void instrument_map_sort(instrument_map_t map);
+instrument_map_entry_t * instrument_map_find(instrument_map_t map, const char name[9]);
+void instrument_map_dispose(instrument_map_t *map);
 
 #ifdef __cplusplus
 }

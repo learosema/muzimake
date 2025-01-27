@@ -71,7 +71,8 @@ typedef struct __bnk_file {
 bnk_file_t *bnkfile_read(char * filename);
 bool bnkfile_write(bnk_file_t * bnkFile, char *filename);
 void bnkfile_free(bnk_file_t * bnkFile);
-instrument_t bnk_convert_to_instrument(bnk_instrument_t bnkInstr);
+instrument_t bnkfile_convert_to_instrument(bnk_instrument_t bnkInstr);
+instrument_map_t bnkfile_convert_to_map(bnk_file_t * bnkFile);
 
 #ifdef __cplusplus
 }
