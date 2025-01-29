@@ -102,7 +102,17 @@ bnk_file_t * bnkfile_read(char * filename)
 	fread(bnkFile->buffer, sizeof(uint8_t), len, fp);
 
 	bnkFile->header = (bnk_header_t *)bnkFile->buffer;
-	printf("%s loaded :)\nversion %d\.%d %d instruments. total %d\noffset names: %d\noffset data: %d\n", filename,
+
+
+	bnkFile->entries = (bnk_entry_t *)(bnkFile->buffer + bnkFile->header->offsetNames);
+	bnkFile->instruments = (bnk_instrument_t *)(bnkFile->buffer + bnkFile->header->offsetData);
+	fclose(fp);
+	return bnkFile;
+}
+
+void bnkfile_debug(bnk_file_t * bnkFile)
+{
+	fprintf(stderr, "bnkfile version %d\.%d\n%d instruments. total %d\noffset names: %d\noffset data: %d\n",
 		bnkFile->header->versionMajor,
 		bnkFile->header->versionMinor,
 		bnkFile->header->numInstuments,
@@ -110,12 +120,8 @@ bnk_file_t * bnkfile_read(char * filename)
 		bnkFile->header->offsetNames,
 		bnkFile->header->offsetData
 	);
-
-	bnkFile->entries = (bnk_entry_t *)(bnkFile->buffer + bnkFile->header->offsetNames);
-	bnkFile->instruments = (bnk_instrument_t *)(bnkFile->buffer + bnkFile->header->offsetData);
-	fclose(fp);
-	return bnkFile;
 }
+
 
 bool bnkfile_write(bnk_file_t * bnkFile, char *filename)
 {

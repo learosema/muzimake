@@ -53,10 +53,11 @@ something like that myself, for educational purposes.
 
 Like the hard mode in Monkey Island.
 
-## Assets
+## Credits
 
-`STANDARD.BNK` is the default instrument bank library shipped with
-[AdLib Visual Composer](https://vgmpf.com/Wiki/index.php?title=AdLib_Visual_Composer), (C) 1987 Adlib Inc.
-
-`STARTREK.ROL` contains a minimalistic soundtrack of the Startrek TNG TV series,
-created by an unknown artist, originally composed by Dennis McCarthy
+- [Angela Galliat](https://github.com/agalliat/) helped me a lot with the programming and
+  optimization of the software architecture
+- `STANDARD.BNK` is the default instrument bank library shipped with
+  [AdLib Visual Composer](https://vgmpf.com/Wiki/index.php?title=AdLib_Visual_Composer), (C) 1987 Adlib Inc.
+- `STARTREK.ROL` contains a minimalistic soundtrack of the Startrek TNG TV series,
+  created by an unknown artist, originally composed by Dennis McCarthy.
