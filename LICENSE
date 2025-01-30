@@ -1,17 +1,15 @@
-
--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+# Licenses
 
 OPL2 code is taken from @SuperIlu/lib16:
-https://github.com/SuperIlu/lib16/blob/main/LICENSE
+<https://github.com/SuperIlu/lib16/blob/main/LICENSE>
 
 Based on the ArduinoOPL2 code, released unter MIT license
-https://github.com/DhrBaksteen/ArduinoOPL2/blob/master/license.txt
+<https://github.com/DhrBaksteen/ArduinoOPL2/blob/master/license.txt>
 
--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+===
 The other code is licensed under the MIT License, see below:
 
-
-MIT License
+## MIT License
 
 Copyright (c) 2025 Lea Rosema
 
