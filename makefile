@@ -1,9 +1,14 @@
 # Compiler and linker settings
-CC = wpp386
-LD = wlink
+CXX=wpp386
+LD=wlink
 SYSTEM=dos4g
 CFLAGS=-zq -zastd=c++0x -bt=dos
 LDFLAGS=
+
+SRC_DIR=src
+BIN_DIR=bin
+OBJ_DIR=obj
+TEST_DIR=tests
 
 !ifdef __UNIX__
 O_EXT=o
@@ -11,23 +16,23 @@ CP=cp
 RM=rm -f
 RD=rm -rf
 DOS4GW_RUNTIME=$(%WATCOM)/binw/dos4gw.exe
-SRC_DIR=./src/
-BIN_DIR=./bin/
-OBJ_DIR=./obj/
-TEST_DIR=./tests/
 MD_BIN=mkdir -p $(BIN_DIR)
 MD_OBJ=mkdir -p $(OBJ_DIR)
+SRC_DIR_J=$(SRC_DIR)/
+BIN_DIR_J=$(BIN_DIR)/
+TEST_DIR_J=$(TEST_DIR)/
+OBJ_DIR_J=$(OBJ_DIR)/
 !else
 CP=copy
 RM=del
 RD=rd
 DOS4GW_RUNTIME=$(%WATCOM)\binw\dos4gw.exe
 O_EXT=obj
-SRC_DIR=.\src\
-BIN_DIR=.\bin\
-TEST_DIR=.\tests\
-OBJ_DIR=.\obj\
-MD_BIN=if not exist $(BIN_DIR) md $(BIN_DIR)
+SRC_DIR_J=$(SRC_DIR)\
+BIN_DIR_J=$(BIN_DIR)\
+TEST_DIR_J=$(TEST_DIR)\
+OBJ_DIR_J=$(OBJ_DIR)\
+MD_BIN=if not exist bin md bin
 MD_OBJ=if not exist $(OBJ_DIR) md $(OBJ_DIR)
 !endif
 
@@ -36,10 +41,10 @@ TEST_ROL_SRCS=instr.cpp bnkfile.cpp opl2.cpp file.cpp rolfile.cpp test_rol.cpp
 TEST_BNK_SRCS=opl2.cpp instr.cpp bnkfile.cpp test_bnk.cpp
 TESTINST_SRCS=bnkfile.cpp instr.cpp testinst.cpp
 
-OBJS = $(SRCS:.cpp=.o)
-TEST_ROL_OBJS=$(TEST_ROL_SRCS:.cpp=.o)
-TEST_BNK_OBJS=$(TEST_BNK_SRCS:.cpp=.o)
-TESTINST_OBJS=$(TESTINST_SRCS:.cpp=.o)
+OBJS = $(SRCS:.cpp=.$(O_EXT))
+TEST_ROL_OBJS=$(TEST_ROL_SRCS:.cpp=.$(O_EXT))
+TEST_BNK_OBJS=$(TEST_BNK_SRCS:.cpp=.$(O_EXT))
+TESTINST_OBJS=$(TESTINST_SRCS:.cpp=.$(O_EXT))
 
 # Executable name
 TARGET = muzimake.exe
@@ -64,24 +69,24 @@ postbuild: .symbolic
 .cpp: $(SRC_DIR);$(TEST_DIR)
 
 .cpp.$(O_EXT):
-	$(CC) $[@ -i=$(SRC_DIR) -fo=$(OBJ_DIR)$[&.$(O_EXT) $(CFLAGS)
+	$(CXX) $[@ -i=$(SRC_DIR) -fo=$(OBJ_DIR_J)$[&.$(O_EXT) $(CFLAGS)
 
 # Link rule for the executable
 $(TARGET): $(OBJS)
-	$(LD) system $(SYSTEM) $(LDFLAGS) name $(BIN_DIR)$(TARGET) file { $< }
+	$(LD) system $(SYSTEM) $(LDFLAGS) name $(BIN_DIR_J)$(TARGET) file { $< }
 
 testinst.exe: $(TESTINST_OBJS)
-	$(LD) system $(SYSTEM) $(LDFLAGS) name $(BIN_DIR)testinst.exe file { $< }
+	$(LD) system $(SYSTEM) $(LDFLAGS) name $(BIN_DIR_J)testinst.exe file { $< }
 
 test_bnk.exe: $(TEST_BNK_OBJS)
-	$(LD) system $(SYSTEM) $(LDFLAGS) name $(BIN_DIR)test_bnk.exe file { $< }
+	$(LD) system $(SYSTEM) $(LDFLAGS) name $(BIN_DIR_J)test_bnk.exe file { $< }
 
 test_rol.exe: $(TEST_ROL_OBJS)
-	$(LD) system $(SYSTEM) $(LDFLAGS) name $(BIN_DIR)test_rol.exe file { $< }
+	$(LD) system $(SYSTEM) $(LDFLAGS) name $(BIN_DIR_J)test_rol.exe file { $< }
 
 # Clean rule
 clean: .symbolic
-	$(RM) $(BIN_DIR)*.*
+	$(RM) $(BIN_DIR_J)*.*
 	$(RD) $(BIN_DIR)
-	$(RM) $(OBJ_DIR)*.*
+	$(RM) $(OBJ_DIR_J)*.*
 	$(RD) $(OBJ_DIR)
