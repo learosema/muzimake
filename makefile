@@ -13,8 +13,10 @@ RD=rm -rf
 DOS4GW_RUNTIME=$(%WATCOM)/binw/dos4gw.exe
 SRC_DIR=./src/
 BIN_DIR=./bin/
+OBJ_DIR=./obj/
 TEST_DIR=./tests/
 MD_BIN=mkdir -p $(BIN_DIR)
+MD_OBJ=mkdir -p $(OBJ_DIR)
 !else
 CP=copy
 RM=del
@@ -24,7 +26,9 @@ O_EXT=obj
 SRC_DIR=.\src\
 BIN_DIR=.\bin\
 TEST_DIR=.\tests\
+OBJ_DIR=.\obj\
 MD_BIN=if not exist $(BIN_DIR) md $(BIN_DIR)
+MD_OBJ=if not exist $(OBJ_DIR) md $(OBJ_DIR)
 !endif
 
 SRCS=main.cpp textmode.cpp mouse.cpp vga.cpp adlib.cpp instr.cpp opl2.cpp bnkfile.cpp
@@ -48,18 +52,19 @@ all: prebuild $(TARGET) postbuild .symbolic
 tests: prebuild $(TESTS) postbuild .symbolic
 
 prebuild: .symbolic
+	$(MD_OBJ)
 	$(MD_BIN)
 
 postbuild: .symbolic
 	$(CP) $(DOS4GW_RUNTIME) $(BIN_DIR)
 
-.o: $(BIN_DIR)
-.obj: $(BIN_DIR)
+.o: $(OBJ_DIR)
+.obj: $(OBJ_DIR)
 .exe: $(BIN_DIR)
-.cpp: $(SRC_DIR);$(TESTS_DIR)
+.cpp: $(SRC_DIR);$(TEST_DIR)
 
 .cpp.$(O_EXT):
-	$(CC) $[@ -fo=$(BIN_DIR)$[&.$(O_EXT) $(CFLAGS)
+	$(CC) $[@ -i=$(SRC_DIR) -fo=$(OBJ_DIR)$[&.$(O_EXT) $(CFLAGS)
 
 # Link rule for the executable
 $(TARGET): $(OBJS)
@@ -78,3 +83,5 @@ test_rol.exe: $(TEST_ROL_OBJS)
 clean: .symbolic
 	$(RM) $(BIN_DIR)*.*
 	$(RD) $(BIN_DIR)
+	$(RM) $(OBJ_DIR)*.*
+	$(RD) $(OBJ_DIR)
