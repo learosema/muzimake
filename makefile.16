@@ -15,21 +15,15 @@ O_EXT=o
 CP=cp
 RM=rm -f
 RD=rm -rf
+SEP=/
 MD_BIN=mkdir -p $(BIN_DIR)
 MD_OBJ=mkdir -p $(OBJ_DIR)
-SRC_DIR_J=$(SRC_DIR)/
-BIN_DIR_J=$(BIN_DIR)/
-TEST_DIR_J=$(TEST_DIR)/
-OBJ_DIR_J=$(OBJ_DIR)/
 !else
 CP=copy
 RM=del
 RD=rd
+SEP=\
 O_EXT=obj
-SRC_DIR_J=$(SRC_DIR)\
-BIN_DIR_J=$(BIN_DIR)\
-TEST_DIR_J=$(TEST_DIR)\
-OBJ_DIR_J=$(OBJ_DIR)\
 MD_BIN=if not exist bin md bin
 MD_OBJ=if not exist $(OBJ_DIR) md $(OBJ_DIR)
 !endif
@@ -67,24 +61,24 @@ postbuild: .symbolic
 .cpp: $(SRC_DIR);$(TEST_DIR)
 
 .cpp.$(O_EXT):
-	$(CXX) $[@ -i=$(SRC_DIR) -fo=$(OBJ_DIR_J)$[&.$(O_EXT) $(CFLAGS)
+	$(CXX) $[@ -i=$(SRC_DIR) -fo=$(OBJ_DIR)/$[&.$(O_EXT) $(CFLAGS)
 
 # Link rule for the executable
 $(TARGET): $(OBJS)
-	*$(LD) system $(SYSTEM) $(LDFLAGS) name $(BIN_DIR_J)$(TARGET) file { $< }
+	*$(LD) system $(SYSTEM) $(LDFLAGS) name $(BIN_DIR)/$(TARGET) file { $< }
 
 testinst.exe: $(TESTINST_OBJS)
-	*$(LD) system $(SYSTEM) $(LDFLAGS) name $(BIN_DIR_J)testinst.exe file { $< }
+	*$(LD) system $(SYSTEM) $(LDFLAGS) name $(BIN_DIR)/testinst.exe file { $< }
 
 test_bnk.exe: $(TEST_BNK_OBJS)
-	*$(LD) system $(SYSTEM) $(LDFLAGS) name $(BIN_DIR_J)test_bnk.exe file { $< }
+	*$(LD) system $(SYSTEM) $(LDFLAGS) name $(BIN_DIR)/test_bnk.exe file { $< }
 
 test_rol.exe: $(TEST_ROL_OBJS)
-	*$(LD) system $(SYSTEM) $(LDFLAGS) name $(BIN_DIR_J)test_rol.exe file { $< }
+	*$(LD) system $(SYSTEM) $(LDFLAGS) name $(BIN_DIR)/test_rol.exe file { $< }
 
 # Clean rule
 clean: .symbolic
-	$(RM) $(BIN_DIR_J)*.*
+	$(RM) $(BIN_DIR)$(SEP)*.*
 	$(RD) $(BIN_DIR)
-	$(RM) $(OBJ_DIR_J)*.*
+	$(RM) $(OBJ_DIR)$(SEP)*.*
 	$(RD) $(OBJ_DIR)
