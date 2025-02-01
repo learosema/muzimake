@@ -12,14 +12,12 @@ TEST_DIR=tests
 
 !ifdef __UNIX__
 O_EXT=o
-CP=cp
 RM=rm -f
 RD=rm -rf
 SEP=/
 MD_BIN=mkdir -p $(BIN_DIR)
 MD_OBJ=mkdir -p $(OBJ_DIR)
 !else
-CP=copy
 RM=del
 RD=rd
 SEP=\
@@ -53,7 +51,7 @@ prebuild: .symbolic
 	$(MD_BIN)
 
 postbuild: .symbolic
-	$(CP) $(%WATCOM)$(SEP)binw$(SEP)dos4gw.exe $(BIN_DIR)
+	%copy $(%WATCOM)/binw/dos4gw.exe $(BIN_DIR)
 
 .o: $(OBJ_DIR)
 .obj: $(OBJ_DIR)
@@ -61,7 +59,7 @@ postbuild: .symbolic
 .cpp: $(SRC_DIR);$(TEST_DIR)
 
 .cpp.$(O_EXT):
-	$(CXX) $[@ -i=$(SRC_DIR) -fo=$(OBJ_DIR)/$[&.$(O_EXT) $(CFLAGS)
+	*$(CXX) $[@ -i=$(SRC_DIR) -fo=$(OBJ_DIR)/$[&.$(O_EXT) $(CFLAGS)
 
 # Link rule for the executable
 $(TARGET): $(OBJS)
