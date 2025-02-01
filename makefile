@@ -73,16 +73,16 @@ postbuild: .symbolic
 
 # Link rule for the executable
 $(TARGET): $(OBJS)
-	$(LD) system $(SYSTEM) $(LDFLAGS) name $(BIN_DIR_J)$(TARGET) file { $< }
+	*$(LD) system $(SYSTEM) $(LDFLAGS) name $(BIN_DIR_J)$(TARGET) file { $< }
 
 testinst.exe: $(TESTINST_OBJS)
-	$(LD) system $(SYSTEM) $(LDFLAGS) name $(BIN_DIR_J)testinst.exe file { $< }
+	*$(LD) system $(SYSTEM) $(LDFLAGS) name $(BIN_DIR_J)testinst.exe file { $< }
 
 test_bnk.exe: $(TEST_BNK_OBJS)
-	$(LD) system $(SYSTEM) $(LDFLAGS) name $(BIN_DIR_J)test_bnk.exe file { $< }
+	*$(LD) system $(SYSTEM) $(LDFLAGS) name $(BIN_DIR_J)test_bnk.exe file { $< }
 
 test_rol.exe: $(TEST_ROL_OBJS)
-	$(LD) system $(SYSTEM) $(LDFLAGS) name $(BIN_DIR_J)test_rol.exe file { $< }
+	*$(LD) system $(SYSTEM) $(LDFLAGS) name $(BIN_DIR_J)test_rol.exe file { $< }
 
 # Clean rule
 clean: .symbolic
