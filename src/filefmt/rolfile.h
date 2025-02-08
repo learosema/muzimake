@@ -14,6 +14,8 @@ extern "C" {
 
 #include <stdint.h>
 
+#include <filedata.h>
+
 #define NUM_VOICE_TRACKS 11
 #define NUM_TIMBRE_TRACKS 11
 #define NUM_VOLUME_TRACKS 11
@@ -116,8 +118,21 @@ typedef struct __rol_file {
 	rol_pitch_track_t pitchTrack[NUM_PITCH_TRACKS];
 } rol_file_t;
 
-bool rolfile_read(rol_file_t *rolFile, char *filename);
-void rolfile_dispose(rol_file_t *rolFile);
+bool rolfile_read_old(rol_file_t *rolFile, char *filename);
+void rolfile_dispose_old(rol_file_t *rolFile);
+
+void rolfile_init(file_data_t* file);
+void rolfile_read(file_data_t* file, char* filename);
+bool rolfile_write(file_data_t* file, char *filename);
+void rolfile_free(file_data_t* file);
+void rolfile_debug(file_data_t* file);
+
+const file_func_t rolfile_func = {
+	rolfile_init,
+	rolfile_read,
+	rolfile_free,
+	rolfile_debug
+};
 
 #ifdef __cplusplus
 }

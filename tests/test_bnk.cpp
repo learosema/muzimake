@@ -4,15 +4,15 @@
 #include <i86.h>
 #include <dos.h>
 #else
-void delay(int) { /* stub */ }
-bool kbhit();
-int getch();
+#include <stubs.h>
 #endif
 #include <string.h>
 #include <assert.h>
 
-#include "bnkfile.h"
+#include <file.h>
 #include "opl2.h"
+
+#include <bnkfile.h> // TODO: to be removed, when structure is refactored
 
 int main()
 {
@@ -34,7 +34,21 @@ int main()
 	bool escape = false;
 	opl2_reset();
 
-	bnk_file_t *bnkFile = bnkfile_read("STANDARD.BNK");
+	sound_file_t soundfile = NULL;
+
+	file_result_t result;
+	result = file_init(&soundfile, FORMAT_BNK);
+
+	result = file_open(&soundfile, "STANDARD.BNK");
+
+	if(result == ERROR){
+		printf("*** Error ***\n");
+	}
+	else {
+		printf("*** Success ***\n");
+	}
+
+	bnk_file_t* bnkFile = (bnk_file_t*)file_get_raw(&soundfile); // TODO: to be removed, when structure is refactored
 
 	assert(strncmp(bnkFile->header->signature, "ADLIB-", 6) == 0);
 	printf("bankfile loaded: %d instruments\n", bnkFile->header->numInstuments);
@@ -111,6 +125,8 @@ int main()
 			break;
 		}
 	}
+
+	file_close(&soundfile);
 
 	delay(1000);
 	opl2_reset();

@@ -6,7 +6,10 @@
 #define BNK_ERR_WRITE_FAILED 2
 
 #include <stdint.h>
-#include "instr.h"
+
+#include <instrmnt.h>
+
+#include <filedata.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -68,14 +71,23 @@ typedef struct __bnk_file {
 	bnk_instrument_t *instruments;
 } bnk_file_t;
 
-bnk_file_t *bnkfile_read(char * filename);
-bool bnkfile_write(bnk_file_t * bnkFile, char *filename);
-void bnkfile_free(bnk_file_t * bnkFile);
-void bnkfile_debug(bnk_file_t * bnkFile);
 instrument_t bnkfile_convert_to_instrument(bnk_instrument_t bnkInstr);
 instrument_map_t bnkfile_convert_to_map(bnk_file_t * bnkFile);
+
+void bnkfile_init(file_data_t* file);
+void bnkfile_read(file_data_t* file, char* filename);
+bool bnkfile_write(file_data_t* file, char *filename);
+void bnkfile_free(file_data_t* file);
+void bnkfile_debug(file_data_t* file);
+
+const file_func_t bnkfile_func = {
+	bnkfile_init,
+	bnkfile_read,
+	bnkfile_free,
+	bnkfile_debug
+};
 
 #ifdef __cplusplus
 }
 #endif
-#endif
+#endif // __BNKFILE_H__

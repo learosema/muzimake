@@ -1,10 +1,10 @@
-MUZIMAKE.EXE
-DOS4GW.EXE
-TEST.EXE
 *.EXE
 *.exe
 *.obj
 *.OBJ
 *.o
+
+obj/*
+bin/*
 
 .DS_Store

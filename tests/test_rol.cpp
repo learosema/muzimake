@@ -1,12 +1,28 @@
 #include <stdio.h>
-#include "bnkfile.h"
-#include "rolfile.h"
+
+#include <file.h>
+
+#include "rolfile.h" // TODO: to be removed, when structure is refactored
 
 int main() {
-	rol_file_t rol;
-	if (! rolfile_read(&rol, "STARTREK.ROL")) {
-		fprintf(stderr, "Could not load STARTREK.ROL :(\n");
+	sound_file_t soundfile = NULL;
+
+	file_result_t result;
+	result = file_init(&soundfile, FORMAT_ROL);
+
+	result = file_open(&soundfile, "STARTREK.ROL");
+
+	if(result == ERROR){
+		printf("*** Error ***\n");
 	}
+	else {
+		printf("*** Success ***\n");
+	}
+
+	rol_file_t* rolFile = (rol_file_t*)file_get_raw(&soundfile); // TODO: to be removed, when structure is refactored
+
+	rol_file_t rol = *rolFile; // TODO: to be removed, when structure is refactored
+
 	printf("ROL Header size...: %d\n", sizeof(rol_header_t));
 
 	printf("isMelodic.........: %s\n", rol.header.isMelodic ? "true" : "false");
@@ -59,5 +75,5 @@ int main() {
 		printf("\n");
 	}
 
-	rolfile_dispose(&rol);
+	file_close(&soundfile);
 }

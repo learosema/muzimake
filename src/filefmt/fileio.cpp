@@ -1,7 +1,8 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include "file.h"
+
+#include "fileio.h"
 
 uint16_t byteswap_16(uint16_t in)
 {
@@ -16,31 +17,31 @@ uint32_t byteswap_32(uint32_t in)
   	(in >> 24);
 }
 
-FILEPTR file_open(char * fileName, char *mode)
+FILEPTR fileio_open(char * fileName, char *mode)
 {
 	return fopen(fileName, mode);
 }
 
-bool file_eof(FILEPTR fp) {
+bool fileio_eof(FILEPTR fp) {
 	return feof(fp) != 0;
 }
 
-bool file_close(FILEPTR fp)
+bool fileio_close(FILEPTR fp)
 {
 	return (fclose(fp) == 0);
 }
 
-size_t file_write(void * buffer, size_t size, size_t nItems, FILEPTR fp)
+size_t fileio_write(void * buffer, size_t size, size_t nItems, FILEPTR fp)
 {
 	return fwrite(buffer, size, nItems, fp);
 }
 
-size_t file_read(void * buffer, size_t size, size_t nItems, FILEPTR fp)
+size_t fileio_read(void * buffer, size_t size, size_t nItems, FILEPTR fp)
 {
 	return fread(buffer, size, nItems, fp);
 }
 
-long file_get_size(FILEPTR fp)
+long fileio_get_size(FILEPTR fp)
 {
 	long len;
 	if (fp == NULL) {
@@ -62,72 +63,72 @@ long file_get_size(FILEPTR fp)
 	return len;
 }
 
-size_t file_read_chars(FILEPTR fp, char *chars, int n)
+size_t fileio_read_chars(FILEPTR fp, char *chars, int n)
 {
-	return file_read(chars, sizeof(char), n, fp);
+	return fileio_read(chars, sizeof(char), n, fp);
 }
 
-uint8_t file_read_u8(FILEPTR fp)
+uint8_t fileio_read_u8(FILEPTR fp)
 {
 	uint8_t b = 0;
-	file_read(&b, sizeof(uint8_t), 1, fp);
+	fileio_read(&b, sizeof(uint8_t), 1, fp);
 	return b;
 }
 
-uint16_t file_read_u16le(FILEPTR fp)
+uint16_t fileio_read_u16le(FILEPTR fp)
 {
 	uint16_t result = 0;
-	file_read(&result, sizeof(uint16_t), 1, fp);
+	fileio_read(&result, sizeof(uint16_t), 1, fp);
 	#if __LITTLE_ENDIAN__ == 0
 	return byteswap16(result);
 	#endif
 	return result;
 }
 
-uint16_t file_read_u16be(FILEPTR fp)
+uint16_t fileio_read_u16be(FILEPTR fp)
 {
 	uint16_t result = 0;
-	file_read(&result, sizeof(uint16_t), 1, fp);
+	fileio_read(&result, sizeof(uint16_t), 1, fp);
 	#if __LITTLE_ENDIAN__ == 1
 	return byteswap_16(result);
 	#endif
 	return result;
 }
 
-uint32_t file_read_u32le(FILEPTR fp)
+uint32_t fileio_read_u32le(FILEPTR fp)
 {
 	uint32_t result = 0;
-	file_read(&result, sizeof(uint32_t), 1, fp);
+	fileio_read(&result, sizeof(uint32_t), 1, fp);
 	#if __LITTLE_ENDIAN__ == 0
 	return byteswap32(result);
 	#endif
 	return result;
 }
 
-uint32_t file_read_u32be(FILEPTR fp)
+uint32_t fileio_read_u32be(FILEPTR fp)
 {
 	uint32_t result = 0;
-	file_read(&result, sizeof(uint32_t), 1, fp);
+	fileio_read(&result, sizeof(uint32_t), 1, fp);
 	#if __LITTLE_ENDIAN__ == 1
 	return byteswap_32(result);
 	#endif
 	return result;
 }
 
-float file_read_f32le(FILEPTR fp)
+float fileio_read_f32le(FILEPTR fp)
 {
 	float result = 0;
-	file_read(&result, sizeof(float), 1, fp);
+	fileio_read(&result, sizeof(float), 1, fp);
 	#if __LITTLE_ENDIAN__ == 0
 	return (uint32_t)byteswap32((uint32_t)result);
 	#endif
 	return result;
 }
 
-float file_read_f32be(FILEPTR fp)
+float fileio_read_f32be(FILEPTR fp)
 {
 	float result = 0;
-	file_read(&result, sizeof(uint32_t), 1, fp);
+	fileio_read(&result, sizeof(uint32_t), 1, fp);
 	#if __LITTLE_ENDIAN__ == 1
 	return (float)byteswap_32((uint32_t)result);
 	#endif

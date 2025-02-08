@@ -1,8 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "macros.h"
-#include "instr.h"
+
+#include <macros.h>
+
+#include "instrmnt.h"
 
 
 instrument_map_t instrument_map_create(uint16_t numInstruments)

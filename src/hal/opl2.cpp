@@ -19,8 +19,13 @@
  * https://github.com/DhrBaksteen/ArduinoOPL2
  */
 
+#if defined(__DOS__)
 #include <conio.h>
 #include <i86.h>
+#include <dos.h>
+#else
+#include <stubs.h>
+#endif
 #include <stdlib.h>
 #include "opl2.h"
 
