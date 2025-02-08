@@ -1,6 +1,9 @@
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include <fileio.h>
+#include <opl2.h>
+
 #include "bnkfile.h"
 
 #define ALLOC_TYPE(T, N) ((T *)malloc(sizeof(T) * N))
@@ -87,31 +90,38 @@ instrument_map_t bnkfile_convert_to_map(bnk_file_t * bnkFile)
 	return map;
 }
 
-bnk_file_t * bnkfile_read(char * filename)
+//-----------------------------------------------
+
+void bnkfile_init(file_data_t* file)
 {
-	FILE * fp;
-	bnk_file_t *bnkFile = NULL;
-	int i;
-	long len;
+	file->type = INSTRUMENT_BANK;
+}
 
-	fp = fopen(filename, "rb");
+void bnkfile_read(file_data_t* file, char* filename)
+{
+	FILEPTR fp = fileio_open(filename, "rb");
 
-	bnkFile = (bnk_file_t *)malloc(sizeof(bnk_file_t));
+	long len = fileio_get_size(fp);
+
+	bnk_file_t* bnkFile = (bnk_file_t *)malloc(sizeof(bnk_file_t));
 	bnkFile->len = len;
 	bnkFile->buffer = (uint8_t *)malloc(len * sizeof(uint8_t));
-	fread(bnkFile->buffer, sizeof(uint8_t), len, fp);
+	fileio_read(bnkFile->buffer, sizeof(uint8_t), len, fp);
 
 	bnkFile->header = (bnk_header_t *)bnkFile->buffer;
 
-
 	bnkFile->entries = (bnk_entry_t *)(bnkFile->buffer + bnkFile->header->offsetNames);
 	bnkFile->instruments = (bnk_instrument_t *)(bnkFile->buffer + bnkFile->header->offsetData);
-	fclose(fp);
-	return bnkFile;
+
+	fileio_close(fp);
+
+	file->data = bnkFile; // TODO: to be removed, when structure is refactored
 }
 
-void bnkfile_debug(bnk_file_t * bnkFile)
+void bnkfile_debug(file_data_t* file)
 {
+	bnk_file_t* bnkFile = (bnk_file_t*)file->data; // TODO: to be removed, when structure is refactored
+
 	fprintf(stderr, "bnkfile version %d\.%d\n%d instruments. total %d\noffset names: %d\noffset data: %d\n",
 		bnkFile->header->versionMajor,
 		bnkFile->header->versionMinor,
@@ -122,22 +132,25 @@ void bnkfile_debug(bnk_file_t * bnkFile)
 	);
 }
 
-
-bool bnkfile_write(bnk_file_t * bnkFile, char *filename)
+bool bnkfile_write(file_data_t* file, char* filename)
 {
-	FILE * fp = fopen(filename, "wb");
+	bnk_file_t* bnkFile = (bnk_file_t*)file->data; // TODO: to be removed, when structure is refactored
+
+	FILE * fp = fileio_open(filename, "wb");
 	if (fp == NULL) {
 		bnk_last_error = BNK_ERR_WRITE_FAILED;
 		return false;
 	}
-	fwrite(bnkFile->buffer, sizeof(uint8_t), bnkFile->len, fp);
-	fclose(fp);
+	fileio_write(bnkFile->buffer, sizeof(uint8_t), bnkFile->len, fp);
+	fileio_close(fp);
+
 	return true;
 }
 
-
-void bnkfile_free(bnk_file_t * bnkFile)
+void bnkfile_free(file_data_t* file)
 {
+	bnk_file_t* bnkFile = (bnk_file_t*)file->data; // TODO: to be removed, when structure is refactored
+
 	if (bnkFile->header) free(bnkFile->buffer);
 	bnkFile->buffer = NULL;
 	bnkFile->header = NULL;

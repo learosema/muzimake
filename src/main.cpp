@@ -3,10 +3,11 @@
 #if defined(__DOS__)
 #include <conio.h>
 #include <dos.h>
+#else
+#include <stubs.h>
 #endif
-#include "mouse.h"
-#include "textmode.h"
-#include "adlib.h"
+#include "textui/mouse.h"
+#include "textui/textmode.h"
 
 bool g_hasMouse;
 MOUSE_STATUS g_mouse;
@@ -27,7 +28,7 @@ int main()
 	textmode_fill_area(1,5,4,5, '.', 0x3f);
 	textmode_box(12,3,30,7,0x4f);
 	textmode_dblbox(15,14,30,7,0x2e);
-	adlib_drum_machine();
+
 	while (!kbhit()) {
 		textmode_gotoxy(1,1);
 		mouse_get_status(&g_mouse);
