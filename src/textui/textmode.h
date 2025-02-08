@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 
-
+#ifdef __DOS__
 #ifdef __386__
 #define INTR int386
 #define VRAMPTR uint8_t *
@@ -17,6 +17,15 @@
 #define TEXT_VRAM_BASE (uint8_t far *)(0xb8000000)
 #define TEXT_VRAM_BASE_MONO (uint8_t far *)(0xb0000000)
 #endif
+#else
+#include <intstubs.h>
+#define INTR int86
+#define VRAMPTR uint8_t *
+#define TEXT_VRAM_BASE (uint8_t *)0x0
+#define TEXT_VRAM_BASE_MONO (uint8_t *)0x0
+#define BIOS_VIDEO_PORT_ADDRESS (uint16_t *)(0x0)
+#endif
+
 
 #define PAGE_SIZE_80X25 0x1000
 #define PAGE_SIZE_80X50 0x2040
@@ -107,9 +116,9 @@ void textmode_box(
 
 void textmode_dblbox(
 	int x,
-	int y, 
+	int y,
 	uint8_t width,
-	uint8_t height, 
+	uint8_t height,
 	uint8_t color
 );
 

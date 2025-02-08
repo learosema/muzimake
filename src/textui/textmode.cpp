@@ -1,6 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
+#ifdef __DOS__
 #include <dos.h>
+#else
+#include <intstubs.h>
+#endif
 #include <string.h>
 
 #include "textmode.h"
@@ -72,7 +76,7 @@ void textmode_set_page(uint8_t page)
 
 	union REGS regs;
 	regs.h.ah = 0x05;
-	regs.h.al =
+	regs.h.al = page;
 	INTR(0x10, &regs, &regs);
 	g_currentMode.page = page;
 }
