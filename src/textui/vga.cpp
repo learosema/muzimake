@@ -1,4 +1,9 @@
+#ifdef (__DOS__ && __WATCOM__)
 #include <conio.h>
+#else
+#include <stubs.h>
+#endif
+
 /*
 
 TODO: turbo c++ seems to use dos.h, mem.h or something,

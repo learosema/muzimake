@@ -1,6 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
+#ifdef __DOS__
 #include <dos.h>
+#else
+#include <intstubs.h>
+#endif
 #include <string.h>
 
 #include "textmode.h"
@@ -95,11 +99,12 @@ void textmode_set_page(uint8_t page)
 	if (g_currentMode.pageSize == PAGE_SIZE_80X25 && page >= 4) {
 		page = page % 4;
 	}
-
+	#ifdef __DOS__
 	union REGS regs;
 	regs.h.ah = 0x05;
-	regs.h.al =
+	regs.h.al = page;
 	INTR(0x10, &regs, &regs);
+	#endif
 	g_currentMode.page = page;
 }
 
