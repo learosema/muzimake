@@ -60,15 +60,14 @@ int main()
 					event.payload.mouse.y
 				);
 				break;
-			case UI_EVENT_KEY:
-				if (event.payload.keyboard.keyCode == 27) {
+			case UI_EVENT_KEYDOWN:
+				if (event.payload.keyboard.keyCode == 28) {
 					done = true;
 				}
 			default:
 				break;
 		}
 	}
-	getch();
 
 	if (g_hasMouse) {
 		mouse_hide();
