@@ -16,7 +16,7 @@ void poll_event(ui_event_t *result)
 	MOUSE_STATUS mouseStatus = {0};
 
 	mouse_get_status(&mouseStatus);
-	if ((mouseStatus.buttons & 1 > 0) && (lastMouseStatus.buttons & 1 == 0))
+	if ((mouseStatus.buttons > 0) && (lastMouseStatus.buttons == 0))
 	{
 		lastMouseStatus.buttons = mouseStatus.buttons;
 		event.type = UI_EVENT_MOUSEDOWN;
@@ -27,7 +27,7 @@ void poll_event(ui_event_t *result)
 		return;
 	}
 
-	if ((mouseStatus.buttons & 1 > 0) && (lastMouseStatus.buttons & 1 == 0))
+	if ((mouseStatus.buttons == 0) && (lastMouseStatus.buttons > 0))
 	{
 		lastMouseStatus.buttons = mouseStatus.buttons;
 		event.type = UI_EVENT_MOUSEUP;
@@ -45,12 +45,14 @@ void poll_event(ui_event_t *result)
 		event.payload.mouse.x = mouseStatus.mouseX;
 		event.payload.mouse.y = mouseStatus.mouseY;
 		event.payload.mouse.buttons = mouseStatus.buttons;
+		*result = event;
 		return;
 	}
 
 	if ((kbhit())) {
 		event.type = UI_EVENT_KEY;
 		event.payload.keyboard.keyCode = getch();
+		*result = event;
 		return;
 	}
 }
