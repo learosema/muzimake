@@ -37,9 +37,6 @@ int main()
 	}
 
 	textmode_print("Hello World!", 33, 25, 0x1e);
-	textmode_fill_area(1,5,4,5, '.', 0x3f);
-	textmode_box(12,3,30,7,0x4f);
-	textmode_dblbox(15,14,30,7,0x2e);
 
 	while (!done) {
 		poll_event(&event);
@@ -47,20 +44,20 @@ int main()
 		switch (event.type) {
 			case UI_EVENT_MOUSEMOVE:
 				printf("MOVE %d | %d     \n",
-					g_mouse.mouseX,
-					g_mouse.mouseY
+					event.payload.mouse.x,
+					event.payload.mouse.y
 				);
 				break;
 			case UI_EVENT_MOUSEDOWN:
 				printf("DOWN %d | %d     \n",
-					g_mouse.mouseX,
-					g_mouse.mouseY
+					event.payload.mouse.x,
+					event.payload.mouse.y
 				);
 				break;
 			case UI_EVENT_MOUSEUP:
 				printf("UP!  %d | %d     \n",
-					g_mouse.mouseX,
-					g_mouse.mouseY
+					event.payload.mouse.x,
+					event.payload.mouse.y
 				);
 				break;
 			case UI_EVENT_KEY:
