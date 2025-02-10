@@ -7,7 +7,7 @@
 #include "ui_event.h"
 #include "mouse.h"
 
-static MOUSE_STATUS lastMouseStatus;
+static MOUSE_STATUS lastMouseStatus = {0};
 
 void poll_event(ui_event_t *result)
 {
