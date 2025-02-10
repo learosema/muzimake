@@ -8,6 +8,10 @@
 #include "mouse.h"
 
 static MOUSE_STATUS lastMouseStatus = {0};
+static int lastKeyboardState = 0x80;
+
+
+
 
 void poll_event(ui_event_t *result)
 {
@@ -49,10 +53,27 @@ void poll_event(ui_event_t *result)
 		return;
 	}
 
-	if ((kbhit())) {
+	int keyState = inp(0x60);
+	if (keyState & 0x80 > 0 && lastKeyboardState < 0x80) {
+		lastKeyboardState = keyState;
+		event.type = UI_EVENT_KEYUP;
+		event.payload.keyboard.keyCode = keyState & 0x7f;
+		*result = event;
+	}
+
+	if (keyState & 0x80 == 0 && lastKeyboardState >= 0x80) {
+		lastKeyboardState = keyState;
+		event.type = UI_EVENT_KEYDOWN;
+		event.payload.keyboard.keyCode = keyState & 0x7f;
+		*result = event;
+		return;
+	}
+
+/*
+	if (kbhit()) {
 		event.type = UI_EVENT_KEY;
 		event.payload.keyboard.keyCode = getch();
 		*result = event;
 		return;
-	}
+	} */
 }
