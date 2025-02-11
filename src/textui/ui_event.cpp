@@ -59,6 +59,7 @@ void poll_event(ui_event_t *result)
 		event.type = UI_EVENT_KEYUP;
 		event.payload.keyboard.keyCode = keyState & 0x7f;
 		*result = event;
+		return;
 	}
 
 	if (keyState & 0x80 == 0 && lastKeyboardState >= 0x80) {
@@ -69,11 +70,10 @@ void poll_event(ui_event_t *result)
 		return;
 	}
 
-/*
 	if (kbhit()) {
 		event.type = UI_EVENT_KEY;
 		event.payload.keyboard.keyCode = getch();
 		*result = event;
 		return;
-	} */
+	}
 }

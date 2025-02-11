@@ -61,9 +61,17 @@ int main()
 				);
 				break;
 			case UI_EVENT_KEYDOWN:
-				if (event.payload.keyboard.keyCode == 28) {
+				printf("KEYDOWN %d      \n", event.payload.keyboard.keyCode);
+				break;
+			case UI_EVENT_KEYUP:
+				printf("KEYUP   %d      \n", event.payload.keyboard.keyCode);
+				break;
+			case UI_EVENT_KEY:
+				printf("KEY     %d      \n", event.payload.keyboard.keyCode);
+				if (event.payload.keyboard.keyCode == 27) {
 					done = true;
 				}
+				break;
 			default:
 				break;
 		}
