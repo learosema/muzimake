@@ -67,7 +67,7 @@ int main()
 				printf("KEYUP   %d      \n", event.payload.keyboard.keyCode);
 				break;
 			case UI_EVENT_KEY:
-				printf("KEY     %d      \n", event.payload.keyboard.keyCode);
+				// printf("KEY     %d      \n", event.payload.keyboard.keyCode);
 				if (event.payload.keyboard.keyCode == 27) {
 					done = true;
 				}
@@ -75,6 +75,7 @@ int main()
 			default:
 				break;
 		}
+		delay(16); // 60FPS
 	}
 
 	if (g_hasMouse) {
