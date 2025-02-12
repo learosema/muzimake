@@ -238,7 +238,7 @@ void textmode_print(char *str, int x, int y, uint8_t color)
 	}
 }
 
-void textmode_box(int x, int y, uint8_t width, uint8_t height, uint8_t color)
+void textmode_rect(int x, int y, uint8_t width, uint8_t height, uint8_t color)
 {
 	uint8_t i;
 
@@ -272,14 +272,18 @@ void textmode_box(int x, int y, uint8_t width, uint8_t height, uint8_t color)
 		x + width - 1, y + height - 1, 1,
 		CP_THIN_LEFT_THIN_UP, color);
 
+}
+
+void textmode_box(int x, int y, uint8_t width, uint8_t height, uint8_t color)
+{
+	textmode_rect(x, y, width, height, color);
 	if (width > 2 && height > 2) {
 		textmode_fill_area(x + 1, y + 1,
 			width - 2, height - 2, ' ', color);
 	}
 }
 
-
-void textmode_dblbox(
+void textmode_dblrect(
 	int x,
 	int y,
 	uint8_t width,
@@ -290,7 +294,7 @@ void textmode_dblbox(
 	uint8_t i;
 
 	textmode_hline(
-		x, y,1,
+		x, y, 1,
 		CP_THICK_RIGHT_THICK_DOWN, color);
 
 	textmode_hline(
@@ -318,12 +322,26 @@ void textmode_dblbox(
 	textmode_hline(
 		x + width - 1, y + height - 1, 1,
 		CP_THICK_LEFT_THICK_UP, color);
+}
+
+void textmode_dblbox(
+	int x,
+	int y,
+	uint8_t width,
+	uint8_t height,
+	uint8_t color
+)
+{
+	textmode_dblrect(x, y, width, height, color);
 
 	if (width > 2 && height > 2) {
 		textmode_fill_area(x + 1, y + 1,
 			width - 2, height - 2, ' ', color);
 	}
 }
+
+
+
 
 void textmode_gotoxy(uint8_t x, uint8_t y) {
 	union REGS regs;

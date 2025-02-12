@@ -122,6 +122,24 @@ void textmode_dblbox(
 	uint8_t color
 );
 
+void textmode_rect(
+	int x,
+	int y,
+	uint8_t width,
+	uint8_t height,
+	uint8_t color
+);
+
+void textmode_dblrect(
+	int x,
+	int y,
+	uint8_t width,
+	uint8_t height,
+	uint8_t color
+);
+
+
+
 void textmode_gotoxy(uint8_t x, uint8_t y);
 
 #endif
