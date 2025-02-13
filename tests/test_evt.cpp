@@ -9,15 +9,11 @@
 #include "textui/mouse.h"
 #include "textui/textmode.h"
 #include "textui/ui_event.h"
+#include "textui/button.h"
 
 bool g_hasMouse;
 MOUSE_STATUS g_mouse;
 MODEINFO * g_modeInfo;
-
-
-
-
-
 
 int main()
 {
@@ -31,6 +27,12 @@ int main()
 	textmode_clear(0x1e);
 	textmode_cursor(32, 0);
 
+	ui_button_t okButton = button_create("Okay", 2, 2, 10, 3, 0x2f);
+	ui_button_t cancelButton = button_create("Cancel", 13, 2, 10, 3, 0x4e);
+	button_render(&okButton);
+	button_render(&cancelButton);
+
+
 	if (g_hasMouse) {
 		mouse_show();
 		mouse_set_vertical_range(0, g_modeInfo->numRows * 8 - 8);
@@ -40,25 +42,47 @@ int main()
 
 	while (!done) {
 		poll_event(&event);
-		textmode_gotoxy(1,1);
+		textmode_gotoxy(1,48);
 		switch (event.type) {
 			case UI_EVENT_MOUSEMOVE:
 				printf("MOVE %d | %d     \n",
 					event.payload.mouse.x,
 					event.payload.mouse.y
 				);
+				if (okButton.active) {
+					button_render(&okButton);
+				}
+				if (cancelButton.active) {
+					button_render(&cancelButton);
+				}
 				break;
 			case UI_EVENT_MOUSEDOWN:
 				printf("DOWN %d | %d     \n",
 					event.payload.mouse.x,
 					event.payload.mouse.y
 				);
+				if (button_test_mouse(&okButton, event.payload.mouse.x, event.payload.mouse.y)) {
+					okButton.active = true;
+					button_render(&okButton);
+				}
+				if (button_test_mouse(&cancelButton, event.payload.mouse.x, event.payload.mouse.y)) {
+					cancelButton.active = true;
+					button_render(&cancelButton);
+				}
 				break;
 			case UI_EVENT_MOUSEUP:
 				printf("UP!  %d | %d     \n",
 					event.payload.mouse.x,
 					event.payload.mouse.y
 				);
+				if (okButton.active) {
+					okButton.active = false;
+					button_render(&okButton);
+				}
+				if (cancelButton.active) {
+					cancelButton.active = false;
+					button_render(&cancelButton);
+				}
 				break;
 			case UI_EVENT_KEYDOWN:
 				printf("KEYDOWN %d      \n", event.payload.keyboard.keyCode);
