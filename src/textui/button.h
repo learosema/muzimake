@@ -12,9 +12,10 @@ typedef struct rect_s {
 
 typedef struct ui_button_s
 {
+	uint8_t id;
+	rect_t bounding_rect;
 	char *label;
 	uint8_t color;
-	rect_t bounding_rect;
 	bool focused;
 	bool active;
 } ui_button_t;
