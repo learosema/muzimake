@@ -15,28 +15,30 @@ bool g_hasMouse;
 MOUSE_STATUS g_mouse;
 MODEINFO * g_modeInfo;
 
-void button_process_events(uint8_t buttonCount, ui_button_t *buttons, ui_event_t *event, ui_event_t *buttonEvent)
+void button_process_events(uint8_t buttonCount, ui_button_t *buttons, ui_event_t *event)
 {
 	for (uint8_t i = 0; i < buttonCount; i++)
 	{
-		ui_button_t button = buttons[i];
+		ui_button_t * button = &(buttons[i]);
 		switch (event->type) {
 			case UI_EVENT_MOUSEMOVE:
-				if (button.active) {
-					button_render(&button);
+				if ((button->active)||
+						(button_test_mouse(button, event->payload.mouse.x, event->payload.mouse.y)))
+				{
+					button_render(button);
 				}
 				break;
 			case UI_EVENT_MOUSEDOWN:
-				if (button_test_mouse(&button, event->payload.mouse.x, event->payload.mouse.y)) {
-					button.active = true;
-					button_render(&button);
+				if (button_test_mouse(button, event->payload.mouse.x, event->payload.mouse.y)) {
+					button->active = true;
+					button_render(button);
 				}
 				break;
 			case UI_EVENT_MOUSEUP:
-				if (button.active) {
-					button.active = false;
-					button_render(&button);
-					if (button_test_mouse(&button, event->payload.mouse.x, event->payload.mouse.y)) {
+				if (button->active) {
+					button->active = false;
+					button_render(button);
+					if (button_test_mouse(button, event->payload.mouse.x, event->payload.mouse.y)) {
 						// emitEvent('click', button);
 					}
 				}
@@ -66,12 +68,12 @@ int main()
 	textmode_clear(0x1e);
 	textmode_cursor(32, 0);
 
-	ui_button_t okButton = button_create("Okay", 2, 2, 10, 3, 0x2f);
-	ui_button_t cancelButton = button_create("Cancel", 13, 2, 10, 3, 0x4e);
-	button_render(&okButton);
-	button_render(&cancelButton);
-
-
+	ui_button_t buttons[2];
+	buttons[0] = button_create("Okay", 2, 2, 10, 3, 0x2f);;
+	buttons[1] = button_create("Cancel", 13, 2, 10, 3, 0x4e);
+	for (uint8_t i = 0; i < 2; i++) {
+		button_render(&(buttons[i]));
+	}
 	if (g_hasMouse) {
 		mouse_show();
 		mouse_set_vertical_range(0, g_modeInfo->numRows * 8 - 8);
@@ -81,6 +83,7 @@ int main()
 
 	while (!done) {
 		poll_event(&event);
+		button_process_events(2, buttons, &event);
 		textmode_gotoxy(1,48);
 		switch (event.type) {
 			case UI_EVENT_MOUSEMOVE:
@@ -88,40 +91,18 @@ int main()
 					event.payload.mouse.x,
 					event.payload.mouse.y
 				);
-				if (okButton.active) {
-					button_render(&okButton);
-				}
-				if (cancelButton.active) {
-					button_render(&cancelButton);
-				}
 				break;
 			case UI_EVENT_MOUSEDOWN:
 				printf("DOWN %d | %d     \n",
 					event.payload.mouse.x,
 					event.payload.mouse.y
 				);
-				if (button_test_mouse(&okButton, event.payload.mouse.x, event.payload.mouse.y)) {
-					okButton.active = true;
-					button_render(&okButton);
-				}
-				if (button_test_mouse(&cancelButton, event.payload.mouse.x, event.payload.mouse.y)) {
-					cancelButton.active = true;
-					button_render(&cancelButton);
-				}
 				break;
 			case UI_EVENT_MOUSEUP:
 				printf("UP!  %d | %d     \n",
 					event.payload.mouse.x,
 					event.payload.mouse.y
 				);
-				if (okButton.active) {
-					okButton.active = false;
-					button_render(&okButton);
-				}
-				if (cancelButton.active) {
-					cancelButton.active = false;
-					button_render(&cancelButton);
-				}
 				break;
 			case UI_EVENT_KEYDOWN:
 				printf("KEYDOWN %d      \n", event.payload.keyboard.keyCode);
