@@ -52,7 +52,8 @@ void button_render(ui_button_t *button)
 	}
 }
 
-ui_button_t button_create(char *label, uint8_t x, uint8_t y, uint8_t width, uint8_t height, uint8_t color) {
+ui_button_t button_create(char *label, uint8_t x, uint8_t y, uint8_t width, uint8_t height, uint8_t color)
+{
 	ui_button_t button = {0};
 	rect_t rect = {0};
 	button.label = label;
