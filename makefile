@@ -45,7 +45,7 @@ TEST_COMMON_SRCS=bnkfile.cpp rolfile.cpp fileio.cpp file.cpp
 TEST_ROL_SRCS=$(TEST_COMMON_SRCS) instrmnt.cpp opl2.cpp test_rol.cpp
 TEST_BNK_SRCS=$(TEST_COMMON_SRCS) instrmnt.cpp opl2.cpp test_bnk.cpp
 TESTINST_SRCS=$(TEST_COMMON_SRCS) instrmnt.cpp testinst.cpp
-TEST_EVT_SRCS=mouse.cpp textmode.cpp ui_event.cpp button.cpp test_evt.cpp
+TEST_EVT_SRCS=mouse.cpp textmode.cpp ui_event.cpp component.cpp test_evt.cpp
 TEST_SRCS    =$(TEST_COMMON_SRCS) instrmnt.cpp test.cpp
 
 OBJS=$(SRCS:.cpp=.$(O_EXT))
