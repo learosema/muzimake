@@ -267,6 +267,18 @@ void textmode_print(char *str, int x, int y, uint8_t color)
 	}
 }
 
+void textmode_putchar(char ch, int x, int y, uint8_t color)
+{
+	VRAMPTR ptr;
+	if ((y < 0) || (y >= g_currentMode.numRows) || (x < 0) || (x >= g_currentMode.numCols))
+	{
+		return;
+	}
+	ptr = TEXT_VRAM + (uint16_t)(y*g_currentMode.numCols*2+x*2);
+	*ptr = ch;
+	*(ptr+1) = color;
+}
+
 void textmode_rect(int x, int y, uint8_t width, uint8_t height, uint8_t color)
 {
 	uint8_t i;
@@ -368,9 +380,6 @@ void textmode_dblbox(
 			width - 2, height - 2, ' ', color);
 	}
 }
-
-
-
 
 void textmode_gotoxy(uint8_t x, uint8_t y) {
 	#ifdef __DOS__
