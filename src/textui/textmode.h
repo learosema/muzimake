@@ -106,6 +106,8 @@ void textmode_colorize_area(
 
 void textmode_print(char *str, int x, int y, uint8_t color);
 
+void textmode_putchar(char ch, int x, int y, uint8_t color);
+
 void textmode_box(
 	int x,
 	int y,

@@ -9,52 +9,11 @@
 #include "textui/mouse.h"
 #include "textui/textmode.h"
 #include "textui/ui_event.h"
-#include "textui/button.h"
+#include "textui/component.h"
 
 bool g_hasMouse;
 MOUSE_STATUS g_mouse;
 MODEINFO * g_modeInfo;
-
-void button_process_events(uint8_t buttonCount, ui_button_t *buttons, ui_event_t *event)
-{
-	for (uint8_t i = 0; i < buttonCount; i++)
-	{
-		ui_button_t * button = &(buttons[i]);
-		switch (event->type) {
-			case UI_EVENT_MOUSEMOVE:
-				if ((button->active)||
-						(button_test_mouse(button, event->payload.mouse.x, event->payload.mouse.y)))
-				{
-					button_render(button);
-				}
-				break;
-			case UI_EVENT_MOUSEDOWN:
-				if (button_test_mouse(button, event->payload.mouse.x, event->payload.mouse.y)) {
-					button->active = true;
-					button_render(button);
-				}
-				break;
-			case UI_EVENT_MOUSEUP:
-				if (button->active) {
-					button->active = false;
-					button_render(button);
-					if (button_test_mouse(button, event->payload.mouse.x, event->payload.mouse.y)) {
-						// emitEvent('click', button);
-					}
-				}
-				break;
-			case UI_EVENT_KEY:
-				// todo: shortcuts?
-				break;
-			default:
-				break;
-		}
-	}
-}
-
-
-
-
 
 int main()
 {
