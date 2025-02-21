@@ -11,6 +11,8 @@
 #include "textui/ui_event.h"
 #include "textui/component.h"
 
+static char *test="Muh!";
+
 bool g_hasMouse;
 MOUSE_STATUS g_mouse;
 MODEINFO * g_modeInfo;
@@ -27,11 +29,14 @@ int main()
 	textmode_clear(0x1e);
 	textmode_cursor(32, 0);
 
-	ui_button_t buttons[2];
-	buttons[0] = button_create("Okay", 2, 2, 10, 3, 0x2f);;
-	buttons[1] = button_create("Cancel", 13, 2, 10, 3, 0x4e);
-	for (uint8_t i = 0; i < 2; i++) {
-		button_render(&(buttons[i]));
+	uint8_t componentCount = 3;
+	ui_component_t components[3];
+	components[0] = component_create_button(1, "Okay", 2, 2, 10, 3, 0x2f);;
+	components[1] = component_create_button(2, "Cancel", 13, 2, 10, 3, 0x4e);
+	components[2] = component_create_input(2, "Muh", 2, 5, 10, 3, 0x5f, "", 10);
+
+	for (uint8_t i = 0; i < 3; i++) {
+		component_render(&(components[i]));
 	}
 	if (g_hasMouse) {
 		mouse_show();
@@ -42,8 +47,8 @@ int main()
 
 	while (!done) {
 		poll_event(&event);
-		button_process_events(2, buttons, &event);
-		textmode_gotoxy(1,48);
+		component_process_events(componentCount, components, &event);
+		textmode_gotoxy(1, 48);
 		switch (event.type) {
 			case UI_EVENT_MOUSEMOVE:
 				printf("MOVE %d | %d     \n",
