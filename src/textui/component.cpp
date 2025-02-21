@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include <string.h>
 #include "component.h"
 #include "textmode.h"
@@ -21,6 +22,9 @@ void input_render(ui_input_t *input)
 
 	if (input->bounding_rect.height == 3)
 	{
+		input_x = input->bounding_rect.x + 1;
+		input_y = input->bounding_rect.y + 1;
+		input_len = input->bounding_rect.width - 2;
 		if (input->focused) {
 			textmode_dblrect(
 				input->bounding_rect.x,
@@ -37,9 +41,6 @@ void input_render(ui_input_t *input)
 				input->bounding_rect.height,
 				color
 			);
-			input_x = input->bounding_rect.x + 1;
-			input_y = input->bounding_rect.y + 1;
-			input_len = input->bounding_rect.width - 2;
 		}
 	}
 
@@ -113,20 +114,6 @@ void button_render(ui_button_t *button)
 	}
 }
 
-ui_button_t button_create(char *label, uint8_t x, uint8_t y, uint8_t width, uint8_t height, uint8_t color)
-{
-	ui_button_t button = {0};
-	rect_t rect = {0};
-	button.label = label;
-	rect.x = x;
-	rect.y = y;
-	rect.width = width;
-	rect.height = height;
-	button.bounding_rect = rect;
-	button.color = color;
-	return button;
-}
-
 bool rect_test_point_in_bounds(rect_t * rect, uint8_t x, uint8_t y)
 {
 	uint8_t x0 = rect->x;
@@ -138,54 +125,67 @@ bool rect_test_point_in_bounds(rect_t * rect, uint8_t x, uint8_t y)
 	);
 }
 
-bool button_test_point_in_bounds(ui_button_t * button, uint8_t x, uint8_t y)
+bool rect_test_mouse(rect_t * rect, uint16_t mouseX, uint16_t mouseY)
 {
-	return rect_test_point_in_bounds(&(button->bounding_rect), x, y);
+	return rect_test_point_in_bounds(rect, (uint8_t)mouseX/8, (uint8_t)mouseY/8);
 }
 
-bool button_test_mouse(ui_button_t * button, uint16_t mouseX, uint16_t mouseY)
+void button_process_events(ui_button_t *button, ui_event_t *event)
 {
-	return button_test_point_in_bounds(button, (uint8_t)mouseX/8, (uint8_t)mouseY/8);
-}
-
-void button_process_events(uint8_t buttonCount, ui_button_t *buttons, ui_event_t *event)
-{
-	for (uint8_t i = 0; i < buttonCount; i++)
-	{
-		ui_button_t * button = &(buttons[i]);
-		switch (event->type) {
-			case UI_EVENT_MOUSEMOVE:
-				if ((button->active)||
-						(button_test_mouse(button, event->payload.mouse.x, event->payload.mouse.y)))
-				{
-					button_render(button);
+	switch (event->type) {
+		case UI_EVENT_MOUSEMOVE:
+			if ((button->active)||
+					(rect_test_mouse(&(button->bounding_rect), event->payload.mouse.x, event->payload.mouse.y)))
+			{
+				button_render(button);
+			}
+			break;
+		case UI_EVENT_MOUSEDOWN:
+			if (rect_test_mouse(&(button->bounding_rect), event->payload.mouse.x, event->payload.mouse.y)) {
+				button->active = true;
+				button_render(button);
+			}
+			break;
+		case UI_EVENT_MOUSEUP:
+			if (button->active) {
+				button->active = false;
+				button_render(button);
+				if (rect_test_mouse(&(button->bounding_rect), event->payload.mouse.x, event->payload.mouse.y)) {
+					// emitEvent('click', button);
 				}
-				break;
-			case UI_EVENT_MOUSEDOWN:
-				if (button_test_mouse(button, event->payload.mouse.x, event->payload.mouse.y)) {
-					button->active = true;
-					button_render(button);
-				}
-				break;
-			case UI_EVENT_MOUSEUP:
-				if (button->active) {
-					button->active = false;
-					button_render(button);
-					if (button_test_mouse(button, event->payload.mouse.x, event->payload.mouse.y)) {
-						// emitEvent('click', button);
-					}
-				}
-				break;
-			case UI_EVENT_KEY:
-				// todo: shortcuts?
-				break;
-			default:
-				break;
-		}
+			}
+			break;
+		case UI_EVENT_KEY:
+			// todo: shortcuts?
+			break;
+		default:
+			break;
 	}
 }
 
+void input_process_events(ui_input_t *input, ui_event_t *event)
+{
+	switch (event->type) {
 
+	}
+}
+
+void component_process_events(uint8_t componentCount, ui_component_t *components, ui_event_t *event)
+{
+	for (uint8_t i = 0; i < componentCount; i++)
+	{
+		switch (components[i].type) {
+			case COMPONENT_BUTTON: {
+				button_process_events(&(components[i].component.button), event);
+				break;
+			}
+			case COMPONENT_INPUT: {
+				input_process_events(&(components[i].component.input), event);
+				break;
+			}
+		}
+	}
+}
 
 void component_render(ui_component_t *component)
 {
@@ -200,5 +200,57 @@ void component_render(ui_component_t *component)
 		case COMPONENT_INPUT:
 			input_render(&(component->component.input));
 			break;
+	}
+}
+
+ui_component_t component_create_button(uint8_t id, char *label, uint8_t x, uint8_t y, uint8_t width, uint8_t height, uint8_t color)
+{
+	ui_component_t component = {0};
+	ui_button_t button = {0};
+	rect_t rect = {0};
+	button.label = label;
+	rect.x = x;
+	rect.y = y;
+	rect.width = width;
+	rect.height = height;
+	button.bounding_rect = rect;
+	button.color = color;
+	component.type = COMPONENT_BUTTON;
+	component.component.button = button;
+	return component;
+}
+
+ui_component_t component_create_input(uint8_t id, char *label, uint8_t x, uint8_t y, uint8_t width, uint8_t height, uint8_t color, char *value, size_t maxlen)
+{
+	ui_component_t component = {0};
+	ui_input_t input = {0};
+	rect_t rect = {0};
+	input.label = label;
+	rect.x = x;
+	rect.y = y;
+	rect.width = width;
+	rect.height = height;
+	input.bounding_rect = rect;
+	input.color = color;
+	input.value = (char *)calloc(maxlen, sizeof(char));
+	input.maxlen = maxlen;
+	input.cursor_x0 = 0;
+	input.cursor_x = 0;
+	component.type = COMPONENT_INPUT;
+	component.component.input = input;
+	return component;
+}
+
+void component_dispose(ui_component_t *component)
+{
+	switch (component->type) {
+		case COMPONENT_BUTTON: {
+			break;
+		}
+		case COMPONENT_INPUT: {
+			free(component->component.input.value);
+			component->component.input.value = nullptr;
+			break;
+		}
 	}
 }

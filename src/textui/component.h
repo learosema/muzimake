@@ -47,15 +47,10 @@ typedef struct ui_component_s
 	} component;
 } ui_component_t;
 
-bool rect_test_point_in_bounds(rect_t *rect, uint8_t x, uint8_t y);
-ui_button_t button_create(char *label, uint8_t x, uint8_t y, uint8_t width, uint8_t height, uint8_t color);
-bool button_test_point_in_bounds(ui_button_t * button, uint8_t x, uint8_t y);
-bool button_test_mouse(ui_button_t * button, uint16_t mouseX, uint16_t mouseY);
-void button_render(ui_button_t *button);
-void button_process_events(uint8_t buttonCount, ui_button_t *buttons, ui_event_t *event);
-
-void input_render(ui_input_t *input);
-
+void component_process_events(uint8_t componentCount, ui_component_t *components, ui_event_t *event);
 void component_render(ui_component_t *component);
+ui_component_t component_create_button(uint8_t id, char *label, uint8_t x, uint8_t y, uint8_t width, uint8_t height, uint8_t color);
+ui_component_t component_create_input(uint8_t id, char *label, uint8_t x, uint8_t y, uint8_t width, uint8_t height, uint8_t color, char *value, size_t maxlen);
+void component_dispose(ui_component_t *component);
 
 #endif
