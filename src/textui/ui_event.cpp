@@ -10,9 +10,6 @@
 static MOUSE_STATUS lastMouseStatus = {0};
 static int lastKeyboardState = 0x80;
 
-
-
-
 void poll_event(ui_event_t *result)
 {
 	ui_event_t event = {0};
@@ -74,8 +71,13 @@ POKE &H1A, PEEK(&H1C) */
 	}
 */
 	if (kbhit()) {
+		uint16_t ch = getch();
+		if (ch == 0) {
+			ch = getch();
+			ch <<= 8;
+		}
 		event.type = UI_EVENT_KEY;
-		event.payload.keyboard.keyCode = getch();
+		event.payload.keyboard.keyCode = ch;
 		*result = event;
 		return;
 	}

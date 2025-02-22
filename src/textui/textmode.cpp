@@ -242,7 +242,7 @@ void textmode_colorize_area(
 	}
 }
 
-void textmode_print(char *str, int x, int y, uint8_t color)
+void textmode_print(const char *str, int x, int y, uint8_t color)
 {
 	VRAMPTR ptr;
 	uint8_t i;
