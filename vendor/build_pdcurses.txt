@@ -1,0 +1,11 @@
+- im Verzeichnis "pdcurses/dos/":
+
+wmake -f Makefile.wcc MODEL=f
+
+- Demo's bauen:
+
+wmake demos -f Makefile.wcc MODEL=f
+
+- Dateien entfernen:
+
+wmake clean -f Makefile.wcc
