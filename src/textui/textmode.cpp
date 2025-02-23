@@ -26,7 +26,7 @@ void _retrieve_modeinfo()
 	g_currentMode.numCols = (uint8_t)regs.h.ah;
 	g_currentMode.numRows = 25;
 	g_currentMode.page = (uint8_t)regs.h.bh;
-	g_currentMode.pageSize=PAGE_SIZE_80X25;
+	g_currentMode.pageSize = PAGE_SIZE_80X25;
 	g_currentMode.videoPortAddress = *(BIOS_VIDEO_PORT_ADDRESS);
 	g_currentMode.hasColors = (g_currentMode.videoPortAddress == 0x3d4);
 	g_currentMode.vram = g_currentMode.hasColors ?
@@ -96,7 +96,7 @@ void textmode_set_page(uint8_t page)
 		page = page % 8;
 	}
 
-	if (g_currentMode.pageSize == PAGE_SIZE_80X25 && page >= 4) {
+	if (g_currentMode.pageSize == PAGE_SIZE_80X50 && page >= 4) {
 		page = page % 4;
 	}
 	#ifdef __DOS__
@@ -252,7 +252,8 @@ void textmode_print(const char *str, int x, int y, uint8_t color)
 	{
 		return;
 	}
-	ptr = TEXT_VRAM + (uint16_t)(y*g_currentMode.numCols*2+x*2);
+	ptr = TEXT_VRAM + g_currentMode.page * g_currentMode.pageSize +
+		(uint16_t)(y*g_currentMode.numCols*2+x*2);
 	for (i = 0; i < len; i++)
 	{
 		if ((x + i < 0) || (x + i >= g_currentMode.numCols))
@@ -267,16 +268,70 @@ void textmode_print(const char *str, int x, int y, uint8_t color)
 	}
 }
 
-void textmode_putchar(char ch, int x, int y, uint8_t color)
+void textmode_putchar(int x, int y, char ch)
 {
 	VRAMPTR ptr;
 	if ((y < 0) || (y >= g_currentMode.numRows) || (x < 0) || (x >= g_currentMode.numCols))
 	{
 		return;
 	}
-	ptr = TEXT_VRAM + (uint16_t)(y*g_currentMode.numCols*2+x*2);
+	ptr = TEXT_VRAM +
+		g_currentMode.page * g_currentMode.pageSize +
+		(uint16_t)(y*g_currentMode.numCols*2+x*2);
+	*ptr = ch;
+}
+
+void textmode_putcolor(int x, int y, uint8_t color)
+{
+	VRAMPTR ptr;
+	if ((y < 0) || (y >= g_currentMode.numRows) || (x < 0) || (x >= g_currentMode.numCols))
+	{
+		return;
+	}
+	ptr = TEXT_VRAM +
+		g_currentMode.page * g_currentMode.pageSize +
+		(uint16_t)(y*g_currentMode.numCols*2+x*2);
+	*(ptr+1) = color;
+}
+
+void textmode_putchar_color(int x, int y, char ch, uint8_t color)
+{
+	VRAMPTR ptr;
+	if ((y < 0) || (y >= g_currentMode.numRows) || (x < 0) || (x >= g_currentMode.numCols))
+	{
+		return;
+	}
+	ptr = TEXT_VRAM +
+		g_currentMode.page * g_currentMode.pageSize +
+		(uint16_t)(y*g_currentMode.numCols*2+x*2);
 	*ptr = ch;
 	*(ptr+1) = color;
+}
+
+char textmode_getchar(int x, int y)
+{
+	VRAMPTR ptr;
+	if ((y < 0) || (y >= g_currentMode.numRows) || (x < 0) || (x >= g_currentMode.numCols))
+	{
+		return 0;
+	}
+	ptr = TEXT_VRAM +
+		g_currentMode.page * g_currentMode.pageSize +
+		(uint16_t)(y*g_currentMode.numCols*2+x*2);
+	return (*ptr);
+}
+
+uint8_t textmode_getcolor(int x, int y)
+{
+	VRAMPTR ptr;
+	if ((y < 0) || (y >= g_currentMode.numRows) || (x < 0) || (x >= g_currentMode.numCols))
+	{
+		return 0;
+	}
+	ptr = TEXT_VRAM +
+		g_currentMode.page * g_currentMode.pageSize +
+		(uint16_t)(y*g_currentMode.numCols*2+x*2);
+	return (*ptr + 1);
 }
 
 void textmode_rect(int x, int y, uint8_t width, uint8_t height, uint8_t color)

@@ -171,7 +171,7 @@ void input_render(ui_input_t *input)
 	{
 		size_t offs = input->cursor_x0 + i;
 		char ch = offs < value_len ? input->value[offs] : '.';
-		textmode_putchar(ch, input_x + i, input_y, color);
+		textmode_putchar_color(input_x + i, input_y, ch, color);
 	}
 
 	if (input->focused) {

@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <string.h>
 #ifdef __DOS__
 #include <conio.h>
 #else
@@ -10,7 +11,7 @@
 static MOUSE_STATUS lastMouseStatus = {0};
 static int lastKeyboardState = 0x80;
 
-void poll_event(ui_event_t *result)
+void event_poll(ui_event_t *result)
 {
 	ui_event_t event = {0};
 
@@ -81,4 +82,11 @@ POKE &H1A, PEEK(&H1C) */
 		*result = event;
 		return;
 	}
+
+	event_clear(result);
+}
+
+void event_clear(ui_event_t *event)
+{
+	memset(event,0, sizeof(ui_event_t));
 }
