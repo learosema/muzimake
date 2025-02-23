@@ -54,6 +54,7 @@ typedef struct ui_input_s {
 	int maxlen;
 	int cursor_x0;
 	int cursor_x;
+	bool overwrite;
 } ui_input_t;
 
 typedef struct ui_component_s
@@ -80,5 +81,6 @@ ui_component_t component_create_button(uint16_t id, const char *label, uint8_t x
 ui_component_t component_create_input(uint16_t id, uint8_t x, uint8_t y, uint8_t width, uint8_t height, uint8_t color, char *value, size_t maxlen);
 void component_dispose(ui_component_t *component);
 void component_set_focus(uint16_t componentCount, ui_component_t *components, uint16_t id);
-
+void component_focus_next(uint16_t count, ui_component_t *components);
+void component_focus_last(uint16_t count, ui_component_t *components);
 #endif
