@@ -25,6 +25,7 @@ typedef struct ui_generic_s
 	uint8_t color;
 	bool active;
 	bool focused;
+	bool paint;
 	ui_event_handler_t event_handler;
 } ui_generic_t;
 
@@ -36,6 +37,7 @@ typedef struct ui_button_s
 	uint8_t color;
 	bool active;
 	bool focused;
+	bool paint;
 	ui_event_handler_t event_handler;
 	const char *label;
 } ui_button_t;
@@ -46,6 +48,7 @@ typedef struct ui_input_s {
 	uint8_t color;
 	bool active;
 	bool focused;
+	bool paint;
 	ui_event_handler_t event_handler;
 	char* value;
 	int maxlen;
@@ -70,8 +73,9 @@ typedef struct ui_state_s
 	ui_component_t *focusedElement;
 } ui_state_t;
 
-void component_process_events(uint16_t componentCount, ui_component_t *components, ui_event_t *event);
+void component_process_events(uint16_t count, ui_component_t *components, ui_event_t *event);
 void component_render(ui_component_t *component);
+void component_render_all(uint16_t count, ui_component_t *components, bool paint_all);
 ui_component_t component_create_button(uint16_t id, const char *label, uint8_t x, uint8_t y, uint8_t width, uint8_t height, uint8_t color);
 ui_component_t component_create_input(uint16_t id, uint8_t x, uint8_t y, uint8_t width, uint8_t height, uint8_t color, char *value, size_t maxlen);
 void component_dispose(ui_component_t *component);

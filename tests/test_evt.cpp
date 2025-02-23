@@ -67,9 +67,7 @@ int main()
 
 	ui_state_t ui = ui_create();
 
-	for (uint8_t i = 0; i < 3; i++) {
-		component_render(&(ui.components[i]));
-	}
+	component_render_all(ui.count, ui.components, true);
 	if (g_hasMouse) {
 		mouse_show();
 		mouse_set_vertical_range(0, g_modeInfo->numRows * 8 - 8);
@@ -78,6 +76,9 @@ int main()
 	textmode_print("Hello World!", 33, 25, 0x1e);
 
 	while (!done) {
+		mouse_hide();
+		component_render_all(ui.count, ui.components, true);
+		mouse_show();
 		event_poll(&event);
 		component_process_events(ui.count, ui.components, &event);
 		textmode_gotoxy(1, 48);
