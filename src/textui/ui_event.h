@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include "mouse.h"
 
+#define UI_EVENT_NONE				0
 #define UI_EVENT_KEYDOWN    1
 #define UI_EVENT_KEYUP			2
 #define UI_EVENT_KEY				4
@@ -48,8 +49,8 @@ typedef struct ui_event_s
 	} payload;
 } ui_event_t;
 
-void poll_event(ui_event_t *event);
-
+void event_poll(ui_event_t *event);
+void event_clear(ui_event_t *event);
 
 
 #endif
