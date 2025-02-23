@@ -428,6 +428,27 @@ ui_component_t component_create_input(uint16_t id, uint8_t x, uint8_t y, uint8_t
 	return component;
 }
 
+ui_component_t create_listbox(uint16_t id, uint8_t x, uint8_t y, uint8_t width, uint8_t height, uint8_t color, char** values, uint16_t num_items)
+{
+	ui_component_t component = {0};
+	ui_listbox_t listbox = {0};
+	rect_t rect = {0};
+	rect.x = x;
+	rect.y = y;
+	rect.width = width;
+	rect.height = height;
+	listbox.id = id;
+	listbox.bounding_rect = rect;
+	listbox.color = color;
+	listbox.values = values;
+	listbox.num_items = num_items;
+	listbox.cursor_y0 = 0;
+	listbox.cursor_y = 0;
+	component.type = COMPONENT_INPUT;
+	component.component.listbox = listbox;
+	return component;
+}
+
 void component_dispose(ui_component_t *component)
 {
 	switch (component->type) {
