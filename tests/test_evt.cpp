@@ -78,7 +78,7 @@ int main()
 	textmode_print("Hello World!", 33, 25, 0x1e);
 
 	while (!done) {
-		poll_event(&event);
+		event_poll(&event);
 		component_process_events(ui.count, ui.components, &event);
 		textmode_gotoxy(1, 48);
 		switch (event.type) {
