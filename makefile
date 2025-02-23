@@ -62,8 +62,10 @@ TARGET = muzimake.exe
 TESTS = testinst.exe test_rol.exe test_bnk.exe test_evt.exe test.exe
 
 # Default target
+.erase
 all: prebuild $(TARGET) postbuild .symbolic
 
+.erase
 tests: prebuild $(TESTS) postbuild .symbolic
 
 prebuild: .symbolic
