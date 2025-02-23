@@ -241,7 +241,7 @@ void input_process_events(ui_input_t *input, ui_event_t *event)
 				uint16_t x = input->cursor_x0 + input->cursor_x;
 				if (x > 0) {
 					input->paint = true;
-					input->value[x - 1] = ' ';
+					input->value[x - 1] = input->value[x] == '\0' ? '\0' : ' ';
 					if (input->cursor_x > 0) {
 						input->cursor_x -= 1;
 					} else {
