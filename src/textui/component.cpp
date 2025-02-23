@@ -207,6 +207,9 @@ void input_process_events(ui_input_t *input, ui_event_t *event)
 		}
 		case UI_EVENT_KEY: {
 			uint16_t input_width = input->bounding_rect.width;
+			if (! input->focused) {
+				break;
+			}
 			if (input->bounding_rect.height == 3) {
 				input_width -= 2;
 			}
@@ -223,10 +226,31 @@ void input_process_events(ui_input_t *input, ui_event_t *event)
 				if (input->cursor_x < input_width - 1) {
 					input->cursor_x += 1;
 				} else {
-					if (input->cursor_x0 + input->cursor_x < input->maxlen - 1) {
+					if (input->cursor_x0 + input->cursor_x < input->maxlen) {
 						input->cursor_x0 += 1;
 					}
 				}
+			}
+			if (event->payload.keyboard.keyCode == KEY_ALT_I)
+			{
+				input->overwrite = !(input->overwrite);
+				input->paint = true;
+			}
+			if (event->payload.keyboard.keyCode == KEY_BACKSPACE)
+			{
+				uint16_t x = input->cursor_x0 + input->cursor_x;
+				if (x > 0) {
+					input->paint = true;
+					input->value[x - 1] = ' ';
+					if (input->cursor_x > 0) {
+						input->cursor_x -= 1;
+					} else {
+						if (input->cursor_x0 > 0) {
+							input->cursor_x0 -= 1;
+						}
+					}
+				}
+				return;
 			}
 			if (event->payload.keyboard.keyCode == 27) {
 				input->focused = false;
@@ -266,12 +290,58 @@ void input_process_events(ui_input_t *input, ui_event_t *event)
 void component_set_focus(uint16_t count, ui_component_t *components, uint16_t id)
 {
 	for (uint16_t i = 0; i < count; i++) {
-		components[i].component.generic.focused = components[i].component.generic.id == id;
+		bool isFocused = components[i].component.generic.id == id;
+		if (isFocused != components[i].component.generic.focused) {
+			components[i].component.generic.focused = isFocused;
+			components[i].component.generic.paint = true;
+		}
+	}
+}
+
+void component_focus_next(uint16_t count, ui_component_t *components)
+{
+	uint16_t i, j;
+	for (i = 0; i < count; i++) {
+		if ((!components[i].component.generic.focused) && (i < count - 1)) {
+			continue;
+		}
+		components[i].component.generic.focused = false;
+		components[i].component.generic.paint = true;
+		j = (i + 1) % count;
+		components[j].component.generic.focused = true;
+		components[j].component.generic.paint = true;
+		return;
+	}
+}
+
+void component_focus_last(uint16_t count, ui_component_t *components)
+{
+	uint16_t i, j;
+	for (i = count - 1; i >= 0; i--) {
+		if ((!components[i].component.generic.focused) && (i != 0)) {
+			continue;
+		}
+		components[i].component.generic.focused = false;
+		components[i].component.generic.paint = true;
+		j = i > 0 ? (i - 1) : (count - 1);
+		components[j].component.generic.focused = true;
+		components[j].component.generic.paint = true;
+		return;
 	}
 }
 
 void component_process_events(uint16_t count, ui_component_t *components, ui_event_t *event)
 {
+	if (event->type == UI_EVENT_KEY) {
+		if (event->payload.keyboard.keyCode == KEY_TAB) {
+			component_focus_next(count, components);
+			return;
+		}
+		if (event->payload.keyboard.keyCode == KEY_SHIFT_TAB) {
+			component_focus_last(count, components);
+			return;
+		}
+	}
 	for (uint16_t i = 0; i < count; i++)
 	{
 		bool oldFocus = components[i].component.generic.focused;
@@ -285,6 +355,7 @@ void component_process_events(uint16_t count, ui_component_t *components, ui_eve
 				break;
 			}
 		}
+
 		if ((oldFocus == false) && (components[i].component.generic.focused))
 		{
 			component_set_focus(count, components, components[i].component.generic.id);
@@ -348,7 +419,7 @@ ui_component_t component_create_input(uint16_t id, uint8_t x, uint8_t y, uint8_t
 	input.id = id;
 	input.bounding_rect = rect;
 	input.color = color;
-	input.value = (char *)calloc(maxlen, sizeof(char));
+	input.value = (char *)calloc(maxlen + 1, sizeof(char));
 	input.maxlen = maxlen;
 	input.cursor_x0 = 0;
 	input.cursor_x = 0;

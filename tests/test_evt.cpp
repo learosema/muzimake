@@ -48,6 +48,10 @@ ui_state_t ui_create() {
 }
 
 void ui_cleanup(ui_state_t *ui) {
+	for (uint16_t i = 0; i < ui->count; i++)
+	{
+		component_dispose(&(ui->components[i]));
+	}
 	free(ui->components);
 	ui->count = 0;
 	ui->components = nullptr;
@@ -76,9 +80,9 @@ int main()
 	textmode_print("Hello World!", 33, 25, 0x1e);
 
 	while (!done) {
-		mouse_hide();
+		if (g_hasMouse) mouse_hide();
 		component_render_all(ui.count, ui.components, true);
-		mouse_show();
+		if (g_hasMouse) mouse_show();
 		event_poll(&event);
 		component_process_events(ui.count, ui.components, &event);
 		textmode_gotoxy(1, 48);
@@ -110,7 +114,7 @@ int main()
 			case UI_EVENT_KEY:
 				textmode_gotoxy(1, 47);
 				printf("KEY     %x      \n", event.payload.keyboard.keyCode);
-				if (event.payload.keyboard.keyCode == 0x2d00) {
+				if (event.payload.keyboard.keyCode == KEY_ALT_X) {
 					// press alt+x to quit
 					done = true;
 				}
@@ -124,7 +128,7 @@ int main()
 	if (g_hasMouse) {
 		mouse_hide();
 	}
-
+	ui_cleanup(&ui);
 	textmode_setmode(3);
 	return 0;
 }
