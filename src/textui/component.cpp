@@ -83,19 +83,19 @@ void button_process_events(ui_button_t *button, ui_event_t *event)
 			if ((button->active)&&
 					(rect_test_mouse(&(button->bounding_rect), event->payload.mouse.x, event->payload.mouse.y)))
 			{
-				button_render(button);
+				button->paint = true;
 			}
 			break;
 		case UI_EVENT_MOUSEDOWN:
 			if (rect_test_mouse(&(button->bounding_rect), event->payload.mouse.x, event->payload.mouse.y)) {
 				button->active = true;
-				button_render(button);
+				button->paint = true;
 			}
 			break;
 		case UI_EVENT_MOUSEUP:
 			if (button->active) {
 				button->active = false;
-				button_render(button);
+				button->paint = true;
 				if (rect_test_mouse(&(button->bounding_rect), event->payload.mouse.x, event->payload.mouse.y)) {
 					if (button->event_handler != nullptr) {
 						ui_event_t click = {0};
@@ -191,9 +191,9 @@ void input_process_events(ui_input_t *input, ui_event_t *event)
 			{
 				if (input->focused) {
 					input->focused = false;
-					input_render(input);
+					input->paint = true;
 				}
-				break;
+				return;
 			}
 			if (input->event_handler != nullptr) {
 				bool result = input->event_handler(input->id, &clickEvent);
@@ -202,10 +202,14 @@ void input_process_events(ui_input_t *input, ui_event_t *event)
 				}
 			}
 			input->focused = true;
-			input_render(input);
+			input->paint = true;
 			break;
 		}
 		case UI_EVENT_KEY: {
+			uint16_t input_width = input->bounding_rect.width;
+			if (input->bounding_rect.height == 3) {
+				input_width -= 2;
+			}
 			if (event->payload.keyboard.keyCode == KEY_ARROW_LEFT) {
 				if (input->cursor_x > 0) {
 					input->cursor_x -= 1;
@@ -215,37 +219,60 @@ void input_process_events(ui_input_t *input, ui_event_t *event)
 					}
 				}
 			}
-			if (event->payload.keyboard.keyCode <= 255) {
-				uint16_t input_width = input->bounding_rect.width;
-				if (input->bounding_rect.height == 3) {
-					input_width -= 2;
+			if (event->payload.keyboard.keyCode == KEY_ARROW_RIGHT) {
+				if (input->cursor_x < input_width - 1) {
+					input->cursor_x += 1;
+				} else {
+					if (input->cursor_x0 + input->cursor_x < input->maxlen - 1) {
+						input->cursor_x0 += 1;
+					}
 				}
+			}
+			if (event->payload.keyboard.keyCode == 27) {
+				input->focused = false;
+				input->cursor_x = 0;
+				input->cursor_x0 = 0;
+				input->paint = true;
+				return;
+			}
+			if (event->payload.keyboard.keyCode <= 255) {
+
 				uint16_t x = input->cursor_x0 + input->cursor_x;
 				if (x < input->maxlen) {
 					input->value[x] = event->payload.keyboard.keyCode & 0xff;
-					if (input->cursor_x < input_width - 1) {
+					for (uint16_t c = x-1; c>=0; c--)
+					{
+						if (input->value[c] == '\0') {
+							input->value[c] = ' ';
+						} else {
+							break;
+						}
+					}
+
+					if (input->cursor_x < input_width - 1)
+					{
 						input->cursor_x++;
 					} else {
 						input->cursor_x0++;
 					}
 				}
 			}
-			input_render(input);
+			input->paint = true;
 			break;
 		}
 	}
 }
 
-void component_set_focus(uint16_t componentCount, ui_component_t *components, uint16_t id)
+void component_set_focus(uint16_t count, ui_component_t *components, uint16_t id)
 {
-	for (uint16_t i = 0; i < componentCount; i++) {
+	for (uint16_t i = 0; i < count; i++) {
 		components[i].component.generic.focused = components[i].component.generic.id == id;
 	}
 }
 
-void component_process_events(uint16_t componentCount, ui_component_t *components, ui_event_t *event)
+void component_process_events(uint16_t count, ui_component_t *components, ui_event_t *event)
 {
-	for (uint16_t i = 0; i < componentCount; i++)
+	for (uint16_t i = 0; i < count; i++)
 	{
 		bool oldFocus = components[i].component.generic.focused;
 		switch (components[i].type) {
@@ -260,7 +287,7 @@ void component_process_events(uint16_t componentCount, ui_component_t *component
 		}
 		if ((oldFocus == false) && (components[i].component.generic.focused))
 		{
-			component_set_focus(componentCount, components, components[i].component.generic.id);
+			component_set_focus(count, components, components[i].component.generic.id);
 		}
 	}
 }
@@ -279,6 +306,16 @@ void component_render(ui_component_t *component)
 			input_render(&(component->component.input));
 			break;
 	}
+	component->component.generic.paint = false;
+}
+
+void component_render_all(uint16_t count, ui_component_t *components, bool paint_all)
+{
+	for (uint16_t i = 0; i < count; i++) {
+		if (paint_all || components[i].component.generic.paint) {
+			component_render(&(components[i]));
+		}
+	}
 }
 
 ui_component_t component_create_button(uint16_t id, const char *label, uint8_t x, uint8_t y, uint8_t width, uint8_t height, uint8_t color)
@@ -286,6 +323,7 @@ ui_component_t component_create_button(uint16_t id, const char *label, uint8_t x
 	ui_component_t component = {0};
 	ui_button_t button = {0};
 	rect_t rect = {0};
+	button.id = id;
 	button.label = label;
 	rect.x = x;
 	rect.y = y;
@@ -307,6 +345,7 @@ ui_component_t component_create_input(uint16_t id, uint8_t x, uint8_t y, uint8_t
 	rect.y = y;
 	rect.width = width;
 	rect.height = height;
+	input.id = id;
 	input.bounding_rect = rect;
 	input.color = color;
 	input.value = (char *)calloc(maxlen, sizeof(char));
