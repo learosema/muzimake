@@ -287,6 +287,53 @@ void input_process_events(ui_input_t *input, ui_event_t *event)
 	}
 }
 
+void listbox_render(ui_listbox_t *listbox)
+{
+	if (listbox->focused) {
+		textmode_dblrect(
+			listbox->bounding_rect.x,
+			listbox->bounding_rect.y,
+			listbox->bounding_rect.width,
+			listbox->bounding_rect.height,
+			listbox->color
+		);
+	} else {
+		textmode_rect(
+			listbox->bounding_rect.x,
+			listbox->bounding_rect.y,
+			listbox->bounding_rect.width,
+			listbox->bounding_rect.height,
+			listbox->color
+		);
+	}
+	uint8_t inner_width = listbox->bounding_rect.width - 2;
+	uint8_t inner_height = listbox->bounding_rect.height - 2;
+	uint8_t select_color = 0x70 + (listbox->color >> 4);
+	for (uint8_t y = 0; y < inner_height; y++)
+	{
+		uint16_t yy = listbox->cursor_y0 + y;
+		uint8_t color = yy == (listbox->cursor_y0 + listbox->cursor_y) ?
+			select_color : listbox->color;
+		if (yy < listbox->num_items) {
+			uint8_t written = textmode_printn(listbox->values[yy], inner_width,
+				listbox->bounding_rect.x + 1,
+				listbox->bounding_rect.y + 1 + y, color
+			);
+			textmode_hline(
+				listbox->bounding_rect.x + 1 + written,
+				listbox->bounding_rect.y + 1 + y,
+				inner_width - written, ' ', color
+			);
+		} else {
+			textmode_hline(
+				listbox->bounding_rect.x + 1,
+				listbox->bounding_rect.y + 1 + y,
+				inner_width, ' ', color
+			);
+		}
+	}
+}
+
 void component_set_focus(uint16_t count, ui_component_t *components, uint16_t id)
 {
 	for (uint16_t i = 0; i < count; i++) {
