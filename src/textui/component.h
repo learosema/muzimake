@@ -94,8 +94,8 @@ void component_process_events(uint16_t count, ui_component_t *components, ui_eve
 void component_render(ui_component_t *component);
 void component_render_all(uint16_t count, ui_component_t *components, bool paint_all);
 ui_component_t component_create_button(uint16_t id, const char *label, uint8_t x, uint8_t y, uint8_t width, uint8_t height, uint8_t color);
-ui_component_t component_create_input(uint16_t id, uint8_t x, uint8_t y, uint8_t width, uint8_t height, uint8_t color, char *value, size_t maxlen);
-ui_component_t create_listbox(uint16_t id, uint8_t x, uint8_t y, uint8_t width, uint8_t height, uint8_t color, char** values, uint16_t num_items);
+ui_component_t component_create_input(uint16_t id, uint8_t x, uint8_t y, uint8_t width, uint8_t height, uint8_t color, const char *value, size_t maxlen);
+ui_component_t component_create_listbox(uint16_t id, uint8_t x, uint8_t y, uint8_t width, uint8_t height, uint8_t color, const char** values, uint16_t num_items);
 void component_dispose(ui_component_t *component);
 
 void component_set_focus(uint16_t componentCount, ui_component_t *components, uint16_t id);
