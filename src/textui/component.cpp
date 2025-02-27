@@ -396,7 +396,6 @@ void listbox_process_events(ui_listbox_t *listbox, ui_event_t *event)
 	}
 }
 
-
 void component_set_focus(uint16_t count, ui_component_t *components, uint16_t id)
 {
 	for (uint16_t i = 0; i < count; i++) {
