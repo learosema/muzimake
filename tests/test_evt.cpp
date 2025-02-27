@@ -15,10 +15,12 @@
 
 static const char * LBL_OK = "Okay";
 static const char * LBL_CANCEL = "Cancel";
+static const char *LIST_EXAMPLE[5] = {"Eins", "Zwei", "Drei", "Vier", "Fuenf"};
 
 #define ID_OK     0
 #define ID_CANCEL 1
 #define ID_INPUT  2
+#define ID_LIST   3
 
 bool g_hasMouse;
 MOUSE_STATUS g_mouse;
@@ -36,12 +38,13 @@ static bool event_handler(uint16_t elementId, ui_event_t *event) {
 ui_state_t ui_create() {
 	ui_state_t ui = {0};
 
-	ui.count = 3;
+	ui.count = 4;
 	ui.components = ALLOC_TYPE(ui_component_t, ui.count);
 
 	ui.components[ID_OK] = component_create_button(ID_OK, LBL_OK, 2, 2, 10, 3, 0x2f);;
 	ui.components[ID_CANCEL] = component_create_button(ID_CANCEL, LBL_CANCEL, 13, 2, 10, 3, 0x4e);
-	ui.components[ID_INPUT] = component_create_input(ID_INPUT, 2, 5, 10, 3, 0x5f, "", 10);
+	ui.components[ID_INPUT] = component_create_input(ID_INPUT, 2, 6, 10, 3, 0x5f, "", 10);
+	ui.components[ID_LIST] = component_create_listbox(ID_LIST, 2, 10, 12,10, 0x6e, LIST_EXAMPLE, 5);
 	ui.components[ID_OK].component.button.event_handler = event_handler;
 	ui.components[ID_CANCEL].component.button.event_handler = event_handler;
 	return ui;

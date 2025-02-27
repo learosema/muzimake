@@ -276,7 +276,7 @@ uint8_t textmode_printn(const char *str, uint8_t len, int x, int y, uint8_t colo
 
 	if ((y < 0) || (y >= g_currentMode.numRows))
 	{
-		return;
+		return 0;
 	}
 	ptr = TEXT_VRAM + g_currentMode.page * g_currentMode.pageSize +
 		(uint16_t)(y*g_currentMode.numCols*2+x*2);

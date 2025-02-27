@@ -222,6 +222,11 @@ void input_process_events(ui_input_t *input, ui_event_t *event)
 					}
 				}
 			}
+			if (event->payload.keyboard.keyCode == KEY_ENTER) {
+				input->focused = false;
+				input->paint = true;
+				return;
+			}
 			if (event->payload.keyboard.keyCode == KEY_ARROW_RIGHT) {
 				if (input->cursor_x < input_width - 1) {
 					input->cursor_x += 1;
@@ -308,7 +313,7 @@ void listbox_render(ui_listbox_t *listbox)
 	}
 	uint8_t inner_width = listbox->bounding_rect.width - 2;
 	uint8_t inner_height = listbox->bounding_rect.height - 2;
-	uint8_t select_color = 0x70 + (listbox->color >> 4);
+	uint8_t select_color = 0xf + (listbox->color & 0x70 ^ 0x70);
 	for (uint8_t y = 0; y < inner_height; y++)
 	{
 		uint16_t yy = listbox->cursor_y0 + y;
@@ -333,6 +338,64 @@ void listbox_render(ui_listbox_t *listbox)
 		}
 	}
 }
+
+void listbox_process_events(ui_listbox_t *listbox, ui_event_t *event)
+{
+	switch (event->type) {
+		case UI_EVENT_MOUSEUP: {
+			ui_event_t clickEvent = {0};
+			clickEvent.type = UI_EVENT_CLICK;
+			clickEvent.payload.click.target = listbox->id;
+			clickEvent.payload.click.buttons = event->payload.mouse.buttons;
+			if (! rect_test_mouse(&(listbox->bounding_rect), event->payload.mouse.x, event->payload.mouse.y))
+			{
+				if (listbox->focused) {
+					listbox->focused = false;
+					listbox->paint = true;
+				}
+				return;
+			}
+			if (listbox->event_handler != nullptr) {
+				bool result = listbox->event_handler(listbox->id, &clickEvent);
+				if (! result) {
+					break;
+				}
+			}
+			listbox->focused = true;
+			listbox->paint = true;
+			break;
+		}
+		case UI_EVENT_KEY: {
+			if (! listbox->focused) {
+				return;
+			}
+			uint16_t inner_height = listbox->bounding_rect.height - 2;
+			if (event->payload.keyboard.keyCode == KEY_ARROW_DOWN) {
+				if (listbox->cursor_y < inner_height - 1) {
+					listbox->cursor_y += 1;
+					listbox->paint = true;
+				} else {
+					if (listbox->cursor_y0 + listbox->cursor_y < listbox->num_items) {
+						listbox->cursor_y0 += 1;
+						listbox->paint = true;
+					}
+				}
+			}
+			if (event->payload.keyboard.keyCode == KEY_ARROW_UP) {
+				if (listbox->cursor_y > 0) {
+					listbox->cursor_y -= 1;
+					listbox->paint = true;
+				} else {
+					if (listbox->cursor_y0 > 0) {
+						listbox->cursor_y0 -= 1;
+						listbox->paint = true;
+					}
+				}
+			}
+		}
+	}
+}
+
 
 void component_set_focus(uint16_t count, ui_component_t *components, uint16_t id)
 {
@@ -401,10 +464,16 @@ void component_process_events(uint16_t count, ui_component_t *components, ui_eve
 				input_process_events(&(components[i].component.input), event);
 				break;
 			}
+			case COMPONENT_LISTBOX: {
+				listbox_process_events(&(components[i].component.listbox), event);
+				break;
+			}
 		}
 
 		if ((oldFocus == false) && (components[i].component.generic.focused))
 		{
+			// if the component processed received focus,
+			// delete the focus from the other elements.
 			component_set_focus(count, components, components[i].component.generic.id);
 		}
 	}
@@ -417,12 +486,20 @@ void component_render(ui_component_t *component)
 	}
 	switch (component->type)
 	{
-		case COMPONENT_BUTTON:
+		case COMPONENT_BUTTON: {
 			button_render(&(component->component.button));
 			break;
-		case COMPONENT_INPUT:
+		}
+
+		case COMPONENT_INPUT: {
 			input_render(&(component->component.input));
 			break;
+		}
+
+		case COMPONENT_LISTBOX: {
+			listbox_render(&(component->component.listbox));
+			break;
+		}
 	}
 	component->component.generic.paint = false;
 }
@@ -454,7 +531,7 @@ ui_component_t component_create_button(uint16_t id, const char *label, uint8_t x
 	return component;
 }
 
-ui_component_t component_create_input(uint16_t id, uint8_t x, uint8_t y, uint8_t width, uint8_t height, uint8_t color, char *value, size_t maxlen)
+ui_component_t component_create_input(uint16_t id, uint8_t x, uint8_t y, uint8_t width, uint8_t height, uint8_t color, const char *value, size_t maxlen)
 {
 	ui_component_t component = {0};
 	ui_input_t input = {0};
@@ -475,7 +552,7 @@ ui_component_t component_create_input(uint16_t id, uint8_t x, uint8_t y, uint8_t
 	return component;
 }
 
-ui_component_t create_listbox(uint16_t id, uint8_t x, uint8_t y, uint8_t width, uint8_t height, uint8_t color, char** values, uint16_t num_items)
+ui_component_t component_create_listbox(uint16_t id, uint8_t x, uint8_t y, uint8_t width, uint8_t height, uint8_t color, const char** values, uint16_t num_items)
 {
 	ui_component_t component = {0};
 	ui_listbox_t listbox = {0};
@@ -487,11 +564,14 @@ ui_component_t create_listbox(uint16_t id, uint8_t x, uint8_t y, uint8_t width, 
 	listbox.id = id;
 	listbox.bounding_rect = rect;
 	listbox.color = color;
-	listbox.values = values;
+	listbox.values = ALLOC_TYPE(char *, num_items);
+	for (uint16_t i = 0; i < num_items; i++) {
+		listbox.values[i] = strdup(values[i]);
+	}
 	listbox.num_items = num_items;
 	listbox.cursor_y0 = 0;
 	listbox.cursor_y = 0;
-	component.type = COMPONENT_INPUT;
+	component.type = COMPONENT_LISTBOX;
 	component.component.listbox = listbox;
 	return component;
 }
@@ -506,6 +586,13 @@ void component_dispose(ui_component_t *component)
 			free(component->component.input.value);
 			component->component.input.value = nullptr;
 			break;
+		}
+		case COMPONENT_LISTBOX: {
+			for (uint16_t i = 0; i < component->component.listbox.num_items; i++) {
+				free(component->component.listbox.values[i]);
+			}
+			free(component->component.listbox.values);
+			component->component.listbox.values = nullptr;
 		}
 	}
 }
