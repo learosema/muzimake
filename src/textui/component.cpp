@@ -4,6 +4,7 @@
 #include "component.h"
 #include "textmode.h"
 #include "macros.h"
+#include "vendor/cp437.h"
 
 bool rect_test_point_in_bounds(rect_t * rect, uint8_t x, uint8_t y)
 {
@@ -18,7 +19,7 @@ bool rect_test_point_in_bounds(rect_t * rect, uint8_t x, uint8_t y)
 
 bool rect_test_mouse(rect_t * rect, uint16_t mouseX, uint16_t mouseY)
 {
-	return rect_test_point_in_bounds(rect, (uint8_t)mouseX/8, (uint8_t)mouseY/8);
+	return rect_test_point_in_bounds(rect, (uint8_t)(mouseX>>3), (uint8_t)(mouseY>>3));
 }
 
 void button_render(ui_button_t *button)
@@ -396,6 +397,41 @@ void listbox_process_events(ui_listbox_t *listbox, ui_event_t *event)
 	}
 }
 
+void range_render(ui_range_t *range)
+{
+	uint8_t color = range->color;
+	if (range->active || range->focused) {
+		color = color & 0x0f;
+	}
+	if (range->bounding_rect.height != 1) {
+		range->bounding_rect.height = 1;
+	}
+
+	uint8_t inner_width = (range->bounding_rect.width - 2);
+	float f = (float)(inner_width) / (float)(range->max - range->min + 1);
+
+	uint8_t x0 = range->bounding_rect.x;
+	uint8_t x1 = x0 + range->bounding_rect.width - 1;
+	uint8_t xm = x0 + 1  + CLAMP((int)((range->value - range->min) * f + .5), 0, inner_width);
+	uint8_t y  = range->bounding_rect.y;
+
+	char stringValue[20];
+	// TODO: pad string....
+	sprintf(stringValue,"%d  ", inner_width, range->value, f);
+	textmode_print(stringValue, x1 + 2, y, color);
+	textmode_putchar_color(x0, y, CP_LEFT_TRIANGLE, color);
+	textmode_hline(x0 + 1, y, xm - x0 - 1, CP_MEDIUM_SHADE, color);
+	textmode_hline(xm + 1, y, inner_width - xm + x0, CP_MEDIUM_SHADE, color);
+	textmode_putchar_color(xm, y, CP_SQUARE, color);
+	textmode_putchar_color(x1, y, CP_RIGHT_TRIANGLE, color);
+}
+
+void range_process_events(ui_range_t *range, ui_event_t *event)
+{
+	// TODO
+}
+
+
 void component_set_focus(uint16_t count, ui_component_t *components, uint16_t id)
 {
 	for (uint16_t i = 0; i < count; i++) {
@@ -499,6 +535,11 @@ void component_render(ui_component_t *component)
 			listbox_render(&(component->component.listbox));
 			break;
 		}
+
+		case COMPONENT_RANGE: {
+			range_render(&(component->component.range));
+			break;
+		}
 	}
 	component->component.generic.paint = false;
 }
@@ -572,6 +613,27 @@ ui_component_t component_create_listbox(uint16_t id, uint8_t x, uint8_t y, uint8
 	listbox.cursor_y = 0;
 	component.type = COMPONENT_LISTBOX;
 	component.component.listbox = listbox;
+	return component;
+}
+
+ui_component_t component_create_range(uint16_t id, uint8_t x, uint8_t y, uint8_t width, uint8_t height, uint8_t color, int value, int min, int max, int step)
+{
+	ui_component_t component = {0};
+	ui_range_t range = {0};
+	rect_t rect = {0};
+	rect.x = x;
+	rect.y = y;
+	rect.width = width;
+	rect.height = height;
+	range.id = id;
+	range.bounding_rect = rect;
+	range.color = color;
+	range.value = value;
+	range.min = min;
+	range.max = max;
+	range.step = step;
+	component.type = COMPONENT_RANGE;
+	component.component.range = range;
 	return component;
 }
 
