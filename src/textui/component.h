@@ -6,6 +6,7 @@
 #define COMPONENT_BUTTON  1
 #define COMPONENT_INPUT   2
 #define COMPONENT_LISTBOX 3
+#define COMPONENT_RANGE   4
 
 #define INPUT_CURSOR_COLOR 0x3f
 
@@ -72,6 +73,20 @@ typedef struct ui_listbox_s {
 	int cursor_y;
 } ui_listbox_t;
 
+typedef struct ui_range_s {
+	uint16_t id;
+	rect_t bounding_rect;
+	uint8_t color;
+	bool active;
+	bool focused;
+	bool paint;
+	ui_event_handler_t event_handler;
+	int value;
+	int min;
+	int max;
+	int step;
+} ui_range_t;
+
 typedef struct ui_component_s
 {
 	uint16_t type;
@@ -80,6 +95,7 @@ typedef struct ui_component_s
 		ui_button_t button;
 		ui_input_t input;
 		ui_listbox_t listbox;
+		ui_range_t range;
 	} component;
 } ui_component_t;
 
@@ -96,6 +112,7 @@ void component_render_all(uint16_t count, ui_component_t *components, bool paint
 ui_component_t component_create_button(uint16_t id, const char *label, uint8_t x, uint8_t y, uint8_t width, uint8_t height, uint8_t color);
 ui_component_t component_create_input(uint16_t id, uint8_t x, uint8_t y, uint8_t width, uint8_t height, uint8_t color, const char *value, size_t maxlen);
 ui_component_t component_create_listbox(uint16_t id, uint8_t x, uint8_t y, uint8_t width, uint8_t height, uint8_t color, const char** values, uint16_t num_items);
+ui_component_t component_create_range(uint16_t id, uint8_t x, uint8_t y, uint8_t width, uint8_t height, uint8_t color, int value, int min, int max, int step);
 void component_dispose(ui_component_t *component);
 
 void component_set_focus(uint16_t componentCount, ui_component_t *components, uint16_t id);
