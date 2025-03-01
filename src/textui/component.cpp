@@ -168,9 +168,6 @@ void input_render(ui_input_t *input)
 	uint8_t i;
 	uint8_t color = input->color;
 
-	if (input->active || input->focused) {
-		color = color & 0x0f;
-	}
 	if (input->bounding_rect.height != 3 && input->bounding_rect.height != 1) {
 		input->bounding_rect.height = 1;
 	}
@@ -318,7 +315,6 @@ void listbox_render(ui_listbox_t *listbox)
 {
 	uint8_t lbcolor = listbox->color;
 	if (listbox->focused) {
-		lbcolor = lbcolor & 15;
 		textmode_dblrect(
 			listbox->bounding_rect.x,
 			listbox->bounding_rect.y,
@@ -368,6 +364,12 @@ void listbox_process_events(ui_listbox_t *listbox, ui_event_t *event)
 	switch (event->type) {
 		case UI_EVENT_MOUSEUP: {
 			ui_handle_mouseup((ui_generic_t *)listbox, event);
+			rect_t clientrect = get_clientrect(&(listbox->bounding_rect));
+			if (rect_test_mouse(&clientrect, event->payload.mouse.x, event->payload.mouse.y)) {
+				uint8_t y = (uint8_t)(event->payload.mouse.y / 8) - clientrect.y;
+				listbox->cursor_y = y;
+				listbox->paint = true;
+			}
 			break;
 		}
 		case UI_EVENT_KEY: {
@@ -404,9 +406,6 @@ void listbox_process_events(ui_listbox_t *listbox, ui_event_t *event)
 void range_render(ui_range_t *range)
 {
 	uint8_t color = range->color;
-	if (range->active || range->focused) {
-		color = color & 0x0f;
-	}
 	if (range->bounding_rect.height != 1 && range->bounding_rect.height != 3) {
 		range->bounding_rect.height = 3;
 	}

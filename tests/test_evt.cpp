@@ -127,7 +127,7 @@ int main()
 			default:
 				break;
 		}
-		delay(16); // 60FPS
+		delay(1);
 	}
 
 	if (g_hasMouse) {
