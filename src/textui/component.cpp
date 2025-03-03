@@ -314,23 +314,59 @@ void input_process_events(ui_input_t *input, ui_event_t *event)
 void listbox_render(ui_listbox_t *listbox)
 {
 	uint8_t lbcolor = listbox->color;
-	if (listbox->focused) {
-		textmode_dblrect(
-			listbox->bounding_rect.x,
-			listbox->bounding_rect.y,
-			listbox->bounding_rect.width,
-			listbox->bounding_rect.height,
-			lbcolor
-		);
-	} else {
-		textmode_rect(
-			listbox->bounding_rect.x,
-			listbox->bounding_rect.y,
-			listbox->bounding_rect.width,
-			listbox->bounding_rect.height,
-			lbcolor
-		);
+	const uint8_t symbol_topleft = listbox->focused ?
+		CP_THICK_RIGHT_THICK_DOWN : CP_THIN_RIGHT_THIN_DOWN;
+	const uint8_t symbol_horizontal = listbox->focused ?
+		CP_THICK_HORIZONTAL : CP_THIN_HORIZONTAL;
+	const uint8_t symbol_topright = listbox->focused ?
+		CP_THICK_LEFT_THICK_DOWN : CP_THIN_LEFT_THIN_DOWN;
+	const uint8_t symbol_vertical = listbox->focused ?
+		CP_THICK_VERTICAL : CP_THIN_VERTICAL;
+	const uint8_t symbol_bottomright = listbox->focused ?
+		CP_THICK_LEFT_THICK_UP : CP_THIN_LEFT_THIN_UP;
+	const uint8_t symbol_bottomleft= listbox->focused ?
+		CP_THICK_RIGHT_THICK_UP : CP_THIN_RIGHT_THIN_UP;
+
+	rect_t clientrect = get_clientrect(&(listbox->bounding_rect));
+
+	uint8_t x0 = listbox->bounding_rect.x;
+	uint8_t y0 = listbox->bounding_rect.y;
+	uint8_t x1 = x0 + listbox->bounding_rect.width - 1;
+	uint8_t y1 = y0 + listbox->bounding_rect.height - 1;
+	uint8_t w = listbox->bounding_rect.width;
+	uint8_t h = listbox->bounding_rect.height;
+
+	textmode_putchar_color(x0, y0, symbol_topleft, lbcolor);
+	textmode_putchar_color(x1, y0, symbol_topright, lbcolor);
+	textmode_putchar_color(x0, y1, symbol_bottomleft, lbcolor);
+	textmode_putchar_color(x1, y1, symbol_bottomright, lbcolor);
+
+	if (w > 2) {
+		textmode_hline(x0 + 1, y0, w - 2, symbol_horizontal, lbcolor);
+		textmode_hline(x0 + 1, y1, w - 2, symbol_horizontal, lbcolor);
 	}
+	if (h > 2) {
+		textmode_vline(x0, y0 + 1, h - 2, symbol_vertical, lbcolor);
+		if (clientrect.height >= listbox->num_items) {
+			textmode_vline(x1, y0 + 1, h - 2, symbol_vertical, lbcolor);
+		} else {
+			textmode_putchar_color(x1, y0 + 1, CP_UP_TRIANGLE, lbcolor);
+			textmode_putchar_color(x1, y0 + h - 2, CP_DOWN_TRIANGLE, lbcolor);
+
+			float thumb_f = (float)(clientrect.height) / (float)(listbox->num_items);
+			uint8_t thumb_h = CLAMP(
+				(0.5f + (float)(clientrect.height - 2) * thumb_f), 1, clientrect.height - 3);
+			uint8_t thumb_y0 = MAX((thumb_y0 + clientrect.height - 3 - thumb_h), y0 + 2 + (
+				(float)(listbox->cursor_y0) / (float)(listbox->num_items) * (float)(h - 4) + 0.5f));
+
+			for (uint8_t scroll_y = y0 + 2; scroll_y < y0 + h - 2; scroll_y++) {
+				textmode_putchar_color(x1, scroll_y,
+					scroll_y >= thumb_y0 &&
+					scroll_y < thumb_y0 + thumb_h ? CP_BLOCK : CP_MEDIUM_SHADE, lbcolor);
+			}
+		}
+	}
+
 	uint8_t inner_width = listbox->bounding_rect.width - 2;
 	uint8_t inner_height = listbox->bounding_rect.height - 2;
 	uint8_t select_color = 0x70;
@@ -378,14 +414,13 @@ void listbox_process_events(ui_listbox_t *listbox, ui_event_t *event)
 			}
 			uint16_t inner_height = listbox->bounding_rect.height - 2;
 			if (event->payload.keyboard.keyCode == KEY_ARROW_DOWN) {
-				if (listbox->cursor_y < inner_height - 1) {
-					listbox->cursor_y += 1;
-					listbox->paint = true;
-				} else {
-					if (listbox->cursor_y0 + listbox->cursor_y < listbox->num_items) {
+				if (listbox->cursor_y0 + listbox->cursor_y < listbox->num_items - 1) {
+					if (listbox->cursor_y < inner_height - 1) {
+						listbox->cursor_y += 1;
+					} else {
 						listbox->cursor_y0 += 1;
-						listbox->paint = true;
 					}
+					listbox->paint = true;
 				}
 			}
 			if (event->payload.keyboard.keyCode == KEY_ARROW_UP) {
@@ -465,9 +500,6 @@ void range_process_events(ui_range_t *range, ui_event_t *event)
 				rect_t clientrect = get_clientrect(&(range->bounding_rect));
 				clientrect.width -= 4;
 				if ((clientrect.width<3) || (clientrect.height < 1)) {
-					char debug[100];
-					sprintf(debug, "MUH %d %d %d %d", clientrect.x, clientrect.y, clientrect.width, clientrect.height);
-					textmode_print(debug, 33, 4, 0x5f);
 					return;
 				}
 				if (rect_test_mouse(&clientrect, event->payload.mouse.x, event->payload.mouse.y)) {
