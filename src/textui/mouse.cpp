@@ -1,4 +1,8 @@
+#ifdef __DOS__
 #include <dos.h>
+#else
+#include <intstubs.h>
+#endif
 
 #include "mouse.h"
 
@@ -7,7 +11,6 @@
 #else
 #define INTR int86
 #endif
-
 
 /**
  * Mouse Init and get Installed Flag
@@ -19,6 +22,35 @@ bool mouse_init()
 	regs.w.ax = 0;
 	INTR(0x33, &regs, &regs);
 	return (regs.w.ax == 0xffff);
+}
+
+
+/**
+ * Set vertical mouse range
+ * @param minY minimum row
+ * @param maxY maximum row
+ */
+void mouse_set_vertical_range(uint16_t minY, uint16_t maxY)
+{
+	union REGS regs;
+	regs.w.ax = 8;
+	regs.w.cx = minY;
+	regs.w.dx = maxY;
+	INTR(0x33, &regs, &regs);
+}
+
+/**
+ * Set horizontal mouse range
+ * @param minX minimum col
+ *
+ */
+void mouse_set_horizontal_range(uint16_t minX, uint16_t maxX)
+{
+	union REGS regs;
+	regs.w.ax = 7;
+	regs.w.cx = minX;
+	regs.w.dx = maxX;
+	INTR(0x33, &regs, &regs);
 }
 
 /**

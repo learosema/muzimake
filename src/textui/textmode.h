@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 
-
+#ifdef __DOS__
 #ifdef __386__
 #define INTR int386
 #define VRAMPTR uint8_t *
@@ -17,6 +17,15 @@
 #define TEXT_VRAM_BASE (uint8_t far *)(0xb8000000)
 #define TEXT_VRAM_BASE_MONO (uint8_t far *)(0xb0000000)
 #endif
+#else
+#include <intstubs.h>
+#define INTR int86
+#define VRAMPTR uint8_t *
+#define TEXT_VRAM_BASE (uint8_t *)0x0
+#define TEXT_VRAM_BASE_MONO (uint8_t *)0x0
+#define BIOS_VIDEO_PORT_ADDRESS (uint16_t *)(0x0)
+#endif
+
 
 #define PAGE_SIZE_80X25 0x1000
 #define PAGE_SIZE_80X50 0x2040
@@ -95,7 +104,19 @@ void textmode_colorize_area(
 	uint8_t color
 );
 
-void textmode_print(char *str, int x, int y, uint8_t color);
+void textmode_print(const char *str, int x, int y, uint8_t color);
+
+uint8_t textmode_printn(const char *str, uint8_t len, int x, int y, uint8_t color);
+
+void textmode_putchar(int x, int y, char ch);
+
+void textmode_putchar_color(int x, int y, char ch, uint8_t color);
+
+void textmode_putcolor(int x, int y, uint8_t color);
+
+char textmode_getchar(int x, int y);
+
+uint8_t textmode_getcolor(int x, int y);
 
 void textmode_box(
 	int x,
@@ -107,11 +128,29 @@ void textmode_box(
 
 void textmode_dblbox(
 	int x,
-	int y, 
+	int y,
 	uint8_t width,
-	uint8_t height, 
+	uint8_t height,
 	uint8_t color
 );
+
+void textmode_rect(
+	int x,
+	int y,
+	uint8_t width,
+	uint8_t height,
+	uint8_t color
+);
+
+void textmode_dblrect(
+	int x,
+	int y,
+	uint8_t width,
+	uint8_t height,
+	uint8_t color
+);
+
+
 
 void textmode_gotoxy(uint8_t x, uint8_t y);
 

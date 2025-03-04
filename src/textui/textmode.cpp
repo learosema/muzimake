@@ -1,6 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
+#ifdef __DOS__
 #include <dos.h>
+#else
+#include <intstubs.h>
+#endif
 #include <string.h>
 
 #include "textmode.h"
@@ -21,7 +25,7 @@ void _retrieve_modeinfo()
 	g_currentMode.numCols = (uint8_t)regs.h.ah;
 	g_currentMode.numRows = 25;
 	g_currentMode.page = (uint8_t)regs.h.bh;
-	g_currentMode.pageSize=PAGE_SIZE_80X25;
+	g_currentMode.pageSize = PAGE_SIZE_80X25;
 	g_currentMode.videoPortAddress = *(BIOS_VIDEO_PORT_ADDRESS);
 	g_currentMode.hasColors = (g_currentMode.videoPortAddress == 0x3d4);
 	g_currentMode.vram = g_currentMode.hasColors ?
@@ -66,13 +70,13 @@ void textmode_set_page(uint8_t page)
 		page = page % 8;
 	}
 
-	if (g_currentMode.pageSize == PAGE_SIZE_80X25 && page >= 4) {
+	if (g_currentMode.pageSize == PAGE_SIZE_80X50 && page >= 4) {
 		page = page % 4;
 	}
 
 	union REGS regs;
 	regs.h.ah = 0x05;
-	regs.h.al =
+	regs.h.al = page;
 	INTR(0x10, &regs, &regs);
 	g_currentMode.page = page;
 }
@@ -209,7 +213,7 @@ void textmode_colorize_area(
 	}
 }
 
-void textmode_print(char *str, int x, int y, uint8_t color)
+void textmode_print(const char *str, int x, int y, uint8_t color)
 {
 	VRAMPTR ptr;
 	uint8_t i;
@@ -219,7 +223,8 @@ void textmode_print(char *str, int x, int y, uint8_t color)
 	{
 		return;
 	}
-	ptr = TEXT_VRAM + (uint16_t)(y*g_currentMode.numCols*2+x*2);
+	ptr = TEXT_VRAM + g_currentMode.page * g_currentMode.pageSize +
+		(uint16_t)(y*g_currentMode.numCols*2+x*2);
 	for (i = 0; i < len; i++)
 	{
 		if ((x + i < 0) || (x + i >= g_currentMode.numCols))
@@ -234,7 +239,106 @@ void textmode_print(char *str, int x, int y, uint8_t color)
 	}
 }
 
-void textmode_box(int x, int y, uint8_t width, uint8_t height, uint8_t color)
+uint8_t textmode_printn(const char *str, uint8_t len, int x, int y, uint8_t color)
+{
+	VRAMPTR ptr;
+	uint8_t i;
+	uint8_t x0 = (uint8_t)(MAX(0, x));
+
+	if ((y < 0) || (y >= g_currentMode.numRows))
+	{
+		return 0;
+	}
+	ptr = TEXT_VRAM + g_currentMode.page * g_currentMode.pageSize +
+		(uint16_t)(y*g_currentMode.numCols*2+x*2);
+
+	for (i = 0; i < len; i++)
+	{
+		if (str[i] == '\0') {
+			break;
+		}
+		if ((x + i < 0) || (x + i >= g_currentMode.numCols))
+		{
+			ptr += 2;
+			continue;
+		}
+		*ptr = str[i];
+		ptr++;
+		*ptr = color;
+		ptr++;
+	}
+	return i;
+}
+
+
+
+void textmode_putchar(int x, int y, char ch)
+{
+	VRAMPTR ptr;
+	if ((y < 0) || (y >= g_currentMode.numRows) || (x < 0) || (x >= g_currentMode.numCols))
+	{
+		return;
+	}
+	ptr = TEXT_VRAM +
+		g_currentMode.page * g_currentMode.pageSize +
+		(uint16_t)(y*g_currentMode.numCols*2+x*2);
+	*ptr = ch;
+}
+
+void textmode_putcolor(int x, int y, uint8_t color)
+{
+	VRAMPTR ptr;
+	if ((y < 0) || (y >= g_currentMode.numRows) || (x < 0) || (x >= g_currentMode.numCols))
+	{
+		return;
+	}
+	ptr = TEXT_VRAM +
+		g_currentMode.page * g_currentMode.pageSize +
+		(uint16_t)(y*g_currentMode.numCols*2+x*2);
+	*(ptr+1) = color;
+}
+
+void textmode_putchar_color(int x, int y, char ch, uint8_t color)
+{
+	VRAMPTR ptr;
+	if ((y < 0) || (y >= g_currentMode.numRows) || (x < 0) || (x >= g_currentMode.numCols))
+	{
+		return;
+	}
+	ptr = TEXT_VRAM +
+		g_currentMode.page * g_currentMode.pageSize +
+		(uint16_t)(y*g_currentMode.numCols*2+x*2);
+	*ptr = ch;
+	*(ptr+1) = color;
+}
+
+char textmode_getchar(int x, int y)
+{
+	VRAMPTR ptr;
+	if ((y < 0) || (y >= g_currentMode.numRows) || (x < 0) || (x >= g_currentMode.numCols))
+	{
+		return 0;
+	}
+	ptr = TEXT_VRAM +
+		g_currentMode.page * g_currentMode.pageSize +
+		(uint16_t)(y*g_currentMode.numCols*2+x*2);
+	return (*ptr);
+}
+
+uint8_t textmode_getcolor(int x, int y)
+{
+	VRAMPTR ptr;
+	if ((y < 0) || (y >= g_currentMode.numRows) || (x < 0) || (x >= g_currentMode.numCols))
+	{
+		return 0;
+	}
+	ptr = TEXT_VRAM +
+		g_currentMode.page * g_currentMode.pageSize +
+		(uint16_t)(y*g_currentMode.numCols*2+x*2);
+	return (*ptr + 1);
+}
+
+void textmode_rect(int x, int y, uint8_t width, uint8_t height, uint8_t color)
 {
 	uint8_t i;
 
@@ -268,14 +372,18 @@ void textmode_box(int x, int y, uint8_t width, uint8_t height, uint8_t color)
 		x + width - 1, y + height - 1, 1,
 		CP_THIN_LEFT_THIN_UP, color);
 
+}
+
+void textmode_box(int x, int y, uint8_t width, uint8_t height, uint8_t color)
+{
+	textmode_rect(x, y, width, height, color);
 	if (width > 2 && height > 2) {
 		textmode_fill_area(x + 1, y + 1,
 			width - 2, height - 2, ' ', color);
 	}
 }
 
-
-void textmode_dblbox(
+void textmode_dblrect(
 	int x,
 	int y,
 	uint8_t width,
@@ -286,7 +394,7 @@ void textmode_dblbox(
 	uint8_t i;
 
 	textmode_hline(
-		x, y,1,
+		x, y, 1,
 		CP_THICK_RIGHT_THICK_DOWN, color);
 
 	textmode_hline(
@@ -314,6 +422,17 @@ void textmode_dblbox(
 	textmode_hline(
 		x + width - 1, y + height - 1, 1,
 		CP_THICK_LEFT_THICK_UP, color);
+}
+
+void textmode_dblbox(
+	int x,
+	int y,
+	uint8_t width,
+	uint8_t height,
+	uint8_t color
+)
+{
+	textmode_dblrect(x, y, width, height, color);
 
 	if (width > 2 && height > 2) {
 		textmode_fill_area(x + 1, y + 1,
@@ -321,7 +440,8 @@ void textmode_dblbox(
 	}
 }
 
-void textmode_gotoxy(uint8_t x, uint8_t y) {
+void textmode_gotoxy(uint8_t x, uint8_t y)
+{
 	union REGS regs;
 
 	regs.h.ah = 0x02;
