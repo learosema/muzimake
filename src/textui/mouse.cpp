@@ -2,6 +2,7 @@
 
 #include "mouse.h"
 
+
 #ifdef __386__
 #define INTR int386
 #else
@@ -15,10 +16,14 @@
  */
 bool mouse_init()
 {
+	#ifdef __DOS__
 	union REGS regs;
 	regs.w.ax = 0;
 	INTR(0x33, &regs, &regs);
 	return (regs.w.ax == 0xffff);
+	#else
+	return false;
+	#endif
 }
 
 /**
@@ -26,9 +31,11 @@ bool mouse_init()
  */
 void mouse_show()
 {
+	#ifdef __DOS__
 	union REGS regs;
 	regs.w.ax = 0x01;
 	INTR(0x33, &regs, &regs);
+	#endif
 }
 
 
@@ -37,9 +44,11 @@ void mouse_show()
  */
 void mouse_hide()
 {
+	#ifdef __DOS__
 	union REGS regs;
 	regs.w.ax = 0x02;
 	INTR(0x33, &regs, &regs);
+	#endif
 }
 
 /**
@@ -47,10 +56,12 @@ void mouse_hide()
  */
 void mouse_get_status(MOUSE_STATUS *status)
 {
+	#ifdef __DOS__
 	union REGS regs;
 	regs.w.ax = 0x03;
 	INTR(0x33, &regs, &regs);
 	status->mouseX = regs.w.cx;
 	status->mouseY = regs.w.dx;
 	status->buttons = regs.w.bx;
+	#endif
 }

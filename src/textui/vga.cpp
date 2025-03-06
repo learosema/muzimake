@@ -9,6 +9,8 @@ but WATCOM uses conio.h for inp
 
 void vga_wait_for_retrace()
 {
+	#ifdef __DOS__
 	while( inp( INPUT_STATUS ) & VRETRACE );
 	while( ! (inp( INPUT_STATUS ) & VRETRACE) );
+	#endif
 }

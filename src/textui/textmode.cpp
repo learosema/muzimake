@@ -14,6 +14,7 @@ MODEINFO g_currentMode = {0};
 
 void _retrieve_modeinfo()
 {
+	#ifdef __DOS__
 	union REGS regs;
 	regs.w.ax = 0x0f00;
 	INTR(0x10, &regs, &regs);
@@ -26,10 +27,21 @@ void _retrieve_modeinfo()
 	g_currentMode.hasColors = (g_currentMode.videoPortAddress == 0x3d4);
 	g_currentMode.vram = g_currentMode.hasColors ?
 		TEXT_VRAM_BASE : TEXT_VRAM_BASE_MONO;
+	#else
+	g_currentMode.mode = 3;
+	g_currentMode.numCols = 80;
+	g_currentMode.numRows = 25;
+	g_currentMode.page = nullptr;
+	g_currentMode.pageSize = 160 * 25;
+	g_currentMode.videoPortAddress = 0;
+	g_currentMode.hasColors = true;
+	g_currentMode.vram = nullptr;
+	#endif
 }
 
 void textmode_setmode(uint8_t mode)
 {
+	#ifdef __DOS__
 	union REGS regs;
 	if (mode > 3 && mode != 7) {
 		printf("mode: %d not supported by library. Defaulting to mode 3\n");
@@ -38,7 +50,19 @@ void textmode_setmode(uint8_t mode)
 	regs.h.ah = 0;
 	regs.h.al = mode;
 	INTR(0x10, &regs, &regs);
+	#else
+	g_currentMode.vram = malloc(160 * 25 * 8);
+	#endif
 	_retrieve_modeinfo();
+}
+
+void textmode_dispose() {
+
+	if (g_currentMode.vram != TEXT_VRAM_BASE && g_currentMode.vram != TEXT_VRAM_BASE_MONO) {
+		free(g_currentMode.vram);
+		g_currentMode.vram = nullptr;
+	}
+
 }
 
 MODEINFO *textmode_get_modeinfo()
@@ -48,6 +72,7 @@ MODEINFO *textmode_get_modeinfo()
 
 void textmode_font8()
 {
+	#ifdef __DOS__
 	union REGS regs;
 	if (g_currentMode.mode == 3 && g_currentMode.hasColors == false) {
 		// Hercules/MDA won't support switching to 50 lines
@@ -56,8 +81,9 @@ void textmode_font8()
 	regs.w.ax = 0x1112;
 	regs.w.bx = 0;
 	INTR(0x10, &regs, &regs);
-	g_currentMode.numRows = 50;
+	#endif
 	g_currentMode.pageSize= PAGE_SIZE_80X50;
+	g_currentMode.numRows = 50;
 }
 
 void textmode_set_page(uint8_t page)
@@ -79,11 +105,13 @@ void textmode_set_page(uint8_t page)
 
 void textmode_cursor(uint8_t startRow, uint8_t endRow)
 {
+	#ifdef __DOS__
 	union REGS regs;
 	regs.h.ah = 0x01;
 	regs.h.ch = startRow;
 	regs.h.cl = endRow;
 	INTR(0x10, &regs, &regs);
+	#endif
 }
 
 void textmode_clear(uint8_t color)
@@ -322,6 +350,7 @@ void textmode_dblbox(
 }
 
 void textmode_gotoxy(uint8_t x, uint8_t y) {
+	#ifdef __DOS__
 	union REGS regs;
 
 	regs.h.ah = 0x02;
@@ -329,4 +358,5 @@ void textmode_gotoxy(uint8_t x, uint8_t y) {
 	regs.h.dl = x;
 	regs.h.dh = y;
 	INTR(0x10, &regs, &regs);
+	#endif
 }
