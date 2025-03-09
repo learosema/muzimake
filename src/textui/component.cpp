@@ -403,8 +403,10 @@ void listbox_process_events(ui_listbox_t *listbox, ui_event_t *event)
 			rect_t clientrect = get_clientrect(&(listbox->bounding_rect));
 			if (rect_test_mouse(&clientrect, event->payload.mouse.x, event->payload.mouse.y)) {
 				uint8_t y = (uint8_t)(event->payload.mouse.y / 8) - clientrect.y;
-				listbox->cursor_y = y;
-				listbox->paint = true;
+				if (y + listbox->cursor_y0 < listbox->num_items) {
+					listbox->cursor_y = y;
+					listbox->paint = true;
+				}
 			}
 			break;
 		}
