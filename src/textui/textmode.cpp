@@ -35,7 +35,7 @@ void _retrieve_modeinfo()
 	g_currentMode.mode = 3;
 	g_currentMode.numCols = 80;
 	g_currentMode.numRows = 25;
-	g_currentMode.page = nullptr;
+	g_currentMode.page = 0;
 	g_currentMode.pageSize = 160 * 25;
 	g_currentMode.videoPortAddress = 0;
 	g_currentMode.hasColors = true;
@@ -55,7 +55,7 @@ void textmode_setmode(uint8_t mode)
 	regs.h.al = mode;
 	INTR(0x10, &regs, &regs);
 	#else
-	g_currentMode.vram = malloc(160 * 25 * 8);
+	g_currentMode.vram = (uint8_t *)malloc(160 * 25 * 8);
 	#endif
 	_retrieve_modeinfo();
 }
