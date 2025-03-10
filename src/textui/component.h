@@ -87,6 +87,19 @@ typedef struct ui_range_s {
 	int step;
 } ui_range_t;
 
+typedef struct ui_piano_s {
+	uint16_t id;
+	rect_t bounding_rect;
+	uint8_t color;
+	bool active;
+	bool focused;
+	bool paint;
+	ui_event_handler_t event_handler;
+	uint8_t num_keys;
+	uint8_t octave;
+	uint16_t pressed_keys;
+} ui_piano_t;
+
 typedef struct ui_component_s
 {
 	uint16_t type;
