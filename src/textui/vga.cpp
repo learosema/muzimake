@@ -1,5 +1,6 @@
-#ifdef (__DOS__ && __WATCOM__)
+#ifdef __DOS__
 #include <conio.h>
+#include <dos.h>
 #else
 #include <stubs.h>
 #endif

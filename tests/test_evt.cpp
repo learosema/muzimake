@@ -10,7 +10,7 @@
 #include "textui/mouse.h"
 #include "textui/textmode.h"
 #include "textui/ui_event.h"
-#include "textui/component.h"
+#include "textui/cmponent.h"
 #include "macros.h"
 
 static const char * LBL_OK = "Okay";
