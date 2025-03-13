@@ -2,7 +2,7 @@
 CXX=wpp386
 LD=wlink
 SYSTEM=dos4g
-CFLAGS=-zq -zastd=c++0x -bt=dos
+CFLAGS=-zq -zastd=c++0x -bt=dos -dDEBUG
 LDFLAGS=
 
 SRC_DIR=src
@@ -45,7 +45,7 @@ TEST_COMMON_SRCS=bnkfile.cpp rolfile.cpp fileio.cpp file.cpp
 TEST_ROL_SRCS=$(TEST_COMMON_SRCS) instrmnt.cpp opl2.cpp test_rol.cpp
 TEST_BNK_SRCS=$(TEST_COMMON_SRCS) instrmnt.cpp opl2.cpp test_bnk.cpp
 TESTINST_SRCS=$(TEST_COMMON_SRCS) instrmnt.cpp testinst.cpp
-TEST_EVT_SRCS=mouse.cpp textmode.cpp ui_event.cpp cmponent.cpp test_evt.cpp
+TEST_EVT_SRCS=mouse.cpp textmode.cpp ui_event.cpp log.cpp cmponent.cpp test_evt.cpp
 TEST_SRCS    =$(TEST_COMMON_SRCS) instrmnt.cpp test.cpp
 
 OBJS=$(SRCS:.cpp=.$(O_EXT))

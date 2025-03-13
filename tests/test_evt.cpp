@@ -12,6 +12,7 @@
 #include "textui/ui_event.h"
 #include "textui/cmponent.h"
 #include "macros.h"
+#include "helper/log.h"
 
 static const char * LBL_OK = "Okay";
 static const char * LBL_CANCEL = "Cancel";
@@ -73,6 +74,7 @@ int main()
 	g_hasMouse = mouse_init();
 	textmode_font8();
 	g_modeInfo = textmode_get_modeinfo();
+	APP_LOG("TextUI-Tests started.");
 
 	textmode_clear(0x1e);
 	textmode_cursor(32, 0);
@@ -138,5 +140,6 @@ int main()
 	}
 	ui_cleanup(&ui);
 	textmode_setmode(3);
+	APP_LOG("Text-UI tests finished.");
 	return 0;
 }
