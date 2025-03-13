@@ -91,7 +91,7 @@ int main()
 
 	while (!done) {
 		if (g_hasMouse) mouse_hide();
-		component_render_all(ui.count, ui.components, true);
+		component_render_all(ui.count, ui.components, false);
 		if (g_hasMouse) mouse_show();
 		event_poll(&event);
 		component_process_events(ui.count, ui.components, &event);

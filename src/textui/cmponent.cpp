@@ -313,7 +313,7 @@ void input_process_events(ui_input_t *input, ui_event_t *event)
 
 void listbox_render(ui_listbox_t *listbox)
 {
-	APP_LOG("listbox_render, offset %d, cursor: %d", listbox->cursor_y, listbox->cursor_y0);
+	APP_LOG("listbox_render, offset %d, cursor: %d, items: %d", listbox->cursor_y, listbox->cursor_y0, listbox->num_items);
 	uint8_t lbcolor = listbox->color;
 	const uint8_t symbol_topleft = listbox->focused ?
 		CP_THICK_RIGHT_THICK_DOWN : CP_THIN_RIGHT_THIN_DOWN;
