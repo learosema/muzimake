@@ -2,7 +2,7 @@
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
-#include "component.h"
+#include "cmponent.h"
 #include "textmode.h"
 #include "macros.h"
 #include "vendor/cp437.h"
