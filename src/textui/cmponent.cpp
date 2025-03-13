@@ -6,6 +6,7 @@
 #include "textmode.h"
 #include "macros.h"
 #include "vendor/cp437.h"
+#include "helper/log.h"
 
 bool rect_test_point_in_bounds(rect_t * rect, uint8_t x, uint8_t y)
 {
@@ -284,7 +285,6 @@ void input_process_events(ui_input_t *input, ui_event_t *event)
 				return;
 			}
 			if (event->payload.keyboard.keyCode <= 255) {
-
 				uint16_t x = input->cursor_x0 + input->cursor_x;
 				if (x < input->maxlen) {
 					input->value[x] = event->payload.keyboard.keyCode & 0xff;
@@ -313,6 +313,7 @@ void input_process_events(ui_input_t *input, ui_event_t *event)
 
 void listbox_render(ui_listbox_t *listbox)
 {
+	APP_LOG("listbox_render, offset %d, cursor: %d", listbox->cursor_y, listbox->cursor_y0);
 	uint8_t lbcolor = listbox->color;
 	const uint8_t symbol_topleft = listbox->focused ?
 		CP_THICK_RIGHT_THICK_DOWN : CP_THIN_RIGHT_THIN_DOWN;
@@ -612,7 +613,8 @@ void component_process_events(uint16_t count, ui_component_t *components, ui_eve
 			case COMPONENT_LISTBOX: {
 				listbox_process_events(&(components[i].component.listbox), event);
 				break;
-			case COMPONENT_RANGE:
+			}
+			case COMPONENT_RANGE: {
 				range_process_events(&(components[i].component.range), event);
 				break;
 			}
@@ -629,7 +631,7 @@ void component_process_events(uint16_t count, ui_component_t *components, ui_eve
 
 void component_render(ui_component_t *component)
 {
-	if (component == nullptr) {
+	if (component == nullptr || component->component.generic.paint == false) {
 		return;
 	}
 	switch (component->type)
@@ -660,9 +662,10 @@ void component_render(ui_component_t *component)
 void component_render_all(uint16_t count, ui_component_t *components, bool paint_all)
 {
 	for (uint16_t i = 0; i < count; i++) {
-		if (paint_all || components[i].component.generic.paint) {
-			component_render(&(components[i]));
+		if (paint_all) {
+			components[i].component.generic.paint = true;
 		}
+		component_render(&(components[i]));
 	}
 }
 
@@ -681,6 +684,7 @@ ui_component_t component_create_button(uint16_t id, const char *label, uint8_t x
 	button.color = color;
 	component.type = COMPONENT_BUTTON;
 	component.component.button = button;
+	component.component.generic.paint = true;
 	return component;
 }
 
@@ -702,6 +706,7 @@ ui_component_t component_create_input(uint16_t id, uint8_t x, uint8_t y, uint8_t
 	input.cursor_x = 0;
 	component.type = COMPONENT_INPUT;
 	component.component.input = input;
+	component.component.generic.paint = true;
 	return component;
 }
 
@@ -726,6 +731,7 @@ ui_component_t component_create_listbox(uint16_t id, uint8_t x, uint8_t y, uint8
 	listbox.cursor_y = 0;
 	component.type = COMPONENT_LISTBOX;
 	component.component.listbox = listbox;
+	component.component.generic.paint = true;
 	return component;
 }
 
@@ -747,6 +753,7 @@ ui_component_t component_create_range(uint16_t id, uint8_t x, uint8_t y, uint8_t
 	range.step = step;
 	component.type = COMPONENT_RANGE;
 	component.component.range = range;
+	component.component.generic.paint = true;
 	return component;
 }
 
