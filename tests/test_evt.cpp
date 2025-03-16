@@ -16,9 +16,14 @@
 
 static const char * LBL_OK = "Okay";
 static const char * LBL_CANCEL = "Cancel";
-static const char *LIST_EXAMPLE[10] = {
+static const char *LIST_EXAMPLE[30] = {
 	"Eins", "Zwei", "Drei", "Vier", "Fuenf",
-	"Sechs", "Sieben", "Acht", "Neun", "Zehn"
+	"Sechs", "Sieben", "Acht", "Neun", "Zehn",
+	"Elf", "Zwoelf", "Dreizehn", "Vierzehn", "Fuenfzehn",
+	"Sechzehn", "Siebzehn", "Achtzehn", "Neunzehn",
+	"Zwanzig", "Einundzwanzig", "Zweiundzwanzig", "Dreiundzwanzig",
+	"Vierundzwanzig", "Fuenfundzwanzig", "Sechsundzwanzig", "Siebenundzwanzig",
+	"Achtundzwanzig", "Neunundzwanzig", "Dreissig"
 };
 
 #define ID_OK     0
@@ -48,8 +53,8 @@ ui_state_t ui_create() {
 
 	ui.components[ID_OK] = component_create_button(ID_OK, LBL_OK, 2, 2, 10, 3, 0x2f);;
 	ui.components[ID_CANCEL] = component_create_button(ID_CANCEL, LBL_CANCEL, 13, 2, 10, 3, 0x4e);
-	ui.components[ID_INPUT] = component_create_input(ID_INPUT, 2, 6, 10, 3, 0x5f, "", 10);
-	ui.components[ID_LIST] = component_create_listbox(ID_LIST, 2, 10, 12,10, 0x6e, LIST_EXAMPLE, 10);
+	ui.components[ID_INPUT] = component_create_input(ID_INPUT, 2, 6, 40, 3, 0x5f, "", 80);
+	ui.components[ID_LIST] = component_create_listbox(ID_LIST, 2, 10, 12,10, 0x6e, LIST_EXAMPLE, 30);
 	ui.components[ID_RANGE] = component_create_range(ID_RANGE, 40, 2, 22, 3, 0x3f, 20, 10, 30, 1);
 	ui.components[ID_OK].component.button.event_handler = event_handler;
 	ui.components[ID_CANCEL].component.button.event_handler = event_handler;

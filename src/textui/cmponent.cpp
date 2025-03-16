@@ -348,22 +348,25 @@ void listbox_render(ui_listbox_t *listbox)
 	}
 	if (h > 2) {
 		textmode_vline(x0, y0 + 1, h - 2, symbol_vertical, lbcolor);
-		if (clientrect.height >= listbox->num_items) {
+		if (listbox->num_items == 0 || clientrect.height >= listbox->num_items) {
+			// do not show a scroll line when the list is empty or the listbox is
+			// big enough
 			textmode_vline(x1, y0 + 1, h - 2, symbol_vertical, lbcolor);
 		} else {
 			textmode_putchar_color(x1, y0 + 1, CP_UP_TRIANGLE, lbcolor);
 			textmode_putchar_color(x1, y0 + h - 2, CP_DOWN_TRIANGLE, lbcolor);
-
+			uint8_t scrollbarheight = clientrect.height - 2; // the bar height without arrows
 			float thumb_f = (float)(clientrect.height) / (float)(listbox->num_items);
 			uint8_t thumb_h = CLAMP(
-				(0.5f + (float)(clientrect.height - 2) * thumb_f), 1, clientrect.height - 3);
-			uint8_t thumb_y0 = MAX((thumb_y0 + clientrect.height - 3 - thumb_h), y0 + 2 + (
-				(float)(listbox->cursor_y0) / (float)(listbox->num_items) * (float)(h - 4) + 0.5f));
+				(0.5f + (float)(scrollbarheight) * thumb_f), 1, scrollbarheight);
+			uint8_t thumb_y0 = 2 + CLAMP((uint8_t)(
+				(float)(listbox->cursor_y0) / (float)(listbox->num_items) * (float)(scrollbarheight) + 0.5
+			), 0, (h-4));
 
-			for (uint8_t scroll_y = y0 + 2; scroll_y < y0 + h - 2; scroll_y++) {
-				textmode_putchar_color(x1, scroll_y,
-					scroll_y >= thumb_y0 &&
-					scroll_y < thumb_y0 + thumb_h ? CP_BLOCK : CP_MEDIUM_SHADE, lbcolor);
+			for (uint8_t scroll_y = 2; scroll_y < h - 2; scroll_y++) {
+				textmode_putchar_color(x1, y0 + scroll_y,
+					((scroll_y >= thumb_y0) &&
+					(scroll_y <(thumb_y0 + thumb_h))) ? CP_BLOCK : CP_MEDIUM_SHADE, lbcolor);
 			}
 		}
 	}

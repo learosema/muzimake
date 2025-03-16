@@ -67,7 +67,7 @@ I still wanted to code something like that myself, for educational purposes.
 
 Like the hard mode in Monkey Island.
 
-## Credits
+## Attributions
 
 - [Angela Galliat](https://github.com/agalliat/) helped me a lot with the programming and
   optimization of the software architecture
