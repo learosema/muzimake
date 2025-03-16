@@ -4,9 +4,11 @@
 #include "ui_event.h"
 
 #define COMPONENT_BUTTON  1
-#define COMPONENT_INPUT   2
-#define COMPONENT_LISTBOX 3
-#define COMPONENT_RANGE   4
+#define COMPONENT_LABEL   2
+#define COMPONENT_INPUT   3
+#define COMPONENT_LISTBOX 4
+#define COMPONENT_RANGE   5
+#define COMPONENT_PIANO   6
 
 #define INPUT_CURSOR_COLOR 0x3f
 
@@ -44,7 +46,21 @@ typedef struct ui_button_s
 	const char *label;
 } ui_button_t;
 
-typedef struct ui_input_s {
+typedef struct ui_label_s
+{
+	uint16_t id;
+	rect_t bounding_rect;
+	uint8_t color;
+	bool active;
+	bool focused;
+	bool paint;
+	ui_event_handler_t event_handler;
+	const char *label;
+	uint8_t forId;
+} ui_label_t;
+
+typedef struct ui_input_s
+{
 	uint16_t id;
 	rect_t bounding_rect;
 	uint8_t color;
@@ -106,6 +122,7 @@ typedef struct ui_component_s
 	union component_data {
 		ui_generic_t generic;
 		ui_button_t button;
+		ui_label_t label;
 		ui_input_t input;
 		ui_listbox_t listbox;
 		ui_range_t range;
@@ -123,6 +140,7 @@ void component_process_events(uint16_t count, ui_component_t *components, ui_eve
 void component_render(ui_component_t *component);
 void component_render_all(uint16_t count, ui_component_t *components, bool paint_all);
 ui_component_t component_create_button(uint16_t id, const char *label, uint8_t x, uint8_t y, uint8_t width, uint8_t height, uint8_t color);
+ui_component_t component_create_label(uint16_t id, uint16_t forId, const char *label, uint8_t x, uint8_t y, uint8_t color);
 ui_component_t component_create_input(uint16_t id, uint8_t x, uint8_t y, uint8_t width, uint8_t height, uint8_t color, const char *value, size_t maxlen);
 ui_component_t component_create_listbox(uint16_t id, uint8_t x, uint8_t y, uint8_t width, uint8_t height, uint8_t color, const char** values, uint16_t num_items);
 ui_component_t component_create_range(uint16_t id, uint8_t x, uint8_t y, uint8_t width, uint8_t height, uint8_t color, int value, int min, int max, int step);
