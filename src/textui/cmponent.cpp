@@ -160,6 +160,17 @@ void button_process_events(ui_button_t *button, ui_event_t *event)
 	}
 }
 
+void label_render(ui_label_t *label)
+{
+	textmode_print(label->label, label->bounding_rect.x, label->bounding_rect.y, label->color);
+}
+
+void label_process_events(ui_label_t *label, ui_event_t * event) {
+	if (event->type == UI_EVENT_MOUSEUP) {
+		ui_handle_mouseup((ui_generic_t *)label, event);
+	}
+}
+
 void input_render(ui_input_t *input)
 {
 	uint8_t input_x;
@@ -546,13 +557,42 @@ void range_process_events(ui_range_t *range, ui_event_t *event)
 	}
 }
 
+ui_component_t *component_get_by_id(uint16_t count, ui_component_t *components, uint16_t id)
+{
+	for (uint16_t i = 0; i < count; i++) {
+		if (components[i].component.generic.id == id) {
+			return &(components[i]);
+		}
+	}
+	return 0;
+}
+
+uint16_t component_index_by_id(uint16_t count, ui_component_t *components, uint16_t id)
+{
+	uint16_t i = 0;
+	for (i = 0; i < count; i++) {
+		if (components[i].component.generic.id == id) {
+			return i;
+		}
+	}
+	return 0xffff;
+}
+
 void component_set_focus(uint16_t count, ui_component_t *components, uint16_t id)
 {
 	for (uint16_t i = 0; i < count; i++) {
-		bool isFocused = components[i].component.generic.id == id;
+		bool isFocused = (components[i].component.generic.id == id);
 		if (isFocused != components[i].component.generic.focused) {
-			components[i].component.generic.focused = isFocused;
-			components[i].component.generic.paint = true;
+			ui_component_t * component = &(components[i]);
+			component->component.generic.focused = isFocused;
+			component->component.generic.paint = true;
+			if (isFocused == true && components[id].type == COMPONENT_LABEL) {
+				component = component_get_by_id(count, components, components[i].component.label.forId);
+				if (component != 0 && component->type != COMPONENT_LABEL) {
+					component_set_focus(count, components, components[i].component.label.forId);
+				}
+				return;
+			}
 		}
 	}
 }
@@ -560,6 +600,7 @@ void component_set_focus(uint16_t count, ui_component_t *components, uint16_t id
 void component_focus_next(uint16_t count, ui_component_t *components)
 {
 	uint16_t i, j;
+
 	for (i = 0; i < count; i++) {
 		if ((!components[i].component.generic.focused) && (i < count - 1)) {
 			continue;
@@ -567,6 +608,18 @@ void component_focus_next(uint16_t count, ui_component_t *components)
 		components[i].component.generic.focused = false;
 		components[i].component.generic.paint = true;
 		j = (i + 1) % count;
+		if (components[j].type == COMPONENT_LABEL) {
+			// if next element is a label then focus the assoc element
+			j = component_index_by_id(
+					count, components,
+					components[j].component.label.forId
+			);
+			APP_LOG("It's a Label! %d", j);
+			if (j >= count) {
+				continue;
+			}
+		}
+		APP_LOG("FOCUS %d", components[j].component.generic.id);
 		components[j].component.generic.focused = true;
 		components[j].component.generic.paint = true;
 		return;
@@ -583,6 +636,17 @@ void component_focus_last(uint16_t count, ui_component_t *components)
 		components[i].component.generic.focused = false;
 		components[i].component.generic.paint = true;
 		j = i > 0 ? (i - 1) : (count - 1);
+		if (components[j].type == COMPONENT_LABEL) {
+			// if next element is a label then focus the assoc element
+			j = component_index_by_id(
+					count, components,
+					components[j].component.label.forId
+			);
+			APP_LOG("It's a Label! %d", j);
+			if (j >= count) {
+				continue;
+			}
+		}
 		components[j].component.generic.focused = true;
 		components[j].component.generic.paint = true;
 		return;
@@ -607,6 +671,10 @@ void component_process_events(uint16_t count, ui_component_t *components, ui_eve
 		switch (components[i].type) {
 			case COMPONENT_BUTTON: {
 				button_process_events(&(components[i].component.button), event);
+				break;
+			}
+			case COMPONENT_LABEL: {
+				label_process_events(&(components[i].component.label), event);
 				break;
 			}
 			case COMPONENT_INPUT: {
@@ -643,7 +711,10 @@ void component_render(ui_component_t *component)
 			button_render(&(component->component.button));
 			break;
 		}
-
+		case COMPONENT_LABEL: {
+			label_render(&(component->component.label));
+			break;
+		}
 		case COMPONENT_INPUT: {
 			input_render(&(component->component.input));
 			break;
@@ -687,6 +758,26 @@ ui_component_t component_create_button(uint16_t id, const char *label, uint8_t x
 	button.color = color;
 	component.type = COMPONENT_BUTTON;
 	component.component.button = button;
+	component.component.generic.paint = true;
+	return component;
+}
+
+ui_component_t component_create_label(uint16_t id, uint16_t forId, const char *label, uint8_t x, uint8_t y, uint8_t color)
+{
+	ui_component_t component = {0};
+	ui_label_t label_el = {0};
+	rect_t rect = {0};
+	label_el.id = id;
+	label_el.forId = forId;
+	label_el.label = label;
+	rect.x = x;
+	rect.y = y;
+	rect.width = strlen(label);
+	rect.height = 1;
+	label_el.bounding_rect = rect;
+	label_el.color = color;
+	component.type = COMPONENT_LABEL;
+	component.component.label = label_el;
 	component.component.generic.paint = true;
 	return component;
 }

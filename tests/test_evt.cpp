@@ -16,6 +16,8 @@
 
 static const char * LBL_OK = "Okay";
 static const char * LBL_CANCEL = "Cancel";
+static const char * LBL_NAME = "Vorname";
+
 static const char *LIST_EXAMPLE[30] = {
 	"Eins", "Zwei", "Drei", "Vier", "Fuenf",
 	"Sechs", "Sieben", "Acht", "Neun", "Zehn",
@@ -26,11 +28,12 @@ static const char *LIST_EXAMPLE[30] = {
 	"Achtundzwanzig", "Neunundzwanzig", "Dreissig"
 };
 
-#define ID_OK     0
-#define ID_CANCEL 1
-#define ID_INPUT  2
-#define ID_LIST   3
-#define ID_RANGE  4
+#define ID_OK         0
+#define ID_CANCEL     1
+#define ID_INPUTLABEL 2
+#define ID_INPUT      3
+#define ID_LIST       4
+#define ID_RANGE      5
 
 bool g_hasMouse;
 MOUSE_STATUS g_mouse;
@@ -48,11 +51,12 @@ static bool event_handler(uint16_t elementId, ui_event_t *event) {
 ui_state_t ui_create() {
 	ui_state_t ui = {0};
 
-	ui.count = 5;
+	ui.count = 6;
 	ui.components = ALLOC_TYPE(ui_component_t, ui.count);
 
 	ui.components[ID_OK] = component_create_button(ID_OK, LBL_OK, 2, 2, 10, 3, 0x2f);;
 	ui.components[ID_CANCEL] = component_create_button(ID_CANCEL, LBL_CANCEL, 13, 2, 10, 3, 0x4e);
+	ui.components[ID_INPUTLABEL] = component_create_label(ID_INPUTLABEL, ID_INPUT, LBL_NAME, 3, 5, 0x1f);
 	ui.components[ID_INPUT] = component_create_input(ID_INPUT, 2, 6, 40, 3, 0x5f, "", 80);
 	ui.components[ID_LIST] = component_create_listbox(ID_LIST, 2, 10, 12,10, 0x6e, LIST_EXAMPLE, 30);
 	ui.components[ID_RANGE] = component_create_range(ID_RANGE, 40, 2, 22, 3, 0x3f, 20, 10, 30, 1);
