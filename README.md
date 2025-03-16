@@ -71,6 +71,7 @@ Like the hard mode in Monkey Island.
 
 - [Angela Galliat](https://github.com/agalliat/) helped me a lot with the programming and
   optimization of the software architecture
+- OPL2 code taken from [lib16](https://github.com/SuperIlu/lib16) by [SuperIlu](https://mastodon.social/@dec_hl) which is in turn based on [ArduinoOPL2](https://github.com/DhrBaksteen/ArduinoOPL2), ported from a class interface to plain C
 - `STANDARD.BNK` is the default instrument bank library shipped with
   [AdLib Visual Composer](https://vgmpf.com/Wiki/index.php?title=AdLib_Visual_Composer), (C) 1987 Adlib Inc.
 - `STARTREK.ROL` contains a minimalistic soundtrack of the Startrek TNG TV series,
