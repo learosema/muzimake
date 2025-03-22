@@ -567,15 +567,26 @@ ui_component_t *component_get_by_id(uint16_t count, ui_component_t *components, 
 	return 0;
 }
 
-uint16_t component_index_by_id(uint16_t count, ui_component_t *components, uint16_t id)
+int component_find_focused(uint16_t count, ui_component_t *components)
+{
+	for (uint16_t i = 0; i < count; i++) {
+		if (components[i].component.generic.focused) {
+			return i;
+		}
+	}
+	return -1;
+}
+
+
+int component_index_by_id(uint16_t count, ui_component_t *components, uint16_t id)
 {
 	uint16_t i = 0;
 	for (i = 0; i < count; i++) {
 		if (components[i].component.generic.id == id) {
-			return i;
+			return (int)i;
 		}
 	}
-	return 0xffff;
+	return -1;
 }
 
 void component_set_focus(uint16_t count, ui_component_t *components, uint16_t id)
@@ -599,58 +610,77 @@ void component_set_focus(uint16_t count, ui_component_t *components, uint16_t id
 
 void component_focus_next(uint16_t count, ui_component_t *components)
 {
-	uint16_t i, j;
-
-	for (i = 0; i < count; i++) {
-		if ((!components[i].component.generic.focused) && (i < count - 1)) {
-			continue;
-		}
-		components[i].component.generic.focused = false;
-		components[i].component.generic.paint = true;
-		j = (i + 1) % count;
-		if (components[j].type == COMPONENT_LABEL) {
-			// if next element is a label then focus the assoc element
-			j = component_index_by_id(
-					count, components,
-					components[j].component.label.forId
-			);
-			APP_LOG("It's a Label! %d", j);
-			if (j >= count) {
-				continue;
-			}
-		}
-		APP_LOG("FOCUS %d", components[j].component.generic.id);
-		components[j].component.generic.focused = true;
-		components[j].component.generic.paint = true;
+	if (count == 0) {
+		// no elements at all
 		return;
 	}
+	int curr = component_find_focused(count, components);
+	int next = curr >= 0 ? (curr + 1) % count : 0;
+	bool found = false;
+
+	for (int it = 0; it < count; it++) {
+		if (components[next].type != COMPONENT_LABEL) {
+			found = true;
+			break;
+		}
+		next = (next + 1) % count;
+	}
+
+	if (!found) {
+		// There is nothing to focus
+		return;
+	}
+
+	if (curr == next) {
+		// The current element is the only one to focus.
+		return;
+	}
+
+	if (curr >= 0) {
+		components[curr].component.generic.focused = false;
+		components[curr].component.generic.paint = true;
+	}
+
+	components[next].component.generic.focused = true;
+	components[next].component.generic.paint = true;
 }
 
-void component_focus_last(uint16_t count, ui_component_t *components)
+void component_focus_prev(uint16_t count, ui_component_t *components)
 {
-	uint16_t i, j;
-	for (i = count - 1; i >= 0; i--) {
-		if ((!components[i].component.generic.focused) && (i != 0)) {
-			continue;
-		}
-		components[i].component.generic.focused = false;
-		components[i].component.generic.paint = true;
-		j = i > 0 ? (i - 1) : (count - 1);
-		if (components[j].type == COMPONENT_LABEL) {
-			// if next element is a label then focus the assoc element
-			j = component_index_by_id(
-					count, components,
-					components[j].component.label.forId
-			);
-			APP_LOG("It's a Label! %d", j);
-			if (j >= count) {
-				continue;
-			}
-		}
-		components[j].component.generic.focused = true;
-		components[j].component.generic.paint = true;
+	if (count == 0) {
+		// no elements at all
 		return;
 	}
+	int curr = component_find_focused(count, components);
+	int prev = curr > 0 ? (curr - 1) : (count - 1);
+
+	bool found = false;
+
+	for (int it = 0; it < count; it++) {
+		if (components[prev].type != COMPONENT_LABEL) {
+			found = true;
+			break;
+		}
+		prev = prev > 0 ? (prev - 1) : (count - 1);
+	}
+
+	if (!found) {
+		// There is nothing to focus
+		return;
+	}
+
+	if (curr == prev) {
+		// The current element is the only one to focus.
+		return;
+	}
+
+	if (curr >= 0) {
+		components[curr].component.generic.focused = false;
+		components[curr].component.generic.paint = true;
+	}
+
+	components[prev].component.generic.focused = true;
+	components[prev].component.generic.paint = true;
 }
 
 void component_process_events(uint16_t count, ui_component_t *components, ui_event_t *event)
@@ -661,7 +691,7 @@ void component_process_events(uint16_t count, ui_component_t *components, ui_eve
 			return;
 		}
 		if (event->payload.keyboard.keyCode == KEY_SHIFT_TAB) {
-			component_focus_last(count, components);
+			component_focus_prev(count, components);
 			return;
 		}
 	}
