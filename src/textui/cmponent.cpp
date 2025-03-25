@@ -168,11 +168,12 @@ void label_render(ui_label_t *label)
 void label_process_events(ui_label_t *label, ui_event_t * event) {
 	if (event->type == UI_EVENT_MOUSEUP) {
 		ui_handle_mouseup((ui_generic_t *)label, event);
-	}
+ 	}
 }
 
 void input_render(ui_input_t *input)
 {
+	APP_LOG("input render %d", input->focused);
 	uint8_t input_x;
 	uint8_t input_y;
 	uint8_t input_len;
@@ -577,7 +578,6 @@ int component_find_focused(uint16_t count, ui_component_t *components)
 	return -1;
 }
 
-
 int component_index_by_id(uint16_t count, ui_component_t *components, uint16_t id)
 {
 	uint16_t i = 0;
@@ -592,18 +592,11 @@ int component_index_by_id(uint16_t count, ui_component_t *components, uint16_t i
 void component_set_focus(uint16_t count, ui_component_t *components, uint16_t id)
 {
 	for (uint16_t i = 0; i < count; i++) {
-		bool isFocused = (components[i].component.generic.id == id);
-		if (isFocused != components[i].component.generic.focused) {
-			ui_component_t * component = &(components[i]);
+		ui_component_t * component = &(components[i]);
+		bool isFocused = component->component.generic.id == id;
+		if (isFocused != component->component.generic.focused) {
 			component->component.generic.focused = isFocused;
 			component->component.generic.paint = true;
-			if (isFocused == true && components[id].type == COMPONENT_LABEL) {
-				component = component_get_by_id(count, components, components[i].component.label.forId);
-				if (component != 0 && component->type != COMPONENT_LABEL) {
-					component_set_focus(count, components, components[i].component.label.forId);
-				}
-				return;
-			}
 		}
 	}
 }
@@ -723,9 +716,24 @@ void component_process_events(uint16_t count, ui_component_t *components, ui_eve
 
 		if ((oldFocus == false) && (components[i].component.generic.focused))
 		{
+			uint8_t focusId = components[i].component.generic.id;
 			// if the component processed received focus,
 			// delete the focus from the other elements.
-			component_set_focus(count, components, components[i].component.generic.id);
+			component_set_focus(count, components, focusId);
+		}
+	}
+
+	// if a label has been focused, then change the focus to the
+	// assoc element
+	int focused_idx = component_find_focused(count, components);
+	if (focused_idx > -1 && focused_idx < count && components[focused_idx].type == COMPONENT_LABEL) {
+		uint16_t for_id = components[focused_idx].component.label.forId;
+		ui_component_t *associated_component = component_get_by_id(count, components, for_id);
+		if (associated_component) {
+			components[focused_idx].component.generic.focused = false;
+			components[focused_idx].component.generic.paint = false;
+			associated_component->component.generic.focused = true;
+			associated_component->component.generic.paint = true;
 		}
 	}
 }
