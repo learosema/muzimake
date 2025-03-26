@@ -1,5 +1,11 @@
 #ifndef __BUTTON_H__
 #define __BUTTON_H__
+
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdint.h>
 #include "ui_event.h"
 
@@ -126,6 +132,7 @@ typedef struct ui_component_s
 		ui_input_t input;
 		ui_listbox_t listbox;
 		ui_range_t range;
+		ui_piano_t piano;
 	} component;
 } ui_component_t;
 
@@ -144,9 +151,15 @@ ui_component_t component_create_label(uint16_t id, uint16_t forId, const char *l
 ui_component_t component_create_input(uint16_t id, uint8_t x, uint8_t y, uint8_t width, uint8_t height, uint8_t color, const char *value, size_t maxlen);
 ui_component_t component_create_listbox(uint16_t id, uint8_t x, uint8_t y, uint8_t width, uint8_t height, uint8_t color, const char** values, uint16_t num_items);
 ui_component_t component_create_range(uint16_t id, uint8_t x, uint8_t y, uint8_t width, uint8_t height, uint8_t color, int value, int min, int max, int step);
+ui_component_t component_create_piano(uint16_t id, uint8_t x, uint8_t y, uint8_t width, uint8_t height, uint8_t color);
+
 void component_dispose(ui_component_t *component);
 
 void component_set_focus(uint16_t componentCount, ui_component_t *components, uint16_t id);
 void component_focus_next(uint16_t count, ui_component_t *components);
 void component_focus_last(uint16_t count, ui_component_t *components);
+
+#ifdef __cplusplus
+}
+#endif
 #endif

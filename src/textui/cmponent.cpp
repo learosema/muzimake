@@ -24,7 +24,7 @@ bool rect_test_mouse(rect_t * rect, uint16_t mouseX, uint16_t mouseY)
 	return rect_test_point_in_bounds(rect, (uint8_t)(mouseX>>3), (uint8_t)(mouseY>>3));
 }
 
-rect_t get_clientrect(rect_t *bounding_rect)
+rect_t get_clientrect(const rect_t *bounding_rect)
 {
 	rect_t clientrect = *bounding_rect;
 	if (clientrect.height > 2 && clientrect.width > 2)
@@ -456,6 +456,54 @@ void listbox_process_events(ui_listbox_t *listbox, ui_event_t *event)
 	}
 }
 
+void piano_render(ui_piano_t *piano)
+{
+	const uint8_t keys[7] = {1, 1, 0, 1, 1, 1, 0};
+	uint8_t color = piano->color;
+
+	if (piano->bounding_rect.height < 7) {
+		piano->bounding_rect.height = 7;
+	}
+	if (piano->bounding_rect.width < 14) {
+		piano->bounding_rect.width = 14;
+	}
+	rect_t inner = get_clientrect(&(piano->bounding_rect));
+	uint8_t black_height = inner.height * 0.7;
+
+	if (piano->focused) {
+		textmode_dblrect(
+			piano->bounding_rect.x,
+			piano->bounding_rect.y,
+			piano->bounding_rect.width,
+			piano->bounding_rect.height,
+			color
+		);
+	} else {
+		textmode_rect(
+			piano->bounding_rect.x,
+			piano->bounding_rect.y,
+			piano->bounding_rect.width,
+			piano->bounding_rect.height,
+			color
+		);
+	}
+
+	for (uint8_t y = 0; y < inner.height; y++) {
+		for (uint8_t x = 0; x < inner.width; x++) {
+			char ch = (x%2 == 0) ? ' ' :
+				(y < black_height * keys[((x>>1) % 7)]) ? CP_BLOCK : CP_THIN_VERTICAL;
+			textmode_putchar_color(inner.x + x, inner.y + y, ch, color);
+		}
+	}
+}
+
+void piano_process_events(ui_piano_t *piano, ui_event_t *event)
+{
+	if (event->type == UI_EVENT_MOUSEUP) {
+		ui_handle_mouseup((ui_generic_t *)piano, event);
+ 	}
+}
+
 void range_render(ui_range_t *range)
 {
 	uint8_t color = range->color;
@@ -712,6 +760,10 @@ void component_process_events(uint16_t count, ui_component_t *components, ui_eve
 				range_process_events(&(components[i].component.range), event);
 				break;
 			}
+			case COMPONENT_PIANO: {
+				piano_process_events(&(components[i].component.piano), event);
+				break;
+			}
 		}
 
 		if ((oldFocus == false) && (components[i].component.generic.focused))
@@ -765,6 +817,11 @@ void component_render(ui_component_t *component)
 
 		case COMPONENT_RANGE: {
 			range_render(&(component->component.range));
+			break;
+		}
+
+		case COMPONENT_PIANO: {
+			piano_render(&(component->component.piano));
 			break;
 		}
 	}
@@ -888,6 +945,26 @@ ui_component_t component_create_range(uint16_t id, uint8_t x, uint8_t y, uint8_t
 	component.component.generic.paint = true;
 	return component;
 }
+
+ui_component_t component_create_piano(uint16_t id, uint8_t x, uint8_t y, uint8_t width, uint8_t height, uint8_t color)
+{
+	ui_component_t component = {0};
+	ui_piano_t piano = {0};
+	rect_t rect = {0};
+	rect.x = x;
+	rect.y = y;
+	rect.width = width;
+	rect.height = height;
+	piano.id = id;
+	piano.bounding_rect = rect;
+	piano.color = color;
+
+	component.type = COMPONENT_PIANO;
+	component.component.piano = piano;
+	component.component.generic.paint = true;
+	return component;
+}
+
 
 void component_dispose(ui_component_t *component)
 {
