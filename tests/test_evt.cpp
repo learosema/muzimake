@@ -64,8 +64,8 @@ ui_state_t ui_create() {
 	ui.components[ID_INPUT] = component_create_input(ID_INPUT, 2, 8, 40, 3, 0x5f, "", 80);
 	ui.components[ID_LIST] = component_create_listbox(ID_LIST, 2, 12, 12,10, 0x6e, LIST_EXAMPLE, 30);
 	ui.components[ID_RANGE] = component_create_range(ID_RANGE, 16, 12, 22, 3, 0x3f, 20, 10, 30, 1);
-	ui.components[ID_PIANO] = component_create_piano(ID_PIANO, 2, 35, 76, 8, 0x71);
-	ui.components[ID_PIANO2] = component_create_piano(ID_PIANO2, 2, 25, 76, 8, 0x71);
+	ui.components[ID_PIANO] = component_create_piano(ID_PIANO, 2, 25, 76, 8, 0x71);
+	ui.components[ID_PIANO2] = component_create_piano(ID_PIANO2, 2, 35, 76, 8, 0x71);
 	ui.components[ID_OK].component.button.event_handler = event_handler;
 	ui.components[ID_CANCEL].component.button.event_handler = event_handler;
 	return ui;
