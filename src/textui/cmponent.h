@@ -122,6 +122,17 @@ typedef struct ui_piano_s {
 	uint16_t pressed_keys;
 } ui_piano_t;
 
+typedef struct ui_sheet_s {
+	uint16_t id;
+	rect_t bounding_rect;
+	uint8_t color;
+	bool active;
+	bool focused;
+	bool paint;
+	ui_event_handler_t event_handler;
+
+} ui_sheet_t;
+
 typedef struct ui_component_s
 {
 	uint16_t type;
