@@ -15,6 +15,7 @@ extern "C" {
 #define COMPONENT_LISTBOX 4
 #define COMPONENT_RANGE   5
 #define COMPONENT_PIANO   6
+#define COMPONENT_SHEET   7
 
 #define INPUT_CURSOR_COLOR 0x3f
 
@@ -122,6 +123,8 @@ typedef struct ui_piano_s {
 	uint16_t pressed_keys;
 } ui_piano_t;
 
+typedef void * pattern_t; // TODO
+
 typedef struct ui_sheet_s {
 	uint16_t id;
 	rect_t bounding_rect;
@@ -130,7 +133,12 @@ typedef struct ui_sheet_s {
 	bool focused;
 	bool paint;
 	ui_event_handler_t event_handler;
-
+	pattern_t *pattern;
+	int offset_x;
+	int offset_y;
+	int cursor_x;
+	int cursor_y;
+	int cursor_input_x;
 } ui_sheet_t;
 
 typedef struct ui_component_s
@@ -144,6 +152,7 @@ typedef struct ui_component_s
 		ui_listbox_t listbox;
 		ui_range_t range;
 		ui_piano_t piano;
+		ui_sheet_t sheet;
 	} component;
 } ui_component_t;
 
