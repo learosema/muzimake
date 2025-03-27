@@ -16,12 +16,14 @@
 
 static const char * LBL_OK = "Okay";
 static const char * LBL_CANCEL = "Cancel";
-static const char * LBL_NAME = "Vorname";
+static const char * LBL_PLAY = "Play";
+static const char * LBL_STOP = "Stop";
+static const char * LBL_FILENAME = "Filename";
 
 static const char *LIST_EXAMPLE[30] = {
-	"Eins", "Zwei", "Drei", "Vier", "Fuenf",
-	"Sechs", "Sieben", "Acht", "Neun", "Zehn",
-	"Elf", "Zwoelf", "Dreizehn", "Vierzehn", "Fuenfzehn",
+	"Piano", "Violin", "BaseDrum", "Beep", "Boop",
+	"Sawtooth", "Triangle", "Square", "Sine", "Pulse",
+	"Snare", "Xylophone", "Dreizehn", "Vierzehn", "Fuenfzehn",
 	"Sechzehn", "Siebzehn", "Achtzehn", "Neunzehn",
 	"Zwanzig", "Einundzwanzig", "Zweiundzwanzig", "Dreiundzwanzig",
 	"Vierundzwanzig", "Fuenfundzwanzig", "Sechsundzwanzig", "Siebenundzwanzig",
@@ -35,6 +37,7 @@ static const char *LIST_EXAMPLE[30] = {
 #define ID_LIST       4
 #define ID_RANGE      5
 #define ID_PIANO			6
+#define ID_PIANO2			7
 
 bool g_hasMouse;
 MOUSE_STATUS g_mouse;
@@ -52,16 +55,17 @@ static bool event_handler(uint16_t elementId, ui_event_t *event) {
 ui_state_t ui_create() {
 	ui_state_t ui = {0};
 
-	ui.count = 7;
+	ui.count = 8;
 	ui.components = ALLOC_TYPE(ui_component_t, ui.count);
 
 	ui.components[ID_OK] = component_create_button(ID_OK, LBL_OK, 2, 2, 10, 3, 0x2f);;
 	ui.components[ID_CANCEL] = component_create_button(ID_CANCEL, LBL_CANCEL, 13, 2, 10, 3, 0x4e);
-	ui.components[ID_INPUTLABEL] = component_create_label(ID_INPUTLABEL, ID_INPUT, LBL_NAME, 3, 5, 0x1f);
-	ui.components[ID_INPUT] = component_create_input(ID_INPUT, 2, 6, 40, 3, 0x5f, "", 80);
-	ui.components[ID_LIST] = component_create_listbox(ID_LIST, 2, 10, 12,10, 0x6e, LIST_EXAMPLE, 30);
-	ui.components[ID_RANGE] = component_create_range(ID_RANGE, 40, 2, 22, 3, 0x3f, 20, 10, 30, 1);
-	ui.components[ID_PIANO] = component_create_piano(ID_PIANO, 2, 30, 76, 8, 0x71);
+	ui.components[ID_INPUTLABEL] = component_create_label(ID_INPUTLABEL, ID_INPUT, LBL_FILENAME, 3, 7, 0x1f);
+	ui.components[ID_INPUT] = component_create_input(ID_INPUT, 2, 8, 40, 3, 0x5f, "", 80);
+	ui.components[ID_LIST] = component_create_listbox(ID_LIST, 2, 12, 12,10, 0x6e, LIST_EXAMPLE, 30);
+	ui.components[ID_RANGE] = component_create_range(ID_RANGE, 16, 12, 22, 3, 0x3f, 20, 10, 30, 1);
+	ui.components[ID_PIANO] = component_create_piano(ID_PIANO, 2, 35, 76, 8, 0x71);
+	ui.components[ID_PIANO2] = component_create_piano(ID_PIANO2, 2, 25, 76, 8, 0x71);
 	ui.components[ID_OK].component.button.event_handler = event_handler;
 	ui.components[ID_CANCEL].component.button.event_handler = event_handler;
 	return ui;
@@ -98,7 +102,8 @@ int main()
 		mouse_set_vertical_range(0, g_modeInfo->numRows * 8 - 8);
 	}
 
-	textmode_print("Hello World!", 33, 25, 0x1e);
+	textmode_hline(0,0, 80, ' ', 0x70);
+	textmode_print("MUZIMAKE UI Test", 1, 0, 0x74);
 
 	while (!done) {
 		if (g_hasMouse) mouse_hide();
