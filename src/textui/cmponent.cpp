@@ -502,6 +502,60 @@ void piano_process_events(ui_piano_t *piano, ui_event_t *event)
 	if (event->type == UI_EVENT_MOUSEUP) {
 		ui_handle_mouseup((ui_generic_t *)piano, event);
  	}
+	// todo: keyboard/mouse handling
+}
+
+void sheet_render(ui_sheet_t *sheet)
+{
+	const uint8_t keys[7] = {1, 1, 0, 1, 1, 1, 0};
+	uint8_t color = sheet->color;
+
+	if (sheet->bounding_rect.height < 7) {
+		sheet->bounding_rect.height = 7;
+	}
+	if (sheet->bounding_rect.width < 14) {
+		sheet->bounding_rect.width = 14;
+	}
+	rect_t inner = get_clientrect(&(sheet->bounding_rect));
+	uint8_t black_height = inner.height * 0.7;
+
+	if (sheet->focused) {
+		textmode_dblrect(
+			sheet->bounding_rect.x,
+			sheet->bounding_rect.y,
+			sheet->bounding_rect.width,
+			sheet->bounding_rect.height,
+			color
+		);
+	} else {
+		textmode_rect(
+			sheet->bounding_rect.x,
+			sheet->bounding_rect.y,
+			sheet->bounding_rect.width,
+			sheet->bounding_rect.height,
+			color
+		);
+	}
+
+	textmode_colorize_area(inner.x, inner.y, inner.width, inner.height, sheet->color);
+
+	for (uint8_t row = 0; row < inner.height; row++) {
+		for (uint8_t voice = 0; voice < 9; voice++) {
+			 // todo print actual data here...
+			textmode_print("......", inner.x + voice * 7, inner.y + row, color);
+			if (voice < 9) {
+				textmode_putchar_color(inner.x + voice * 7 + 6, inner.y + row, ' ', color);
+			}
+		}
+	}
+}
+
+void sheet_process_events(ui_sheet_t *sheet, ui_event_t *event)
+{
+	if (event->type == UI_EVENT_MOUSEUP) {
+		ui_handle_mouseup((ui_generic_t *)sheet, event);
+ 	}
+	// todo: keyboard/mouse handling
 }
 
 void range_render(ui_range_t *range)
@@ -764,6 +818,10 @@ void component_process_events(uint16_t count, ui_component_t *components, ui_eve
 				piano_process_events(&(components[i].component.piano), event);
 				break;
 			}
+			case COMPONENT_SHEET: {
+				sheet_process_events(&(components[i].component.sheet), event);
+				break;
+			}
 		}
 
 		if ((oldFocus == false) && (components[i].component.generic.focused))
@@ -822,6 +880,11 @@ void component_render(ui_component_t *component)
 
 		case COMPONENT_PIANO: {
 			piano_render(&(component->component.piano));
+			break;
+		}
+
+		case COMPONENT_SHEET: {
+			sheet_render(&(component->component.sheet));
 			break;
 		}
 	}
@@ -946,6 +1009,25 @@ ui_component_t component_create_range(uint16_t id, uint8_t x, uint8_t y, uint8_t
 	return component;
 }
 
+ui_component_t component_create_sheet(uint16_t id, uint8_t x, uint8_t y, uint8_t width, uint8_t height, uint8_t color)
+{
+	ui_component_t component = {0};
+	ui_sheet_t sheet = {0};
+	rect_t rect = {0};
+	rect.x = x;
+	rect.y = y;
+	rect.width = width;
+	rect.height = height;
+	sheet.id = id;
+	sheet.bounding_rect = rect;
+	sheet.color = color;
+	// TODO add data
+	component.type = COMPONENT_SHEET;
+	component.component.sheet = sheet;
+	component.component.generic.paint = true;
+	return component;
+}
+
 ui_component_t component_create_piano(uint16_t id, uint8_t x, uint8_t y, uint8_t width, uint8_t height, uint8_t color)
 {
 	ui_component_t component = {0};
@@ -964,7 +1046,6 @@ ui_component_t component_create_piano(uint16_t id, uint8_t x, uint8_t y, uint8_t
 	component.component.generic.paint = true;
 	return component;
 }
-
 
 void component_dispose(ui_component_t *component)
 {
