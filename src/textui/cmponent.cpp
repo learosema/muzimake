@@ -519,6 +519,8 @@ void sheet_render(ui_sheet_t *sheet)
 	rect_t inner = get_clientrect(&(sheet->bounding_rect));
 	uint8_t black_height = inner.height * 0.7;
 
+	sheet->bounding_rect.width = MAX(sheet->bounding_rect.width, 2 + 9 * 8);
+
 	if (sheet->focused) {
 		textmode_dblrect(
 			sheet->bounding_rect.x,
@@ -538,12 +540,12 @@ void sheet_render(ui_sheet_t *sheet)
 	}
 
 	textmode_colorize_area(inner.x, inner.y, inner.width, inner.height, sheet->color);
-
+	uint8_t num_voices = 9;
 	for (uint8_t row = 0; row < inner.height; row++) {
-		for (uint8_t voice = 0; voice < 9; voice++) {
+		for (uint8_t voice = 0; voice < num_voices; voice++) {
 			 // todo print actual data here...
-			textmode_print("......", inner.x + voice * 7, inner.y + row, color);
-			if (voice < 9) {
+			textmode_print(".......", inner.x + voice * 8, inner.y + row, color);
+			if (voice < num_voices) {
 				textmode_putchar_color(inner.x + voice * 7 + 6, inner.y + row, ' ', color);
 			}
 		}
