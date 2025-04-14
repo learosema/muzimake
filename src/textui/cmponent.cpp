@@ -471,21 +471,105 @@ void piano_render(ui_piano_t *piano)
 	uint8_t black_height = inner.height * 0.7;
 
 	if (piano->focused) {
-		textmode_dblrect(
+		textmode_putchar_color(
 			piano->bounding_rect.x,
 			piano->bounding_rect.y,
-			piano->bounding_rect.width,
-			piano->bounding_rect.height,
-			color
+			CP_THIN_RIGHT_THICK_DOWN,
+			piano->color
 		);
+		textmode_putchar_color(
+			piano->bounding_rect.x + piano->bounding_rect.width - 1,
+			piano->bounding_rect.y,
+			CP_THIN_LEFT_THICK_DOWN,
+			piano->color
+		);
+		textmode_putchar_color(
+			piano->bounding_rect.x,
+			piano->bounding_rect.y + piano->bounding_rect.height -1,
+			CP_THIN_RIGHT_THICK_UP,
+			piano->color
+		);
+		textmode_putchar_color(
+			piano->bounding_rect.x + piano->bounding_rect.width - 1,
+			piano->bounding_rect.y + piano->bounding_rect.height -1,
+			CP_THIN_LEFT_THICK_UP,
+			piano->color
+		);
+
+		textmode_vline(piano->bounding_rect.x,
+			inner.y, inner.height, CP_THICK_VERTICAL, piano->color);
+		textmode_vline(piano->bounding_rect.x + + piano->bounding_rect.width - 1,
+			inner.y, inner.height, CP_THICK_VERTICAL, piano->color);
+
+		for (uint8_t innerX = 0; innerX < inner.width; innerX++) {
+			char chTop = (innerX % 2 == 0) ?
+				CP_THIN_HORIZONTAL :
+				(keys[((innerX>>1) % 7)]) ? CP_LOWER_BLOCK :
+				CP_THIN_HORIZONTAL_THIN_DOWN;
+			char chBottom = (innerX % 2 == 0) ?
+				CP_THIN_HORIZONTAL :
+				CP_THIN_HORIZONTAL_THIN_UP;
+
+			textmode_putchar_color(
+				inner.x + innerX,
+				piano->bounding_rect.y, chTop, color
+			);
+			textmode_putchar_color(
+				inner.x + innerX,
+				piano->bounding_rect.y + piano->bounding_rect.height - 1,
+				chBottom, color
+			);
+		}
 	} else {
-		textmode_rect(
+		textmode_putchar_color(
 			piano->bounding_rect.x,
 			piano->bounding_rect.y,
-			piano->bounding_rect.width,
-			piano->bounding_rect.height,
-			color
+			CP_THIN_RIGHT_THIN_DOWN,
+			piano->color
 		);
+		textmode_putchar_color(
+			piano->bounding_rect.x + piano->bounding_rect.width - 1,
+			piano->bounding_rect.y,
+			CP_THIN_LEFT_THIN_DOWN,
+			piano->color
+		);
+		textmode_putchar_color(
+			piano->bounding_rect.x,
+			piano->bounding_rect.y + piano->bounding_rect.height -1,
+			CP_THIN_RIGHT_THIN_UP,
+			piano->color
+		);
+		textmode_putchar_color(
+			piano->bounding_rect.x + piano->bounding_rect.width - 1,
+			piano->bounding_rect.y + piano->bounding_rect.height -1,
+			CP_THIN_LEFT_THIN_UP,
+			piano->color
+		);
+
+		textmode_vline(piano->bounding_rect.x,
+			inner.y, inner.height, CP_THIN_VERTICAL, piano->color);
+		textmode_vline(piano->bounding_rect.x + + piano->bounding_rect.width - 1,
+			inner.y, inner.height, CP_THIN_VERTICAL, piano->color);
+
+		for (uint8_t innerX = 0; innerX < inner.width; innerX++) {
+			char chTop = (innerX % 2 == 0) ?
+				CP_THIN_HORIZONTAL :
+				(keys[((innerX>>1) % 7)]) ? CP_LOWER_BLOCK :
+				CP_THIN_HORIZONTAL_THIN_DOWN;
+			char chBottom = (innerX % 2 == 0) ?
+				CP_THIN_HORIZONTAL :
+				CP_THIN_HORIZONTAL_THIN_UP;
+
+			textmode_putchar_color(
+				inner.x + innerX,
+				piano->bounding_rect.y, chTop, color
+			);
+			textmode_putchar_color(
+				inner.x + innerX,
+				piano->bounding_rect.y + piano->bounding_rect.height - 1,
+				chBottom, color
+			);
+		}
 	}
 
 	for (uint8_t y = 0; y < inner.height; y++) {
@@ -546,7 +630,7 @@ void sheet_render(ui_sheet_t *sheet)
 			 // todo print actual data here...
 			textmode_print(".......", inner.x + voice * 8, inner.y + row, color);
 			if (voice < num_voices) {
-				textmode_putchar_color(inner.x + voice * 7 + 6, inner.y + row, ' ', color);
+				textmode_putchar_color(inner.x + voice * 8 + 7, inner.y + row, ' ', color);
 			}
 		}
 	}
