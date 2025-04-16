@@ -1,5 +1,5 @@
-#ifndef __BUTTON_H__
-#define __BUTTON_H__
+#ifndef __CMPONENT_H__
+#define __CMPONENT_H__
 
 
 #ifdef __cplusplus
@@ -128,6 +128,7 @@ typedef struct pattern_entry_s
 	uint8_t note;
 	uint8_t velocity;
 	uint8_t effects;
+	uint8_t reserved;
 } pattern_entry_t;
 
 
@@ -135,7 +136,7 @@ typedef struct pattern_s
 {
 	uint8_t num_rows;
 	uint8_t num_cols;
-	uint32_t *data;
+	pattern_entry_t *data;
 } pattern_t;
 
 typedef struct ui_sheet_s {
@@ -146,7 +147,7 @@ typedef struct ui_sheet_s {
 	bool focused;
 	bool paint;
 	ui_event_handler_t event_handler;
-	pattern_t *pattern;
+	pattern_t pattern;
 	uint8_t offset_x;
 	uint8_t offset_y;
 	uint8_t cursor_x;
@@ -185,7 +186,7 @@ ui_component_t component_create_input(uint16_t id, uint8_t x, uint8_t y, uint8_t
 ui_component_t component_create_listbox(uint16_t id, uint8_t x, uint8_t y, uint8_t width, uint8_t height, uint8_t color, const char** values, uint16_t num_items);
 ui_component_t component_create_range(uint16_t id, uint8_t x, uint8_t y, uint8_t width, uint8_t height, uint8_t color, int value, int min, int max, int step);
 ui_component_t component_create_piano(uint16_t id, uint8_t x, uint8_t y, uint8_t width, uint8_t height, uint8_t color);
-ui_component_t component_create_sheet(uint16_t id, uint8_t x, uint8_t y, uint8_t width, uint8_t height, uint8_t color);
+ui_component_t component_create_sheet(uint16_t id, uint8_t x, uint8_t y, uint8_t width, uint8_t height, uint8_t color, uint8_t rows, uint8_t cols);
 
 void component_dispose(ui_component_t *component);
 

@@ -13,6 +13,7 @@
 #include "textui/cmponent.h"
 #include "macros.h"
 #include "helper/log.h"
+#include "textui/fontdata.h"
 
 static const char * LBL_OK = "Okay";
 static const char * LBL_CANCEL = "Cancel";
@@ -64,7 +65,7 @@ ui_state_t ui_create() {
 	ui.components[ID_INPUT] = component_create_input(ID_INPUT, 2, 8, 40, 3, 0x5f, "", 80);
 	ui.components[ID_LIST] = component_create_listbox(ID_LIST, 2, 12, 12,10, 0x6e, LIST_EXAMPLE, 30);
 	ui.components[ID_RANGE] = component_create_range(ID_RANGE, 16, 12, 22, 3, 0x3f, 20, 10, 30, 1);
-	ui.components[ID_SHEET] = component_create_sheet(ID_SHEET, 1, 24, 78, 12, 0x0f);
+	ui.components[ID_SHEET] = component_create_sheet(ID_SHEET, 1, 24, 78, 12, 0x0f, 32, 9);
 	ui.components[ID_PIANO] = component_create_piano(ID_PIANO, 1, 38, 78, 8, 0x71);
 
 	ui.components[ID_OK].component.button.event_handler = event_handler;
@@ -90,6 +91,7 @@ int main()
 	g_hasMouse = mouse_init();
 	textmode_font8();
 	g_modeInfo = textmode_get_modeinfo();
+	textmode_init_font(0, 255, 8, font_data);
 	APP_LOG("TextUI-Tests started.");
 
 	textmode_clear(0x1e);

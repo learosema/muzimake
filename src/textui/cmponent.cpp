@@ -1095,11 +1095,18 @@ ui_component_t component_create_range(uint16_t id, uint8_t x, uint8_t y, uint8_t
 	return component;
 }
 
-ui_component_t component_create_sheet(uint16_t id, uint8_t x, uint8_t y, uint8_t width, uint8_t height, uint8_t color)
+ui_component_t component_create_sheet(uint16_t id, uint8_t x, uint8_t y, uint8_t width, uint8_t height, uint8_t color, uint8_t rows, uint8_t cols)
 {
 	ui_component_t component = {0};
 	ui_sheet_t sheet = {0};
 	rect_t rect = {0};
+
+	pattern_t pattern = {0};
+	pattern.num_cols = cols;
+	pattern.num_rows = rows;
+	pattern.data = ALLOC_TYPE(pattern_entry_t, rows*cols);
+	memset(pattern.data, 0, cols * rows * sizeof(pattern_entry_t));
+
 	rect.x = x;
 	rect.y = y;
 	rect.width = width;
@@ -1111,6 +1118,7 @@ ui_component_t component_create_sheet(uint16_t id, uint8_t x, uint8_t y, uint8_t
 	component.type = COMPONENT_SHEET;
 	component.component.sheet = sheet;
 	component.component.generic.paint = true;
+	component.component.sheet.pattern = pattern;
 	return component;
 }
 
@@ -1150,6 +1158,10 @@ void component_dispose(ui_component_t *component)
 			}
 			free(component->component.listbox.values);
 			component->component.listbox.values = nullptr;
+		}
+		case COMPONENT_SHEET: {
+			free(component->component.sheet.pattern.data);
+			component->component.sheet.pattern.data = nullptr;
 		}
 	}
 }

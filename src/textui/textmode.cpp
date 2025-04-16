@@ -1,5 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
+#if defined __DOS__ && defined __386__
+#include <dpmiutil.h>
+#endif
 #ifdef __DOS__
 #include <dos.h>
 #else
@@ -108,7 +111,7 @@ void textmode_set_page(uint8_t page)
 	g_currentMode.page = page;
 }
 
-void textmode_cursor(uint8_t startRow, uint8_t endRow)
+void textmode_cursor(const uint8_t startRow, const uint8_t endRow)
 {
 	#ifdef __DOS__
 	union REGS regs;
@@ -242,7 +245,7 @@ void textmode_colorize_area(
 	}
 }
 
-void textmode_print(const char *str, int x, int y, uint8_t color)
+void textmode_print(const char *str, const int x, const int y, const uint8_t color)
 {
 	VRAMPTR ptr;
 	uint8_t i;
@@ -469,7 +472,7 @@ void textmode_dblbox(
 	}
 }
 
-void textmode_gotoxy(uint8_t x, uint8_t y) {
+void textmode_gotoxy(const uint8_t x, const uint8_t y) {
 	#ifdef __DOS__
 	union REGS regs;
 
@@ -478,5 +481,31 @@ void textmode_gotoxy(uint8_t x, uint8_t y) {
 	regs.h.dl = x;
 	regs.h.dh = y;
 	INTR(0x10, &regs, &regs);
+	#endif
+}
+
+void textmode_init_font(const uint8_t offset, const uint8_t count, const uint8_t charHeight, const uint8_t *charData)
+{
+	#if defined __DOS__
+	uint16_t sizeInBytes = count * charHeight;
+	union REGS regs = {0};
+	struct SREGS sregs;
+	regs.w.ax = 0x1110;
+	regs.w.dx = offset;
+	regs.w.cx = count;
+	regs.w.bx = charHeight;
+
+	#if defined __386__
+	dos_block_t memblock = dpmi_alloc_dos_block((sizeInBytes+15)>>4);
+
+	uint8_t __far *rm_buffer = MK_FP(memblock.selector);
+	__fmemcpy(rm_buffer, font_data, sizeInBytes);
+	sregs.es = memblock.segment;
+	regs.x.bp = 0x0000;
+	int386x(0x10, &regs, &regs, &sregs);
+	dpmi_free_dos_block(memblock);
+	#else
+	#error "Real mode not implemented yet"
+	#endif
 	#endif
 }
