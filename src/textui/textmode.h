@@ -3,6 +3,10 @@
 
 #include <stdint.h>
 
+#if defined __DOS__ && defined __WATCOM__ && defined __386__
+#include <dpmiutil.h>
+#endif
+
 #ifdef __DOS__
 #ifdef __386__
 #define INTR int386
@@ -61,7 +65,7 @@ void textmode_set_page(uint8_t page);
 
 void textmode_font8();
 
-void textmode_cursor(uint8_t startRow, uint8_t endRow);
+void textmode_cursor(const uint8_t startRow, const uint8_t endRow);
 
 void textmode_clear(uint8_t color);
 
@@ -104,7 +108,7 @@ void textmode_colorize_area(
 	uint8_t color
 );
 
-void textmode_print(const char *str, int x, int y, uint8_t color);
+void textmode_print(const char *str, const int x, const int y, const uint8_t color);
 
 uint8_t textmode_printn(const char *str, uint8_t len, int x, int y, uint8_t color);
 
@@ -150,8 +154,8 @@ void textmode_dblrect(
 	uint8_t color
 );
 
+void textmode_init_font(const uint8_t offset, const uint8_t count, const uint8_t charHeight, const uint8_t *charData);
 
-
-void textmode_gotoxy(uint8_t x, uint8_t y);
+void textmode_gotoxy(const uint8_t x, const uint8_t y);
 
 #endif

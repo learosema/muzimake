@@ -1,0 +1,32 @@
+#ifndef __DPMIUTIL_H__
+#define __DPMIUTIL_H__
+
+#include <stdint.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+typedef struct dos_block_s {
+    uint16_t segment;   // Real mode segment for ES
+    uint16_t selector;  // Protected mode selector for direct access
+} dos_block_t;
+
+/**
+ * Allocates a block of DOS memory using DPMI (int 0x31, ax=0x0100).
+ * @param size Size in bytes.
+ * @return A dos_block_t with segment and selector; segment==0 on failure.
+ */
+dos_block_t dpmi_alloc_dos_block(uint32_t size);
+
+/**
+ * Frees DOS memory allocated via DPMI_AllocDOSMemory.
+ * @param dp DosPtr returned from allocation.
+ */
+void dpmi_free_dos_block(dos_block_t dp);
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif // DPMIUTIL_H
