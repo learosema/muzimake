@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #if defined __DOS__ && defined __386__
 #include <dpmiutil.h>
+#include <i86.h>
 #endif
 #ifdef __DOS__
 #include <dos.h>
@@ -80,14 +81,14 @@ MODEINFO *textmode_get_modeinfo()
 void textmode_font8()
 {
 	#ifdef __DOS__
-	union REGS regs;
+	union REGPACK regs;
 	if (g_currentMode.mode == 3 && g_currentMode.hasColors == false) {
 		// Hercules/MDA won't support switching to 50 lines
 		return;
 	}
 	regs.w.ax = 0x1112;
 	regs.w.bx = 0;
-	INTR(0x10, &regs, &regs);
+	intr(0x10, &regs);
 	#endif
 	g_currentMode.pageSize= PAGE_SIZE_80X50;
 	g_currentMode.numRows = 50;
@@ -484,28 +485,29 @@ void textmode_gotoxy(const uint8_t x, const uint8_t y) {
 	#endif
 }
 
-void textmode_init_font(const uint8_t offset, const uint8_t count, const uint8_t charHeight, const uint8_t *charData)
+void textmode_init_font(const uint16_t offset, const uint16_t count, const uint16_t charHeight, const uint8_t *charData)
 {
-	#if defined __DOS__
+	#if defined __DOS__ && defined __386__
+	union REGPACK regs = {0};
 	uint16_t sizeInBytes = count * charHeight;
-	union REGS regs = {0};
-	struct SREGS sregs;
 	regs.w.ax = 0x1110;
 	regs.w.dx = offset;
 	regs.w.cx = count;
-	regs.w.bx = charHeight;
-
-	#if defined __386__
+	regs.h.bh = charHeight & 255;
+	regs.h.bl = 0;
 	dos_block_t memblock = dpmi_alloc_dos_block((sizeInBytes+15)>>4);
-
-	uint8_t __far *rm_buffer = MK_FP(memblock.selector);
-	__fmemcpy(rm_buffer, font_data, sizeInBytes);
-	sregs.es = memblock.segment;
-	regs.x.bp = 0x0000;
-	int386x(0x10, &regs, &regs, &sregs);
+	if (memblock.segment == 0) {
+		fprintf(stderr, "Error allocating memory for font. Exiting.\n");
+		exit(1);
+	}
+	uint8_t far *rm_buffer = (uint8_t far *)MK_FP(memblock.selector, 0);
+	_fmemcpy(rm_buffer, charData, sizeInBytes);
+	regs.w.es = memblock.selector;
+	regs.w.bp = 0x0000;
+	intr(0x10, &regs);
 	dpmi_free_dos_block(memblock);
+
 	#else
-	#error "Real mode not implemented yet"
-	#endif
+	#error "not implemented yet"
 	#endif
 }
