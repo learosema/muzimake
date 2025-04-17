@@ -1,8 +1,0 @@
-src/textui/textmode.cpp(4): Error! E059: col(17) unable to open 'dpmi.h'
-src/textui/textmode.cpp(499): Error! E006: col(24) syntax error; probable cause: missing ';'
-src/textui/textmode.cpp(501): Error! E055: col(53) not enough parameters given for macro '_MK_FP'
-src/textui/textmode.cpp(501): Note! N851: col(53) macro '_MK_FP' defined in: /usr/local/bin/watcom/h/i86.h(268) (col 9)
-src/textui/textmode.cpp(501): Error! E029: col(53) symbol 'memblock' has not been declared
-src/textui/textmode.cpp(501): Error! E121: col(53) syntax error
-src/textui/textmode.cpp(502): Error! E029: col(30) symbol 'font_data' has not been declared
-src/textui/textmode.cpp(504): Error! E715: col(16) member 'bp' has not been declared in 'DWORDREGS'

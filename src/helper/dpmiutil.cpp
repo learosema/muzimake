@@ -17,8 +17,8 @@ dos_block_t dpmi_alloc_dos_block(uint32_t size)
     if (regs.x.cflag)
         return dblk; // Failure, return {0, 0}
 
-    dblk.segment = regs.x.ax;
-    dblk.selector = regs.x.dx;
+    dblk.segment = regs.w.ax;
+    dblk.selector = regs.w.dx;
 	#endif;
 	return dblk;
 }
@@ -26,12 +26,14 @@ dos_block_t dpmi_alloc_dos_block(uint32_t size)
 void dpmi_free_dos_block(dos_block_t dblk)
 {
 	#ifdef __DOS__
-    if (dblk.segment == 0)
-        return;
+    if (dblk.segment == 0) {
+			return;
+		}
 
     union REGS regs;
-    regs.x.eax = 0x0101; // DPMI function: Free DOS memory block
-    regs.x.es = dblk.segment;
+
+    regs.w.ax = 0x0101;
+    regs.w.dx = dblk.selector;
 
     int386(0x31, &regs, &regs);
 	#endif
