@@ -9,13 +9,14 @@ SRC_DIR=src
 BIN_DIR=bin
 OBJ_DIR=obj
 TEST_DIR=tests
+VENDOR_DIR=vendor
 
 SRC_DIR_FMT=$(SRC_DIR)/filefmt
 SRC_DIR_HAL=$(SRC_DIR)/hal
 SRC_DIR_HLP=$(SRC_DIR)/helper
 SRC_DIR_TUI=$(SRC_DIR)/textui
 
-CXX_INCL=-i=$(SRC_DIR) -i=$(SRC_DIR_FMT) -i=$(SRC_DIR_HAL) -i=$(SRC_DIR_HLP) -i=$(SRC_DIR_TUI)
+CXX_INCL=-i=$(SRC_DIR) -i=$(SRC_DIR_FMT) -i=$(SRC_DIR_HAL) -i=$(SRC_DIR_HLP) -i=$(SRC_DIR_TUI) -i=$(VENDOR_DIR)
 
 !ifdef __UNIX__
 O_EXT=o
@@ -42,10 +43,11 @@ SRCS=main.cpp $(SRC_FILEFMT) $(SRC_HAL) $(SRC_HELPER) $(SRC_TEXTUI)
 
 TEST_COMMON_SRCS=bnkfile.cpp rolfile.cpp fileio.cpp file.cpp
 
+LIB_UI_SRCS=dpmiutil.cpp mouse.cpp textmode.cpp ui_event.cpp ui_common.cpp ui_label.cpp ui_btn.cpp ui_input.cpp ui_lsbox.cpp ui_piano.cpp ui_range.cpp ui_sheet.cpp cmponent.cpp
 TEST_ROL_SRCS=$(TEST_COMMON_SRCS) instrmnt.cpp opl2.cpp test_rol.cpp
 TEST_BNK_SRCS=$(TEST_COMMON_SRCS) instrmnt.cpp opl2.cpp test_bnk.cpp
 TESTINST_SRCS=$(TEST_COMMON_SRCS) instrmnt.cpp testinst.cpp
-TEST_UI_SRCS=dpmiutil.cpp mouse.cpp textmode.cpp ui_event.cpp log.cpp cmponent.cpp test_ui.cpp
+TEST_UI_SRCS=$(LIB_UI_SRCS) log.cpp test_ui.cpp
 TEST_SRCS    =$(TEST_COMMON_SRCS) instrmnt.cpp test.cpp
 
 OBJS=$(SRCS:.cpp=.$(O_EXT))
