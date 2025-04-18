@@ -3,10 +3,14 @@
 #include <dos.h>
 #endif
 
+#ifdef __I86__
+#error "dmpiutil.cpp should not be compiled into 16 bit applications."
+#endif
+
 dos_block_t dpmi_alloc_dos_block(uint32_t size)
 {
 	dos_block_t dblk = {0, 0};
-	#ifdef __DOS__
+	#if defined __DOS__ && defined __386__
 		union REGS regs;
 
     regs.x.eax = 0x0100; // DPMI function: Allocate DOS memory block
@@ -25,7 +29,7 @@ dos_block_t dpmi_alloc_dos_block(uint32_t size)
 
 void dpmi_free_dos_block(dos_block_t dblk)
 {
-	#ifdef __DOS__
+	#if defined __DOS__ && defined __386__
     if (dblk.segment == 0) {
 			return;
 		}

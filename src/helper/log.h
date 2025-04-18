@@ -1,7 +1,7 @@
 #ifndef __LOG_H__
 #define __LOG_H__
 
-#ifdef DEBUG
+#ifdef DEBUG_LOGS
 #define APP_LOG(...) log_write(__VA_ARGS__)
 #else
 #define APP_LOG(...)

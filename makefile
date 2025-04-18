@@ -2,7 +2,7 @@
 CXX=wpp386
 LD=wlink
 SYSTEM=dos4g
-CFLAGS=-zq -zastd=c++0x -bt=dos -dDEBUG -d3
+CFLAGS=-zq -zastd=c++0x -bt=dos -dDEBUG_LOGS -d2
 LDFLAGS=
 
 SRC_DIR=src
@@ -45,7 +45,7 @@ TEST_COMMON_SRCS=bnkfile.cpp rolfile.cpp fileio.cpp file.cpp
 TEST_ROL_SRCS=$(TEST_COMMON_SRCS) instrmnt.cpp opl2.cpp test_rol.cpp
 TEST_BNK_SRCS=$(TEST_COMMON_SRCS) instrmnt.cpp opl2.cpp test_bnk.cpp
 TESTINST_SRCS=$(TEST_COMMON_SRCS) instrmnt.cpp testinst.cpp
-TEST_EVT_SRCS=dpmiutil.cpp mouse.cpp textmode.cpp ui_event.cpp log.cpp cmponent.cpp test_evt.cpp
+TEST_UI_SRCS=dpmiutil.cpp mouse.cpp textmode.cpp ui_event.cpp log.cpp cmponent.cpp test_ui.cpp
 TEST_SRCS    =$(TEST_COMMON_SRCS) instrmnt.cpp test.cpp
 
 OBJS=$(SRCS:.cpp=.$(O_EXT))
@@ -53,13 +53,13 @@ OBJS=$(SRCS:.cpp=.$(O_EXT))
 TEST_ROL_OBJS=$(TEST_ROL_SRCS:.cpp=.$(O_EXT))
 TEST_BNK_OBJS=$(TEST_BNK_SRCS:.cpp=.$(O_EXT))
 TESTINST_OBJS=$(TESTINST_SRCS:.cpp=.$(O_EXT))
-TEST_EVT_OBJS=$(TEST_EVT_SRCS:.cpp=.$(O_EXT))
+TEST_UI_OBJS=$(TEST_UI_SRCS:.cpp=.$(O_EXT))
 TEST_OBJS=$(TEST_SRCS:.cpp=.$(O_EXT))
 
 # Executable name
 TARGET = muzimake.exe
 
-TESTS = testinst.exe test_rol.exe test_bnk.exe test_evt.exe test.exe
+TESTS = testinst.exe test_rol.exe test_bnk.exe test_ui.exe test.exe
 
 # Default target
 .erase
@@ -101,8 +101,8 @@ test_bnk.exe: $(TEST_BNK_OBJS)
 test_rol.exe: $(TEST_ROL_OBJS)
 	*$(LD) system $(SYSTEM) $(LDFLAGS) name $(BIN_DIR)/test_rol.exe file { $< }
 
-test_evt.exe: $(TEST_EVT_OBJS)
-	*$(LD) system $(SYSTEM) $(LDFLAGS) name $(BIN_DIR)/test_evt.exe file { $< }
+test_ui.exe: $(TEST_UI_OBJS)
+	*$(LD) system $(SYSTEM) $(LDFLAGS) name $(BIN_DIR)/test_ui.exe file { $< }
 
 # Clean rule
 clean: .symbolic
