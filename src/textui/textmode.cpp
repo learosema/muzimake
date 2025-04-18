@@ -6,6 +6,7 @@
 #endif
 #ifdef __DOS__
 #include <dos.h>
+#include <malloc.h>
 #else
 #include <intstubs.h>
 #endif
@@ -67,7 +68,12 @@ void textmode_setmode(uint8_t mode)
 void textmode_dispose() {
 
 	if (g_currentMode.vram != TEXT_VRAM_BASE && g_currentMode.vram != TEXT_VRAM_BASE_MONO) {
+		#if defined __386__
 		free(g_currentMode.vram);
+		#endif
+		#if defined __I86__
+		_ffree(g_currentMode.vram);
+		#endif
 		g_currentMode.vram = nullptr;
 	}
 
@@ -506,8 +512,18 @@ void textmode_init_font(const uint16_t offset, const uint16_t count, const uint1
 	regs.w.bp = 0x0000;
 	intr(0x10, &regs);
 	dpmi_free_dos_block(memblock);
+	#endif
 
-	#else
-	#error "not implemented yet"
+	#if defined __DOS__ && defined __I86__
+	union REGPACK regs = {0};
+	uint16_t sizeInBytes = count * charHeight;
+	regs.w.ax = 0x1110;
+	regs.w.dx = offset;
+	regs.w.cx = count;
+	regs.h.bh = charHeight & 255;
+	regs.h.bl = 0;
+	regs.w.es = FP_SEG(charData);
+	regs.w.bp = FP_OFF(charData);
+	intr(0x10, &regs);
 	#endif
 }

@@ -83,6 +83,17 @@ void ui_cleanup(ui_state_t *ui) {
 	ui->components = nullptr;
 }
 
+bool needs_repaint(const ui_state_t *ui) {
+	for (uint16_t i = 0; i < ui->count; i++)
+	{
+		if (ui->components[i].component.generic.paint) {
+			return true;
+		}
+	}
+	return false;
+}
+
+
 int main()
 {
 	ui_event_t event;
@@ -109,9 +120,11 @@ int main()
 	textmode_print("MUZIMAKE UI Test", 1, 0, 0x74);
 
 	while (!done) {
-		if (g_hasMouse) mouse_hide();
-		component_render_all(ui.count, ui.components, false);
-		if (g_hasMouse) mouse_show();
+		if (needs_repaint(&ui)) {
+			if (g_hasMouse) mouse_hide();
+			component_render_all(ui.count, ui.components, false);
+			if (g_hasMouse) mouse_show();
+		}
 		event_poll(&event);
 		component_process_events(ui.count, ui.components, &event);
 		textmode_gotoxy(1, 48);
@@ -151,7 +164,7 @@ int main()
 			default:
 				break;
 		}
-		delay(4);
+		delay(8);
 	}
 
 	if (g_hasMouse) {
