@@ -278,11 +278,12 @@ void textmode_print(const char *str, const int x, const int y, const uint8_t col
 	}
 }
 
-uint8_t textmode_printn(const char *str, uint8_t len, int x, int y, uint8_t color)
+uint8_t textmode_printn_color(const char *str, uint8_t len, int x, int y, uint8_t color)
 {
 	VRAMPTR ptr;
 	uint8_t i;
 	uint8_t x0 = (uint8_t)(MAX(0, x));
+	bool ended = false;
 
 	if ((y < 0) || (y >= g_currentMode.numRows))
 	{
@@ -294,14 +295,14 @@ uint8_t textmode_printn(const char *str, uint8_t len, int x, int y, uint8_t colo
 	for (i = 0; i < len; i++)
 	{
 		if (str[i] == '\0') {
-			break;
+			ended = true;
 		}
 		if ((x + i < 0) || (x + i >= g_currentMode.numCols))
 		{
 			ptr += 2;
 			continue;
 		}
-		*ptr = str[i];
+		*ptr = ended ? ' ' : str[i];
 		ptr++;
 		*ptr = color;
 		ptr++;
@@ -309,7 +310,36 @@ uint8_t textmode_printn(const char *str, uint8_t len, int x, int y, uint8_t colo
 	return i;
 }
 
+uint8_t textmode_printn(const char *str, uint8_t len, int x, int y)
+{
+	VRAMPTR ptr;
+	uint8_t i;
+	uint8_t x0 = (uint8_t)(MAX(0, x));
+	bool ended = false;
 
+	if ((y < 0) || (y >= g_currentMode.numRows))
+	{
+		return 0;
+	}
+	ptr = TEXT_VRAM + g_currentMode.page * g_currentMode.pageSize +
+		(uint16_t)(y*g_currentMode.numCols*2+x*2);
+
+	for (i = 0; i < len; i++)
+	{
+		if (str[i] == '\0') {
+			ended = true;
+		}
+		if ((x + i < 0) || (x + i >= g_currentMode.numCols))
+		{
+			ptr += 2;
+			continue;
+		}
+		*ptr = ended ? ' ' : str[i];
+		ptr++;
+		ptr++;
+	}
+	return i;
+}
 
 void textmode_putchar(int x, int y, char ch)
 {

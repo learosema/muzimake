@@ -6,12 +6,16 @@ extern "C" {
 #endif
 #include "ui_common.h"
 
+#define PATTERN_FLAG_ISSET 1
+
 typedef struct pattern_entry_s
 {
+	bool has_content;
 	uint8_t note;
 	uint8_t velocity;
-	uint8_t effects;
-	uint8_t reserved;
+	uint8_t instrument;
+	char effect;
+	uint8_t effectParam;
 } pattern_entry_t;
 
 typedef struct pattern_s
@@ -31,7 +35,7 @@ typedef struct ui_sheet_s {
 	ui_event_handler_t event_handler;
 	pattern_t pattern;
 	uint8_t offset_x;
-	uint8_t offset_y;
+	int8_t offset_y;
 	uint8_t cursor_x;
 	uint8_t cursor_y;
 	uint8_t cursor_input_x;

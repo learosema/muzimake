@@ -71,7 +71,7 @@ void listbox_render(ui_listbox_t *listbox)
 		uint8_t color = yy == (listbox->cursor_y0 + listbox->cursor_y) ?
 			select_color : lbcolor;
 		if (yy < listbox->num_items) {
-			uint8_t written = textmode_printn(listbox->values[yy], inner_width,
+			uint8_t written = textmode_printn_color(listbox->values[yy], inner_width,
 				listbox->bounding_rect.x + 1,
 				listbox->bounding_rect.y + 1 + y, color
 			);

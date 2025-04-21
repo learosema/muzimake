@@ -17,6 +17,10 @@
 #define KEY_ARROW_RIGHT     0x4D00
 #define KEY_ARROW_UP        0x4800
 #define KEY_ARROW_DOWN      0x5000
+#define KEY_ALT_ARROW_LEFT  0x9B00
+#define KEY_ALT_ARROW_RIGHT 0x9D00
+#define KEY_ALT_ARROW_UP    0x9800
+#define KEY_ALT_ARROW_DOWN  0xA000
 #define KEY_BACKSPACE       0x08
 #define KEY_ENTER           0x0D
 #define KEY_TAB             0x09
