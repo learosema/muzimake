@@ -49,7 +49,7 @@ void range_render(ui_range_t *range)
 	uint8_t y  = clientrect.y;
 
 	char stringValue[20];
-	sprintf(stringValue,"%4d", range->value);
+	snprintf(stringValue, 20, "%4d", range->value);
 
 	textmode_print(stringValue, x1 + 1, y, color);
 	textmode_putchar_color(x0, y, CP_LEFT_TRIANGLE, color);
