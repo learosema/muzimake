@@ -43,12 +43,12 @@ void RegisterListener(EventManager_t* manager, EventHandler_t handler, unsigned 
     my_mutex_unlock(&manager->listenerMutex);
 }
 
-void UnregisterListener(EventManager_t *manager, EventHandler_t handler) {
+void UnregisterListener(EventManager_t* manager, EventHandler_t handler) {
     my_mutex_lock(&manager->listenerMutex);
-    Listener_t **current = &manager->listeners;
+    Listener_t** current = &manager->listeners;
     while (*current != NULL) {
         if ((*current)->handler == handler) {
-            Listener_t *temp = *current;
+            Listener_t* temp = *current;
             *current = (*current)->next;
             free(temp);
             break;
@@ -65,11 +65,11 @@ int SendMessage(EventManager_t* manager, const EventParam_t* event) {
     int result = 0;
 
     my_mutex_lock(&manager->listenerMutex);
-    Listener *current = manager->listeners;
+    Listener_t* current = manager->listeners;
     while (current != NULL) {
         if (current->filter == event->eventId) {
             // Aufruf des registrierten Handlers
-            result = current->handler((EventParam*) event);
+            result = current->handler((EventParam_t*)event);
             if (result != 0) { // Bei nicht-null Rückgabewert eventuell abbrechen
                 break;
             }
@@ -82,7 +82,7 @@ int SendMessage(EventManager_t* manager, const EventParam_t* event) {
 }
 
 // PostMessage: Fügt ein Event (mit Priorität) in die Message Queue ein.
-void PostMessage(EventManager *manager, const EventParam_t* event) {
+void PostMessage(EventManager_t* manager, const EventParam_t* event) {
     QueueItem_t* newItem = (QueueItem_t*) malloc(sizeof(QueueItem_t));
     if (newItem == NULL) {
         return; // Fehlerbehandlung: Speicherfehler
