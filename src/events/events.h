@@ -37,7 +37,7 @@ void UnregisterListener(EventManager_t *manager, EventHandler_t handler);
 /* === Nachrichtensenden === */
 int SendMessage(EventManager_t *manager, const EventParam_t *event);
 
-void PostMessage(EventManager *manager, const EventParam_t *event);
+void PostMessage(EventManager_t *manager, const EventParam_t *event);
 
 /* === Verarbeitung der Message Queue (ohne Endlosschleife) === */
 void ProcessMessageQueue(EventManager_t *manager);
