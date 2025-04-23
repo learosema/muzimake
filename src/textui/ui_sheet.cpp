@@ -10,9 +10,10 @@ static const char* tone_scale[12] = {"C-", "C#", "D-", "D#", "E-", "F-", "F#", "
 #define NOTE_MAX_VALUE 0x7f
 #define NUM_TOTAL_CHANNELS 9
 #define CELL_LEN 11
+#define MAX_BUF_LEN (NUM_TOTAL_CHANNELS * 11 + 1)
 
-void sheet_build_row(char *rowBuf, pattern_entry_t *data, uint8_t count, uint8_t row_index) {
-	rowBuf[0] = '\0';
+void sheet_build_row(char *row_buf, size_t max_buf_len, pattern_entry_t *data, uint8_t count, uint8_t row_index) {
+	row_buf[0] = '\0';
 	uint8_t count_clamped = MIN(NUM_TOTAL_CHANNELS, count);
 	for (uint8_t channel = 0; channel < count_clamped; channel++) {
 		char buf[12] = ".......... ";
@@ -21,12 +22,12 @@ void sheet_build_row(char *rowBuf, pattern_entry_t *data, uint8_t count, uint8_t
 			uint8_t octave = CLAMP(entry.note / 12, 0, 10);
 			const char* tone = tone_scale[entry.note % 12];
 			// tone+octave instrument velocity effects(todo)
-			sprintf(buf, "%s%1x%2x%2x... ", tone, octave, entry.instrument, entry.velocity);
+			snprintf(buf, max_buf_len, "%s%1x%2x%2x... ", tone, octave, entry.instrument, entry.velocity);
 		}
 		if (entry.has_content && entry.note > NOTE_MAX_VALUE) {
-			sprintf(buf, "---------- ");
+			snprintf(buf, max_buf_len, "---------- ");
 		}
-		strcat(rowBuf, buf);
+		strlcat(row_buf, buf, MAX_BUF_LEN);
 	}
 }
 
@@ -42,7 +43,6 @@ void sheet_render(ui_sheet_t *sheet)
 		sheet->bounding_rect.width = 14;
 	}
 	rect_t inner = get_clientrect(&(sheet->bounding_rect));
-	uint8_t black_height = inner.height * 0.7;
 
 	sheet->bounding_rect.width = MAX(sheet->bounding_rect.width, 2 + 9 * 8);
 
@@ -69,15 +69,14 @@ void sheet_render(ui_sheet_t *sheet)
 	int num_cols = sheet->pattern.num_cols;
 	int num_rows = sheet->pattern.num_rows;
 
-	uint8_t num_channels = sheet->pattern.num_cols;
-	char *rowBuf = (char *)malloc(NUM_TOTAL_CHANNELS * CELL_LEN + 1);
+	char *rowBuf = (char *)malloc(MAX_BUF_LEN);
 	for (int y = 0; y < inner.height; y++) {
 		int yy = (int)(sheet->offset_y) + y;
 		char idx_buf[5] = "\0";
-		sprintf(idx_buf, "%02x: ", yy);
+		snprintf(idx_buf, 5, "%02x: ", yy);
 		textmode_printn(idx_buf, 4, inner.x, inner.y + y);
 		if (yy >= 0 && yy < num_rows) {
-			sheet_build_row(rowBuf, &(sheet->pattern.data[yy * num_cols]), sheet->pattern.num_cols, yy);
+			sheet_build_row(rowBuf, MAX_BUF_LEN ,&(sheet->pattern.data[yy * num_cols]), sheet->pattern.num_cols, yy);
 			textmode_printn_color(&(rowBuf[sheet->offset_x]), inner.width - 4, inner.x + 4, inner.y + y, sheet->color);
 		} else {
 			textmode_hline(inner.x + 4, inner.y + y, inner.width - 4, ' ', sheet->color);
