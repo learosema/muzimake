@@ -37,7 +37,7 @@ MD_OBJ=if not exist $(OBJ_DIR) md $(OBJ_DIR)
 SRC_FILEFMT=file.cpp fileio.cpp bnkfile.cpp rolfile.cpp
 SRC_HAL=instrmnt.cpp opl2.cpp
 SRC_HELPER=list.cpp
-SRC_TEXTUI=mouse.cpp textmode.cpp vga.cpp
+SRC_TEXTUI=mouse.cpp dpmiutil.cpp textmode.cpp vga.cpp
 
 SRCS=main.cpp $(SRC_FILEFMT) $(SRC_HAL) $(SRC_HELPER) $(SRC_TEXTUI)
 
