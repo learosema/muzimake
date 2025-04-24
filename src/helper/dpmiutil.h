@@ -12,6 +12,16 @@ typedef struct dos_block_s {
     uint16_t selector;  // Protected mode selector for direct access
 } dos_block_t;
 
+typedef struct pm_address_s {
+	uint16_t selector;
+	uint32_t offset;
+} pm_address_t;
+
+typedef struct rm_address_s {
+	uint16_t segment;
+	uint16_t offset;
+} rm_address_t;
+
 /**
  * Allocates a block of DOS memory using DPMI (int 0x31, ax=0x0100).
  * @param size Size in bytes.

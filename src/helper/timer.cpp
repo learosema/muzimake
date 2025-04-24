@@ -1,9 +1,4 @@
 // https://expiredpopsicle.com/articles/2017-04-13-DOS_Timer_Stuff/2017-04-13-DOS_Timer_Stuff.html
-#ifndef __DOS__
-#error "FAIL FAST"
-#endif
-
-
 #include "timer.h"
 #include <stdio.h>
 #include <string.h>
@@ -13,14 +8,15 @@
 #include <dos.h>
 #endif
 #include <stdlib.h>
-
+#include <stdint.h>
 
 // This is a different one that gets called from 0x08.
 //#define TIMER_INTERRUPT 0x1c
 
 #define TIMER_INTERRUPT 0x08
 
-#pragma aux timer_clearInterrupt =              \
+#ifdef __DOS__
+#pragma aux timer_endOfInterrupt =              \
     "mov al,20H",                               \
     "out 20H,al"
 
@@ -30,9 +26,6 @@
 #pragma aux timer_sti =                         \
     "sti"
 
-void timer_clearInterrupt();
-void timer_cli();
-void timer_sti();
 
 static uint32_t timeValue = 0;
 static int32_t nextOldTimer = 0;
@@ -43,7 +36,7 @@ static void (__interrupt __far *oldDosTimerInterrupt)();
 static void __interrupt __far newCustomTimerInterrupt()
 {
     timeValue++;
-
+		printf("%d", timeValue);
     nextOldTimer -= 10;
     if(nextOldTimer <= 0) {
 
@@ -55,17 +48,23 @@ static void __interrupt __far newCustomTimerInterrupt()
         // Make sure we still execute the "HEY I'M DONE WITH THIS
         // INTERRUPT" signal.
 
-        timer_clearInterrupt();
+        timer_endOfInterrupt();
     }
 }
+#endif
 
 uint32_t timer_get()
 {
+	#ifdef __DOS__
     return timeValue;
+	#else
+		return 0;
+	#endif
 }
 
 void timer_init()
 {
+	#ifdef __DOS__
     // The clock we're dealing with here runs at 1.193182mhz, so we
     // just divide 1.193182 by the number of triggers we want per
     // second to get our divisor.
@@ -104,10 +103,12 @@ void timer_init()
     outp(0x40, (uint8_t)((c >> 8) & 0xff));
 
     timer_sti();
+	#endif
 }
 
 void timer_shutdown(void)
 {
+	#ifdef __DOS__
     // Decrement ref count and refuse to shut down if we're still in
     // use.
     timerInitCounter--;
@@ -130,6 +131,7 @@ void timer_shutdown(void)
 
     // Restore original timer interrupt handler.
     _dos_setvect(TIMER_INTERRUPT, oldDosTimerInterrupt);
+	#endif
 }
 
 void timer_delay(uint32_t ms)
