@@ -11,9 +11,10 @@ extern "C" {
 typedef void (*timer_func_t)(const uint64_t);
 
 void timer_shutdown();
-void timer_init(uint32_t calls_per_second, timer_func_t callback);
+void timer_init(timer_func_t callback);
 void timer_end_of_interrupt();
 uint64_t timer_get();
+void timer_delay(uint64_t ms);
 
 uint16_t timer_calc_freq(uint32_t calls_per_second);
 uint16_t timer_get_pit_count();

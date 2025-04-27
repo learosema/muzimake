@@ -1,7 +1,11 @@
 // This code is based on this blog post and this osdev article:
+//
 // https://expiredpopsicle.com/articles/2017-04-13-DOS_Timer_Stuff/2017-04-13-DOS_Timer_Stuff.html
 // https://wiki.osdev.org/Programmable_Interval_Timer
-
+//
+// More info on _dos_getvect:
+// https://open-watcom.github.io/open-watcom-v2-wikidocs/clib.html#_dos_getvect
+//
 #include "timer.h"
 #include <stdio.h>
 #include <string.h>
@@ -39,7 +43,6 @@ static void (__interrupt __far *oldDosTimerInterrupt)();
 static void __interrupt __far newCustomTimerInterrupt()
 {
     timeValue++;
-		printf("%d", timeValue);
 
 		if (g_callback != nullptr) {
 			g_callback(timeValue);
@@ -48,7 +51,7 @@ static void __interrupt __far newCustomTimerInterrupt()
     nextOldTimer -= 10;
     if(nextOldTimer <= 0) {
         nextOldTimer += 182;
-        oldDosTimerInterrupt();
+				_chain_intr(oldDosTimerInterrupt);
 				return;
     }
     timer_end_of_interrupt();
@@ -62,16 +65,6 @@ uint64_t timer_get()
 	#else
 		return 0;
 	#endif
-}
-
-uint16_t timer_calc_freq(uint32_t calls_per_second)
-{
-	// The clock we're dealing with here runs at 1.193182mhz, so we
-	// just divide 1.193182 by the number of triggers we want per
-	// second to get our divisor.
-
-	uint32_t c = 1193181 / (uint32_t)calls_per_second;
-	return (uint16_t)c;
 }
 
 uint16_t timer_get_pit_count()
@@ -123,9 +116,13 @@ void timer_set_pit_count(uint16_t c)
 /**
  * Init PIT timer, setting a call frequency and a callback function
  */
-void timer_init(uint32_t calls_per_second, timer_func_t callback)
+void timer_init(timer_func_t callback)
 {
 	#ifdef __DOS__
+		// The clock we're dealing with here runs at 1.193182mhz, so we
+		// just divide 1.193182 by the number of triggers we want per
+		// second to get our divisor.
+		uint32_t c = 1193181 / 1000;
 
     // Increment ref count and refuse to init if we're already
     // initialized.
@@ -136,9 +133,8 @@ void timer_init(uint32_t calls_per_second, timer_func_t callback)
 
 		g_callback = callback;
 
-		uint32_t c = timer_calc_freq(calls_per_second);
-		timer_set_pit_count(c);
 		original_pit_count = timer_get_pit_count();
+		timer_set_pit_count(c);
 
     // Swap out interrupt handlers.
     oldDosTimerInterrupt = _dos_getvect(TIMER_INTERRUPT);
