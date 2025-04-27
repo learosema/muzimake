@@ -18,7 +18,7 @@ static void timer_func(uint64_t time_value)
 {
 	counter++;
 
-	// we can print via textmode_print
+	// we can print via textmode_print (printf won't work)
 	textmode_print("Muh", 0, 0, (counter & 0x0f) + 16);
 }
 
@@ -38,7 +38,7 @@ int main(int argc, char const *argv[])
 		}
 		snprintf(buf, 256, "Main program: %d", counter);
 		textmode_print(buf, 0, 2, 0x1e);
-		timer_delay(1000);
+		timer_delay(10);
 	}
 	textmode_setmode(3);
 	timer_shutdown();
