@@ -12,7 +12,7 @@
 #ifdef __DOS__
 #define KBD_INTERRUPT 9
 typedef void (__interrupt __far *interrupt_func_t)();
-#define INTRFUNC __interrupt __far
+#define INTERRUPT __interrupt __far
 #pragma aux kbd_cli =                         \
     "cli"
 
@@ -25,15 +25,18 @@ typedef void (__interrupt __far *interrupt_func_t)();
 
 #else
 typedef void (*interrupt_func_t)();
-#define INTERRUPT_FUNC
+#define INTERRUPT
 #endif
-static char g_keys[128];
+static bool g_keys[128];
 
 static interrupt_func_t old_keyboard_interrupt;
-static void INTERRUPT_FUNC new_keyboard_interrupt() {
+static void INTERRUPT new_keyboard_interrupt() {
 	#ifdef __DOS__
-	// TODO FIGURE OUT HOW THIS WORKS
-	int ch = inp(0x61);
+	uint8_t kbd = inp(0x60);
+	uint8_t code = kbd & 0x7f;
+	bool pressed = (kbd & 0x80 == 0);
+	g_keys[code] = pressed;
+
 	_chain_intr(old_keyboard_interrupt);
 	#endif
 }
@@ -41,14 +44,13 @@ static void INTERRUPT_FUNC new_keyboard_interrupt() {
 void kbd_init()
 {
 	#ifdef __DOS__
-
 		old_keyboard_interrupt = _dos_getvect(KBD_INTERRUPT);
     _dos_setvect(KBD_INTERRUPT, new_keyboard_interrupt);
-
 	#endif
 }
 
 void kbd_shutdown() {
+	memset(g_keys, 128, 0);
 	#ifdef __DOS__
 	_dos_setvect(KBD_INTERRUPT, old_keyboard_interrupt);
 	#endif
@@ -56,5 +58,25 @@ void kbd_shutdown() {
 
 
 int main() {
-	memset(g_keys, 128, 0);
+	bool done = false;
+	int i, x, y;
+	char buf[3];
+	textmode_setmode(3);
+	textmode_clear(0x17);
+	kbd_init();
+
+	while (!done) {
+		for (i = 0; i < 128; i++) {
+			x = (i % 32)*2;
+			y = i / 32;
+			snprintf(buf, 3, "%2x", i);
+			textmode_print(buf, x, y, g_keys[i] ? 0x1e : 0x17);
+		}
+		if (g_keys[27]) {
+			done = true;
+		}
+	}
+
+	kbd_shutdown();
+	textmode_setmode(3);
 }
