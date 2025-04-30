@@ -16,20 +16,11 @@
 #define KBD_INTERRUPT 9
 typedef void (__interrupt __far *interrupt_func_t)();
 #define INTERRUPT __interrupt __far
-#pragma aux kbd_cli =                         \
-    "cli"
-
-#pragma aux kbd_sti =                         \
-    "sti"
-
-#pragma aux kbd_end_of_interrupt =              \
-    "mov al,20H",                               \
-    "out 20H,al"
-
 #else
 typedef void (*interrupt_func_t)();
 #define INTERRUPT
 #endif
+
 static bool g_keys[128];
 static interrupt_func_t old_keyboard_interrupt;
 
