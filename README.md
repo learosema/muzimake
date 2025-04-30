@@ -70,6 +70,7 @@ Like the hard mode in Monkey Island.
 
 ## Attributions
 
+- thank you [root42](https://codeberg.org/root42) for making [dosadlib](https://codeberg.org/root42/dosadlib) and making a youtube video about it! Helped me a lot to get started.
 - [Angela Galliat](https://github.com/agalliat/) helped me a lot with the programming and
   optimization of the software architecture
 - OPL2 code taken from [lib16](https://github.com/SuperIlu/lib16) by [SuperIlu](https://mastodon.social/@dec_hl) which is in turn based on [ArduinoOPL2](https://github.com/DhrBaksteen/ArduinoOPL2), ported from a class interface to plain C
