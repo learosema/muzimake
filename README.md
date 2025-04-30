@@ -31,13 +31,11 @@ Rabbit Hole:
 The only 32 bit platform tested so far is 32Bit DOS with DOS4GW and Watcom C.
 
 Type `wmake`. It will create an MUZIMAKE.EXE and copy
-DOS4GW.EXE into the current dir.
+DOS4GW.EXE into the current dir. In the current state, this one is only a bare bone skeleton.
 
-### "Unit tests"
+### "tests"
 
-There are a couple tests in this project. Well, without using a test framework, just tinier programs testing the functionalities.
-
-I didn't get a proper test framework working yet:
+There are a couple "tests" in this project. Well, they're not unit tests, just tinier programs I built for experimentation and testing. They do give some confidence to ensure the things work :D.
 
 ```sh
 wmake tests
@@ -45,9 +43,12 @@ wmake tests
 
 This builds a couple of test programs:
 
+- `testinst` for testing the instrument data structure
 - `test_bnk` for testing bnk files, playing every instrument inside a bnk
-- `test_rol` for testing the rol file loading routing
-- `testinst` for testing the instrument datastructure
+- `test_rol` for testing the rol file loading routine
+- `test_tmr` for testing timer interrupts
+- `test_evt` for testing an event system, inspired by the Windows API
+- `test_ui` for testing the textmode UI. It has knobs, inputs, lists and more
 
 ## Real mode
 
