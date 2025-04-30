@@ -47,6 +47,7 @@ This builds a couple of test programs:
 - `test_bnk` for testing bnk files, playing every instrument inside a bnk
 - `test_rol` for testing the rol file loading routine
 - `test_tmr` for testing timer interrupts
+- `test_kbd` for testing the keyboard interrupt
 - `test_evt` for testing an event system, inspired by the Windows API
 - `test_ui` for testing the textmode UI. It has knobs, inputs, lists and more
 
