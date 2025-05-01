@@ -259,5 +259,49 @@ int dpmi_unlock_code(uint32_t lockaddr, uint32_t locksize)
 	return 0;
 }
 
+/**
+ * Allocate a "real mode callback" (Function 0x303)
+ * a function pointer to a stub that calls back to protected mode
+ * limited resource, don't forget to free.
+ */
+int dpmi_alloc_real_mode_callback(const interrupt_func_t pm_func, const dos_block_t rm_buffer, rm_address_t* result)
+{
+	#if defined __DOS__ && defined __386__
+	union REGS regs;
+	struct SREGS sregs;
+	regs.w.ax = 0x303;
+	sregs.ds = FP_SEG(pm_func);
+	regs.w.si = FP_OFF(pm_func);
+	sregs.es = rm_buffer.selector;
+	regs.w.di = 0;
+	int386x(0x31, &regs, &regs, &sregs);
+	if (regs.x.cflag) {
+		return -1;
+	}
+	result->segment = regs.w.cx;
+	result->offset = regs.w.dx;
+	return 0;
+	#endif
+	return -1;
+}
 
+/**
+ * Free real mode callback (Function 0x304)
+ */
+int dpmi_free_real_mode_callback(rm_address_t callback)
+{
+	#if defined __DOS__ && defined __386__
+	union REGS regs;
 
+	regs.w.ax = 0x304;
+	regs.w.cx = callback.segment;
+	regs.w.dx = callback.offset;
+
+	int386x(0x31, &regs, &regs);
+	if (regs.x.cflag) {
+		return -1;
+	}
+	return 0;
+	#endif
+	return -1;
+}

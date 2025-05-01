@@ -6,12 +6,19 @@ extern "C" {
 #endif
 
 #include <stdint.h>
+#include <intrhelp.h>
+#include <dpmiutil.h>
 
 typedef struct MOUSE_STATUS {
 	uint16_t mouseX;
 	uint16_t mouseY;
 	uint16_t buttons;
 } MOUSE_STATUS;
+
+typedef struct mouse_callback_s {
+	dos_block_t memblock;
+	rm_address_t rm_callback;
+} mouse_callback_t;
 
 
 bool mouse_init();
