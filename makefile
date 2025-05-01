@@ -51,7 +51,7 @@ TEST_ROL_SRCS=$(TEST_COMMON_SRCS) instrmnt.cpp opl2.cpp test_rol.cpp
 TEST_BNK_SRCS=$(TEST_COMMON_SRCS) instrmnt.cpp opl2.cpp test_bnk.cpp
 TESTINST_SRCS=$(TEST_COMMON_SRCS) instrmnt.cpp testinst.cpp
 TEST_TMR_SRCS=dpmiutil.cpp textmode.cpp timer.cpp test_tmr.cpp
-TEST_KBD_SRCS=dpmiutil.cpp textmode.cpp test_kbd.cpp
+TEST_KBD_SRCS=dpmiutil.cpp textmode.cpp mouse.cpp test_kbd.cpp
 TEST_UI_SRCS=$(LIB_UI_SRCS) log.cpp test_ui.cpp
 TEST_SRCS    =$(TEST_COMMON_SRCS) instrmnt.cpp test.cpp
 
