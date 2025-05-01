@@ -4,6 +4,8 @@
 #include <intstubs.h>
 #endif
 
+#include <intrhelp.h>
+
 #include "mouse.h"
 
 
@@ -97,3 +99,31 @@ void mouse_get_status(MOUSE_STATUS *status)
 	status->buttons = regs.w.bx;
 	#endif
 }
+
+int mouse_set_user_eventhandler(interrupt_func_t handler, uint8_t call_mask, mouse_callback_t *result)
+{
+	// https://stanislavs.org/helppc/int_33-c.html
+	#ifdef __DOS__
+	mouse_callback_t cb;
+	union REGS regs;
+	struct SREGS sregs;
+	cb.memblock = dpmi_alloc_dos_block(32);
+	if (cb.memblock.segment == 0) {
+		return -1;
+	}
+	if (dpmi_alloc_real_mode_callback(handler, cb.memblock, &(cb.rm_callback)) < 0) {
+		dpmi_free_dos_block(cb.memblock);
+		return -1;
+	}
+	*result = cb;
+	regs.w.ax = 0x0C;
+	regs.w.cx = call_mask;
+
+	sregs.es = FP_SEG(cb.rm_callback);
+	regs.w.dx = FP_OFF(cb.rm_callback);
+	int386x(0x33, &regs, &regs, &sregs);
+	return 0;
+	#endif
+	return -1;
+}
+
