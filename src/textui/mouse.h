@@ -15,18 +15,14 @@ typedef struct MOUSE_STATUS {
 	uint16_t buttons;
 } MOUSE_STATUS;
 
-typedef struct mouse_callback_s {
-	dos_block_t memblock;
-	rm_address_t rm_callback;
-} mouse_callback_t;
-
-
 bool mouse_init();
 void mouse_show();
 void mouse_hide();
 void mouse_get_status(MOUSE_STATUS *status);
 void mouse_set_vertical_range(uint16_t minY, uint16_t maxY);
 void mouse_set_horizontal_range(uint16_t minX, uint16_t maxX);
+
+int mouse_set_eventhandler(void * handler, uint8_t call_mask);
 
 #ifdef __cplusplus
 }
