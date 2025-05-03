@@ -9,6 +9,32 @@
 #include "mouse.h"
 
 
+/**
+
+TODO: Figure out how the callbacks work :)
+
+OWC has a nice demo about it here:
+https://github.com/open-watcom/open-watcom-v2/blob/master/bld/src/goodies/mouse.c
+
+DOS/4GW Professional now supports the INT 31h interface for managing
+real-mode callbacks. However, you don't need to bother with them for
+their single most important application: mouse callback functions.
+Just register your protected-mode mouse callback function as you would
+in real mode, by issuing INT 33h/0Ch with the event mask in CX and the
+function address in ES:EDX, and your function will work as expected.
+.np
+Because a mouse callback function is called asynchronously, the same
+locking requirement exists for a mouse callback function as for a
+hardware interrupt handler. See (4c) above.
+
+
+ */
+
+
+
+
+// https://github.com/open-watcom/open-watcom-v2/blob/master/docs/doc/rsi/dos4gwqa.gml
+
 #ifdef __386__
 #define INTR int386
 #else
@@ -16,7 +42,8 @@
 #endif
 
 /**
- * Mouse Init and get Installed Flag
+ * Mouse Init and get Installed Flag.
+ * Also resets the callback.
  * @returns true, if a mouse driver is installed
  */
 bool mouse_init()
@@ -100,30 +127,20 @@ void mouse_get_status(MOUSE_STATUS *status)
 	#endif
 }
 
-int mouse_set_user_eventhandler(interrupt_func_t handler, uint8_t call_mask, mouse_callback_t *result)
+int mouse_set_eventhandler(void *handler, uint8_t call_mask)
 {
 	// https://stanislavs.org/helppc/int_33-c.html
 	#ifdef __DOS__
 	mouse_callback_t cb;
 	union REGS regs;
 	struct SREGS sregs;
-	cb.memblock = dpmi_alloc_dos_block(32);
-	if (cb.memblock.segment == 0) {
-		return -1;
-	}
-	if (dpmi_alloc_real_mode_callback(handler, cb.memblock, &(cb.rm_callback)) < 0) {
-		dpmi_free_dos_block(cb.memblock);
-		return -1;
-	}
-	*result = cb;
+
 	regs.w.ax = 0x0C;
 	regs.w.cx = call_mask;
-
-	sregs.es = FP_SEG(cb.rm_callback);
-	regs.w.dx = FP_OFF(cb.rm_callback);
-	int386x(0x33, &regs, &regs, &sregs);
+	sregs.es = FP_SEG(handler);
+	regs.w.dx = FP_OFF(handler);
+	INTR(0x33, &regs, &regs, &sregs);
 	return 0;
 	#endif
-	return -1;
 }
 
