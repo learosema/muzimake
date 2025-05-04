@@ -5,13 +5,11 @@
 extern "C" {
 #endif
 
-#ifdef __DOS__
-typedef void (__interrupt __far *interrupt_func_t)();
-#define INTERRUPT __interrupt __far
-#else
-typedef void (*interrupt_func_t)();
-#define INTERRUPT
+#ifndef __DOS__
+#include <stubs.h>
 #endif
+
+typedef void (__interrupt far *interrupt_func_t)();
 
 #ifdef __cplusplus
 }

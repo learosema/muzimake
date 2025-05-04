@@ -14,12 +14,13 @@ static volatile int counter = 0;
 
 
 
-static void timer_func(uint64_t time_value)
+void timer_func(uint64_t time_value)
 {
 	counter++;
+}
 
-	// we can print via textmode_print (printf won't work)
-	textmode_print("Muh", 0, 0, (counter & 0x0f) + 16);
+void timer_func_end() {
+	/* Function-End Marker */
 }
 
 
@@ -27,17 +28,25 @@ int main(int argc, char const *argv[])
 {
 	char buf[256];
 	int ch = 0;
+
+	if ((DPMI_LOCK_FUNC(timer_func) != 0) ||
+			(DPMI_LOCK_VAR(counter) != 0)) {
+		printf("Locks failed.\n");
+		exit(-1);
+	}
+
 	textmode_setmode(3);
 	textmode_clear(0x1f);
 	textmode_print("Hit ESC to quit", 0, 24, 0x1a);
+
 	timer_init(timer_func);
 
 	while (ch != 27) {
 		if (kbhit()) {
 			ch = getch();
 		}
-		snprintf(buf, 256, "Main program: %d", counter);
-		textmode_print(buf, 0, 2, 0x1e);
+		snprintf(buf, 256, "Counter: %d", counter);
+		textmode_print(buf, 0, 2, 0x10 + counter & 0xf);
 		timer_delay(10);
 	}
 	textmode_setmode(3);

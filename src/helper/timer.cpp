@@ -13,10 +13,12 @@
 #ifdef __DOS__
 #include <conio.h>
 #include <dos.h>
+#else
+#include <stubs.h>
 #endif
 #include <stdlib.h>
 #include <stdint.h>
-
+#include <dpmiutil.h>
 
 // This is a different one that gets called from 0x08.
 //#define TIMER_INTERRUPT 0x1c
@@ -38,9 +40,9 @@ static uint32_t timerInitCounter = 0;
 
 #pragma aux timer_sti =                         \
     "sti"
-static void (__interrupt __far *oldDosTimerInterrupt)();
+static void (__interrupt far *oldDosTimerInterrupt)();
 
-static void __interrupt __far newCustomTimerInterrupt()
+void __interrupt far newCustomTimerInterrupt()
 {
     timeValue++;
 
@@ -55,6 +57,11 @@ static void __interrupt __far newCustomTimerInterrupt()
 				return;
     }
     timer_end_of_interrupt();
+}
+
+void newCustomTimerInterrupt_end()
+{
+	/* Function-End marker */
 }
 #endif
 
@@ -136,6 +143,15 @@ void timer_init(timer_func_t callback)
 		original_pit_count = timer_get_pit_count();
 		timer_set_pit_count(c);
 
+		if (
+			(DPMI_LOCK_FUNC(newCustomTimerInterrupt) != 0) ||
+			(DPMI_LOCK_VAR(timeValue) != 0) ||
+			(DPMI_LOCK_VAR(nextOldTimer) != 0) ||
+			(DPMI_LOCK_VAR(g_callback) != 0)
+		) {
+			printf("Lock failed\n");
+			return;
+		}
     // Swap out interrupt handlers.
     oldDosTimerInterrupt = _dos_getvect(TIMER_INTERRUPT);
     _dos_setvect(TIMER_INTERRUPT, newCustomTimerInterrupt);
@@ -157,6 +173,16 @@ void timer_shutdown(void)
 
     // Restore original timer interrupt handler.
     _dos_setvect(TIMER_INTERRUPT, oldDosTimerInterrupt);
+
+		if (
+			(DPMI_UNLOCK_FUNC(newCustomTimerInterrupt) != 0) ||
+			(DPMI_UNLOCK_VAR(timeValue) != 0) ||
+			(DPMI_UNLOCK_VAR(nextOldTimer) != 0) ||
+			(DPMI_UNLOCK_VAR(g_callback) != 0)
+		) {
+			printf("Lock failed\n");
+			return;
+		}
 	#endif
 }
 

@@ -50,7 +50,6 @@ struct mouse_callback_data_s {
 
 } g_mouse_data = { 0 };
 
-#pragma off( check_stack )
 void _loadds far mouse_handler( int max, int mbx, int mcx, int mdx, int msi, int mdi )
 {
 #pragma aux mouse_handler __parm [__eax] [__ebx] [__ecx] [__edx] [__esi] [__edi]
@@ -68,25 +67,16 @@ void _loadds far mouse_handler( int max, int mbx, int mcx, int mdx, int msi, int
   g_mouse_data.y_counts = (int16_t)mdi;
 }
 
-/* Dummy function so we can calculate size of
-  code to lock (mouse_handler_end - mouse_handler).
-*/
 void mouse_handler_end( void )
 {
+	/* Function-End marker */
 }
-#pragma on(check_stack)
 
-static void INTERRUPT new_keyboard_interrupt() {
+void __interrupt far new_keyboard_interrupt() {
 	#ifdef __DOS__
 	static char buf[4];
 	uint8_t kbd = inp(0x60);
 
-	// there is no snprintf inside interrupts :)
-	buf[3] = 0;
-	buf[2] = 48 + (kbd % 10);
-	buf[1] = 48 + (kbd / 10) % 10;
-	buf[0] = 48 + (kbd / 100) % 10;
-	// textmode_print(buf, 0, 23, 0x1e);
 
 	uint8_t code = kbd & 0x7f;
 	bool pressed = (kbd & 0x80) == 0;
@@ -97,12 +87,21 @@ static void INTERRUPT new_keyboard_interrupt() {
 	#endif
 }
 
-void kbd_init(void)
+void new_keyboard_interrupt_end() {
+	/* Function-End marker */
+}
+
+int kbd_init(void)
 {
 	#ifdef __DOS__
+		if (DPMI_LOCK_FUNC(new_keyboard_interrupt) != 0) {
+			printf("Lock failed\n");
+			return -1;
+		}
 		old_keyboard_interrupt = _dos_getvect(KBD_INTERRUPT);
     _dos_setvect(KBD_INTERRUPT, new_keyboard_interrupt);
 	#endif
+	return -1;
 }
 
 void kbd_shutdown(void) {
@@ -145,15 +144,11 @@ int setup_mouse_callback(void)
 	// Locked means: the DPMI Host must not move this region (which can happen
 	// due to swapping, done by a Virtual Memory Manager)
 
-	if (dpmi_lock_linear_region(
-			&g_mouse_data,
-			sizeof(g_mouse_data)) != 0) {
+	if (DPMI_LOCK_VAR(g_mouse_data) != 0) {
 		return -1;
 	}
 
-	if (dpmi_lock_linear_region(
-		(void near *)mouse_handler,
-		(char *)mouse_handler_end - (char near *)mouse_handler) != 0) {
+	if (DPMI_LOCK_FUNC(mouse_handler) != 0) {
 		return -1;
 	}
 

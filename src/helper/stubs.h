@@ -1,6 +1,7 @@
 #if !defined(__DOS__)
 
 	#define _loadds
+	#define __interrupt
 	#define far
 	#define near
 

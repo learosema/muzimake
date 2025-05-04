@@ -8,6 +8,17 @@
 extern "C" {
 #endif
 
+#ifdef __386__
+#define DPMI_LOCK_FUNC(x) dpmi_lock_linear_region((void near *)x, (char *)x##_end - (char near *)x)
+#define DPMI_LOCK_VAR(x) dpmi_lock_linear_region((void *)&x, sizeof(x))
+#define DPMI_UNLOCK_FUNC(x) dpmi_unlock_linear_region((void near *)x, (char *)x##_end - (char near *)x)
+#define DPMI_UNLOCK_VAR(x) dpmi_unlock_linear_region((void *)&x, sizeof(x))
+#else
+#define DPMI_LOCK_FUNC(x) 0
+#define DPMI_LOCK_VAR(x) 0
+#endif
+
+
 typedef struct dos_block_s {
     uint16_t segment;   // Real mode segment for ES
     uint16_t selector;  // Protected mode selector for direct access
@@ -56,6 +67,7 @@ int dpmi_unlock_linear_region(void *address, uint32_t size);
 
 int dpmi_alloc_real_mode_callback(const interrupt_func_t pm_func, const dos_block_t rm_buffer, rm_address_t* result);
 int dpmi_free_real_mode_callback(rm_address_t callback);
+
 #ifdef __cplusplus
 }
 #endif
