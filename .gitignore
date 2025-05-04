@@ -1,8 +1,17 @@
 *.EXE
 *.exe
-*.obj
+*.COM
+*.com
+
 *.OBJ
+*.obj
+*.O
 *.o
+
+*.MAP
+*.map
+*.ERR
+*.err
 
 obj/*
 bin/*
