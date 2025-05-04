@@ -128,50 +128,56 @@ void dpmi_set_pmode_intvector(uint8_t interrupt_number, pm_address_t addr) {
  * DPMI Lock linear region (Function call 0x600)
  * Memory to be used by interrupt handlers should be locked.
  */
-int dpmi_lock_linear_region(uint32_t linear_addr, uint32_t size) {
+int dpmi_lock_linear_region(void *address, uint32_t size) {
 	#if defined __DOS__ && defined __386__
 	union REGS regs;
-	struct SREGS sregs;
+	uint32_t linear_addr;
 
+	/* Thanks to DOS/4GW's zero-based flat memory
+     model, converting a pointer of any type to
+     a linear address is trivial.
+  */
+	linear_addr = (uint32_t)address;
+
+	/* DPMI Lock Linear Region */
 	regs.w.ax = 0x0600;
-	regs.w.bx = (uint16_t) (linear_addr >> 16) & 0xffff;
+	/* Linear address in BX:CX */
+	regs.w.bx = (uint16_t) (linear_addr >> 16);
 	regs.w.cx = (uint16_t) (linear_addr & 0xffff);
-	regs.w.si = (uint16_t) (size >> 16) & 0xffff;
-	regs.w.di = (uint16_t) size & 0xffff;
+	/* Length in SI:DI */
+	regs.w.si = (uint16_t) (size >> 16);
+	regs.w.di = (uint16_t) (size & 0xffff);
 
 	int386(0x31, &regs, &regs);
 
-
-	if (regs.x.cflag) {
-		return regs.w.ax;
-	}
-	return 0;
+	return (regs.x.cflag == 0) ? 0: -1;
 
 	#endif
-	// error: not implemented
 	return -1;
 }
 
 /**
  * DPMI unlock linear region (Function Call 0x601)
  */
-int dpmi_unlock_linear_region(uint32_t linear_addr, uint32_t size) {
+int dpmi_unlock_linear_region(void *address, uint32_t size)
+{
 	#if defined __DOS__ && defined __386__
 	union REGS regs;
 	struct SREGS sregs;
+	uint32_t linear_addr;
+
+	linear_addr = (uint32_t)address;
 
 	regs.w.ax = 0x0601;
-	regs.w.bx = (uint16_t) (linear_addr >> 16) & 0xffff;
-	regs.w.cx = (uint16_t) linear_addr & 0xffff;
-	regs.w.si = (uint16_t) (size >> 16) & 0xffff;
-	regs.w.di = (uint16_t) size & 0xffff;
+	regs.w.bx = (uint16_t) (linear_addr >> 16);
+	regs.w.cx = (uint16_t) (linear_addr & 0xffff);
+	regs.w.si = (uint16_t) (size >> 16);
+	regs.w.di = (uint16_t) (size & 0xffff);
 
 	int386(0x31, &regs, &regs);
 
-	if (regs.x.cflag) {
-		return regs.w.ax;
-	}
-	return 0;
+	return (regs.x.cflag == 0) ? 0: -1;
+
 	#endif
 	return -1;
 }
@@ -233,32 +239,6 @@ int dpmi_get_segment_base_address(uint16_t selector, uint32_t *base_address) {
 	return -1;
 }
 
-int dpmi_lock_code(uint32_t lockaddr, uint32_t locksize)
-{
-	uint32_t baseaddr = 0;
-	if (dpmi_get_segment_base_address(dpmi_get_cs(), &baseaddr) == -1) {
-		return -1;
-	}
-	uint32_t addr = baseaddr + lockaddr;
-	if (dpmi_lock_linear_region(addr, locksize) == -1) {
-		return -1;
-	}
-	return 0;
-}
-
-int dpmi_unlock_code(uint32_t lockaddr, uint32_t locksize)
-{
-	uint32_t baseaddr = 0;
-	if (dpmi_get_segment_base_address(dpmi_get_cs(), &baseaddr) == -1) {
-		return -1;
-	}
-	uint32_t addr = baseaddr + lockaddr;
-	if (dpmi_unlock_linear_region(addr, locksize) == -1) {
-		return -1;
-	}
-	return 0;
-}
-
 /**
  * Allocate a "real mode callback" (Function 0x303)
  * a function pointer to a stub that calls back to protected mode
@@ -297,11 +277,8 @@ int dpmi_free_real_mode_callback(rm_address_t callback)
 	regs.w.cx = callback.segment;
 	regs.w.dx = callback.offset;
 
-	int386x(0x31, &regs, &regs);
-	if (regs.x.cflag) {
-		return -1;
-	}
-	return 0;
+	int386(0x31, &regs, &regs);
+	return (regs.x.cflag) ? 0 : -1;
 	#endif
 	return -1;
 }

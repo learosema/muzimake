@@ -8,37 +8,14 @@
 
 #include "mouse.h"
 
-
-/**
-
-TODO: Figure out how the callbacks work :)
-
-OWC has a nice demo about it here:
-https://github.com/open-watcom/open-watcom-v2/blob/master/bld/src/goodies/mouse.c
-
-DOS/4GW Professional now supports the INT 31h interface for managing
-real-mode callbacks. However, you don't need to bother with them for
-their single most important application: mouse callback functions.
-Just register your protected-mode mouse callback function as you would
-in real mode, by issuing INT 33h/0Ch with the event mask in CX and the
-function address in ES:EDX, and your function will work as expected.
-.np
-Because a mouse callback function is called asynchronously, the same
-locking requirement exists for a mouse callback function as for a
-hardware interrupt handler. See (4c) above.
-
-
- */
-
-
-
-
 // https://github.com/open-watcom/open-watcom-v2/blob/master/docs/doc/rsi/dos4gwqa.gml
 
 #ifdef __386__
 #define INTR int386
+#define INTRX int386x
 #else
 #define INTR int86
+#define INTRX int86x
 #endif
 
 /**
@@ -99,7 +76,6 @@ void mouse_show()
 	#endif
 }
 
-
 /**
  * Hide mouse cursor
  */
@@ -127,20 +103,20 @@ void mouse_get_status(MOUSE_STATUS *status)
 	#endif
 }
 
-int mouse_set_eventhandler(void *handler, uint8_t call_mask)
+int mouse_set_eventhandler(far_function_ptr_t handler, uint8_t call_mask)
 {
 	// https://stanislavs.org/helppc/int_33-c.html
 	#ifdef __DOS__
-	mouse_callback_t cb;
 	union REGS regs;
+	union REGS oregs;
 	struct SREGS sregs;
+	segread( &sregs );
 
 	regs.w.ax = 0x0C;
 	regs.w.cx = call_mask;
 	sregs.es = FP_SEG(handler);
-	regs.w.dx = FP_OFF(handler);
-	INTR(0x33, &regs, &regs, &sregs);
+	regs.x.edx = FP_OFF(handler);
+	INTRX(0x33, &regs, &oregs, &sregs);
 	return 0;
 	#endif
 }
-
