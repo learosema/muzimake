@@ -23,10 +23,8 @@ typedef struct MOUSE_STATUS {
 #define EVENT_MOUSEUP_R    16
 
 #if defined __DOS__ && defined __WATCOM__
-#define MOUSE_CALLBACK _loadds far
 typedef void (far *far_function_ptr_t)();
 #else
-#define MOUSE_CALLBACK
 typedef void (*far_function_ptr_t)();
 #endif
 

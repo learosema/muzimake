@@ -55,7 +55,7 @@ void cbc_end( void )
 }
 #pragma on( check_stack )
 
-void main (void)
+int main (void)
 {
     int installed = 0;
 
@@ -110,4 +110,6 @@ void main (void)
     printf( "Press Enter key to return\n" );
     getc( stdin );
 		textmode_setmode(3);
+
+		return 0;
 }

@@ -13,34 +13,20 @@
 #include <events.h>
 #include <mouse.h>
 
+#include <dpmiutil.h>
 
 #define KBD_INTERRUPT 9
 
 #ifdef __DOS__
-
-#pragma aux magic_bytes = \
-	"xor eax, 0xb500dbba" \
-	"xor eax, 0xb500dbba"
-
 #pragma aux cpu_hlt = \
 	"hlt"
 #else
 inline void cpu_hlt(void) {}
-inline void magic_bytes(void) {}
 #endif
 
 static bool needs_repaint;
 static bool g_keys[128];
 static interrupt_func_t old_keyboard_interrupt = nullptr;
-static struct mouse_callback_data_s {
-	uint8_t event;
-	uint16_t code;
-	uint16_t x_pos;
-	uint16_t y_pos;
-	int16_t x_counts;
-	int16_t y_counts;
-	uint16_t button_state;
-} g_mouse_data = {0};
 
 bool g_has_mouse;
 
@@ -48,23 +34,38 @@ bool g_has_mouse;
    in a structure to simplify calculating the size
    of the region to lock.
 */
+struct mouse_callback_data_s {
+
+	bool has_event;
+
+	uint16_t code;
+
+	uint16_t x_pos;
+	uint16_t y_pos;
+
+	int16_t x_counts;
+	int16_t y_counts;
+
+	uint16_t button_state;
+
+} g_mouse_data = { 0 };
 
 #pragma off( check_stack )
-void MOUSE_CALLBACK mouse_handler( int max, int mbx,
-                                int mcx, int mdx,
-                                int msi, int mdi )
+void _loadds far mouse_handler( int max, int mbx, int mcx, int mdx, int msi, int mdi )
 {
-#pragma aux mouse_handler __parm [__eax] [__ebx] [__ecx] \
-                               [__edx] [__esi] [__edi]
+#pragma aux mouse_handler __parm [__eax] [__ebx] [__ecx] [__edx] [__esi] [__edi]
 
-	g_mouse_data.event = 1;
+	g_mouse_data.has_event = true;
+
 	g_mouse_data.code = (uint16_t)max;
+
 	g_mouse_data.button_state = (uint16_t)mbx;
-  g_mouse_data.x_pos = (uint16_t)mcx;
+
+	g_mouse_data.x_pos = (uint16_t)mcx;
   g_mouse_data.y_pos = (uint16_t)mdx;
-  g_mouse_data.x_counts = (int16_t)msi;
+
+	g_mouse_data.x_counts = (int16_t)msi;
   g_mouse_data.y_counts = (int16_t)mdi;
-	magic_bytes();
 }
 
 /* Dummy function so we can calculate size of
@@ -95,7 +96,6 @@ static void INTERRUPT new_keyboard_interrupt() {
 	_chain_intr(old_keyboard_interrupt);
 	#endif
 }
-
 
 void kbd_init(void)
 {
@@ -141,7 +141,6 @@ void paint(void) {
 int setup_mouse_callback(void)
 {
 	#ifdef __DOS__
-
 	// All code and touched memory of the mouse callback needs to be locked.
 	// Locked means: the DPMI Host must not move this region (which can happen
 	// due to swapping, done by a Virtual Memory Manager)
@@ -161,32 +160,10 @@ int setup_mouse_callback(void)
 	mouse_set_eventhandler((far_function_ptr_t)mouse_handler,
 		EVENT_MOUSEDOWN_L | EVENT_MOUSEUP_L | EVENT_MOUSEDOWN_R | EVENT_MOUSEUP_R);
 
-  char buf[81];
-	snprintf(buf, 81,
-		"%08x %08x %08x", (uint32_t)mouse_handler, (uint32_t)mouse_handler_end);
-	textmode_print(buf, 0,16, 0x1c);
-
-
-	far_function_ptr_t fptr = (far_function_ptr_t)mouse_handler;
-	uint32_t size = (char *)mouse_handler_end - (char near *)mouse_handler;
-	snprintf(buf, 81, "Mouse handler far: %04x:%08x, near: %08x, size: %d bytes", FP_SEG(fptr), FP_OFF(fptr),(char near *)mouse_handler, size);
-	textmode_print(buf, 0, 19, 0x1B);
-	for (int y = 0; y < 3; y++) {
-		for (int x = 0; x < 40; x++) {
-			if (y * 40 + x > size) {
-				break;
-			}
-			char far *hex = (char far *)MK_FP(0, FP_OFF(mouse_handler));
-			snprintf(buf, 81, "%02x", *((char far *)fptr + y * 40 + x));
-			textmode_print(buf, x * 2, 20 + y, 0x17 + ((x & 1)<<2));
-		}
-	}
-	// 55 89 e5 81 ec 18 00 00 00 89 45 e8 89 4d f0 89 55
-	// f4 89 55 d3 89 75 f8 89 7d fc 35 ba db 00 b5 35 ba
-	// db 00 b5 c6 05 34 c5 17 00 01
 	return 0;
-	#endif
+	#else
 	return -1;
+	#endif
 }
 
 void shutdown(void)
@@ -234,14 +211,16 @@ int main(void) {
 			}
 		}
 
-		if (g_mouse_data.event == 1) {
-			g_mouse_data.event = 0;
-			snprintf(buf, 81, "Mouse (%2d): %3d %3d %3b",
+		if (g_mouse_data.has_event) {
+			g_mouse_data.has_event = false;
+
+			snprintf(buf, 81, "Mouse (%2d): X: %3d Y: %3d State: %3b",
 				g_mouse_data.code,
 				g_mouse_data.x_pos,
 				g_mouse_data.y_pos,
 				g_mouse_data.button_state
 			);
+
 			textmode_print(buf, 0, 22, 0x1b);
 		}
 	}
