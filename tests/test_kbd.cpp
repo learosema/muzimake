@@ -153,7 +153,7 @@ int setup_mouse_callback(void)
 	}
 
 	mouse_set_eventhandler((far_function_ptr_t)mouse_handler,
-		EVENT_MOUSEDOWN_L | EVENT_MOUSEUP_L | EVENT_MOUSEDOWN_R | EVENT_MOUSEUP_R);
+		EVENT_MOUSEMOVE | EVENT_MOUSEDOWN_L | EVENT_MOUSEUP_L | EVENT_MOUSEDOWN_R | EVENT_MOUSEUP_R);
 
 	return 0;
 	#else
