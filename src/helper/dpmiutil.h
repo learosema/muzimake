@@ -51,8 +51,8 @@ dos_block_t dpmi_alloc_dos_block(uint32_t size);
 void dpmi_free_dos_block(dos_block_t dp);
 
 
-int dpmi_lock_linear_region(uint32_t linear_addr, uint32_t size);
-int dpmi_unlock_linear_region(uint32_t linear_addr, uint32_t size);
+int dpmi_lock_linear_region(void *address, uint32_t size);
+int dpmi_unlock_linear_region(void *address, uint32_t size);
 
 int dpmi_alloc_real_mode_callback(const interrupt_func_t pm_func, const dos_block_t rm_buffer, rm_address_t* result);
 int dpmi_free_real_mode_callback(rm_address_t callback);
