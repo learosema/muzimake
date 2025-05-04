@@ -54,7 +54,7 @@ void MOUSE_CALLBACK mouse_handler( int max, int mbx,
                                 int mcx, int mdx,
                                 int msi, int mdi )
 {
-	#pragma aux mouse_handler __parm [__eax] [__ebx] [__ecx] \
+#pragma aux mouse_handler __parm [__eax] [__ebx] [__ecx] \
                                [__edx] [__esi] [__edi]
 
 	g_mouse_data.event = 1;
@@ -85,7 +85,7 @@ static void INTERRUPT new_keyboard_interrupt() {
 	buf[2] = 48 + (kbd % 10);
 	buf[1] = 48 + (kbd / 10) % 10;
 	buf[0] = 48 + (kbd / 100) % 10;
-	textmode_print(buf, 0, 23, 0x1e);
+	// textmode_print(buf, 0, 23, 0x1e);
 
 	uint8_t code = kbd & 0x7f;
 	bool pressed = (kbd & 0x80) == 0;
@@ -209,13 +209,15 @@ int main(void) {
 	textmode_print("Press Alt+X to Quit", 0, 24, 0x1a);
 
 	kbd_init();
-	atexit(shutdown);
 	g_has_mouse = mouse_init();
+
+	atexit(shutdown);
+
 	if (g_has_mouse) {
-		mouse_show();
 		if (setup_mouse_callback() != 0) {
 			exit(-1);
 		}
+		mouse_show();
 	};
 
 	needs_repaint = true;

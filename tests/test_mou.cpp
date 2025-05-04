@@ -8,6 +8,11 @@
 #include <dos.h>
 #include <i86.h>
 
+
+#include <mouse.h>
+#include <dpmiutil.h>
+#include <textmode.h>
+
 /* Data touched at mouse callback time -- they are
    in a structure to simplify calculating the size
    of the region to lock.
@@ -22,30 +27,6 @@ struct callback_data {
     signed short    mouse_si;
     signed short    mouse_di;
 } cbd = { 0 };
-
-int lock_region( void *address, unsigned length )
-{
-    union REGS      regs;
-    unsigned        linear;
-
-    /* Thanks to DOS/4GW's zero-based flat memory
-       model, converting a pointer of any type to
-       a linear address is trivial.
-    */
-    linear = (unsigned)address;
-
-    /* DPMI Lock Linear Region */
-    regs.w.ax = 0x600;
-    /* Linear address in BX:CX */
-    regs.w.bx = (unsigned short)(linear >> 16);
-    regs.w.cx = (unsigned short)(linear & 0xFFFF);
-    /* Length in SI:DI */
-    regs.w.si = (unsigned short)(length >> 16);
-    regs.w.di = (unsigned short)(length & 0xFFFF);
-    int386( 0x31, &regs, &regs );
-    /* Return 0 if lock failed */
-    return( regs.w.cflag == 0 );
-}
 
 #pragma off( check_stack )
 void _loadds far click_handler( int max, int mbx,
@@ -76,35 +57,14 @@ void cbc_end( void )
 
 void main (void)
 {
-    struct SREGS        sregs;
-    union REGS          inregs, outregs;
-    int                 installed = 0;
-    unsigned char       orig_mode = 0;
-    unsigned short far  *ptr;
-    void (far *function_ptr)();
+    int installed = 0;
 
-    segread( &sregs );
-
-    /* get original video mode */
-
-    inregs.w.ax = 0x0f00;
-    int386( 0x10, &inregs, &outregs );
-    orig_mode = outregs.h.al;
-
-    /* goto graphics mode */
-
-    inregs.h.ah = 0x00;
-    inregs.h.al = 0x3;
-    int386( 0x10, &inregs, &outregs );
-
-    printf( "Previous Mode = %u\n", orig_mode );
-    printf( "Current Mode = %u\n", inregs.h.al );
+		textmode_setmode(3);
 
     /* check for mouse driver */
 
-    inregs.w.ax = 0;
-    int386( 0x33, &inregs, &outregs );
-    if( installed = (outregs.w.ax == 0xffff) )
+
+    if( installed = mouse_init() )
         printf( "Mouse installed...\n" );
     else
         printf( "Mouse NOT installed...\n" );
@@ -117,25 +77,19 @@ void main (void)
            -- so we can use a regular (near) pointer in the
            lock_region() call.
         */
-        if( (! lock_region( &cbd, sizeof( cbd ) )) ||
-            (! lock_region( (void near *)click_handler,
-               (char *)cbc_end - (char near *)click_handler )) )
+        if( (dpmi_lock_linear_region( &cbd, sizeof( cbd ) ) != 0) ||
+            (dpmi_lock_linear_region( (void near *)click_handler,
+               (char *)cbc_end - (char near *)click_handler ) != 0) )
         {
             printf( "locks failed\n" );
         } else {
             /* show mouse cursor */
-
-            inregs.w.ax = 0x1;
-            int386( 0x33, &inregs, &outregs );
-
+						mouse_show();
             /* install click watcher */
 
-            inregs.w.ax  = 0xC;
-            inregs.w.cx  = 0x0002 + 0x0008;
-            function_ptr = ( void (far *)( void ) )click_handler;
-            inregs.x.edx = FP_OFF( function_ptr );
-            sregs.es     = FP_SEG( function_ptr );
-            int386x( 0x33, &inregs, &outregs, &sregs );
+						mouse_set_eventhandler((far_function_ptr_t)click_handler,
+						0x0002 + 0x0008
+						);
 
             while( !cbd.right_button ) {
                 if( cbd.mouse_event ) {
@@ -149,19 +103,11 @@ void main (void)
             }
         }
     }
+		mouse_hide();
 
     /* check installation again (to clear watcher) */
-
-    inregs.w.ax = 0;
-    int386( 0x33, &inregs, &outregs );
-    if( outregs.w.ax == 0xffff )
-        printf( "DONE : Mouse still installed...\n" );
-    else
-        printf( "DONE : Mouse NOT installed...\n" );
-
-    printf( "Press Enter key to return to original mode\n" );
+		mouse_init();
+    printf( "Press Enter key to return\n" );
     getc( stdin );
-    inregs.h.ah = 0x00;
-    inregs.h.al = orig_mode;
-    int386( 0x10, &inregs, &outregs );
+		textmode_setmode(3);
 }
