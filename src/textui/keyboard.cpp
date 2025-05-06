@@ -18,7 +18,7 @@
 #include "keyboard.h"
 #define KBD_INTERRUPT 9
 
-static bool g_keys[128];
+static kbd_state_t g_keystate = {0};
 static interrupt_func_t old_keyboard_interrupt = nullptr;
 
 void __interrupt far new_keyboard_interrupt()
@@ -29,7 +29,10 @@ void __interrupt far new_keyboard_interrupt()
 
 	uint8_t code = kbd & 0x7f;
 	bool pressed = (kbd & 0x80) == 0;
-	g_keys[code] = pressed;
+	if (pressed != g_keystate.keys[code]) {
+		g_keystate.keys[code] = pressed;
+		g_keystate.changed = true;
+	}
 
 	_chain_intr(old_keyboard_interrupt);
 	#endif
@@ -44,7 +47,7 @@ int kbd_interrupt_init()
 {
 	#ifdef __DOS__
 		if ((DPMI_LOCK_FUNC(new_keyboard_interrupt) != 0) ||
-				(DPMI_LOCK_VAR(g_keys))) {
+				(DPMI_LOCK_VAR(g_keystate))) {
 			fprintf(stderr, "Locks failed\n");
 			return -1;
 		}
@@ -56,7 +59,7 @@ int kbd_interrupt_init()
 
 void kbd_interrupt_shutdown()
 {
-	memset(g_keys, 128, 0);
+	memset(&g_keystate, 1, sizeof(g_keystate));
 	#ifdef __DOS__
 	_dos_setvect(KBD_INTERRUPT, old_keyboard_interrupt);
 	#endif
@@ -71,7 +74,7 @@ uint16_t kbd_getkey()
 	return ch;
 }
 
-bool *kbd_get_state()
+kbd_state_t *kbd_get_state()
 {
-	return g_keys;
+	return &g_keystate;
 }
