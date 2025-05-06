@@ -10,10 +10,8 @@
 #endif
 
 #include <textmode.h>
-#include <events.h>
 #include <mouse.h>
 #include <keyboard.h>
-#include <dpmiutil.h>
 
 #define KBD_INTERRUPT 9
 
@@ -24,7 +22,7 @@
 inline void cpu_hlt(void) {}
 #endif
 
-static bool needs_repaint;
+bool needs_repaint;
 bool g_has_mouse;
 
 void paint(void) {
@@ -40,7 +38,7 @@ void paint(void) {
 		x = (i % 16) * 3;
 		y = i / 16;
 		snprintf(buf, 3, "%2x", i);
-		keys = kbd_get_state();
+		keys = kbd_get_state()->keys;
 		textmode_print(buf, x, y, keys[i] ? 0x1e : 0x17);
 	}
 	mouse_show();
@@ -84,7 +82,10 @@ int main(void) {
 	while (!done) {
 		paint();
 		cpu_hlt();
-		needs_repaint = true; // todo: keyboard_statechanged flag.
+		if (kbd_get_state()->changed) {
+			needs_repaint = true; // todo: keyboard_statechanged flag.
+			kbd_get_state()->changed = false;
+		}
 		if (kbhit()) {
 			ch = kbd_getkey();
 			snprintf(buf, 5, "%4x", ch);
