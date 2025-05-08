@@ -7,6 +7,7 @@
 #else
 #include <stubs.h>
 #endif
+#include "assembla.h"
 #include "textui/mouse.h"
 #include "textui/textmode.h"
 #include "textui/ui_event.h"
@@ -43,6 +44,8 @@ static const char *LIST_EXAMPLE[30] = {
 bool g_hasMouse;
 MOUSE_STATUS g_mouse;
 MODEINFO * g_modeInfo;
+
+
 
 static bool event_handler(uint16_t elementId, ui_event_t *event) {
 	// Event :)
@@ -125,6 +128,7 @@ int main()
 			component_render_all(ui.count, ui.components, false);
 			if (g_hasMouse) mouse_show();
 		}
+		asm_hlt();
 		event_poll(&event);
 		component_process_events(ui.count, ui.components, &event);
 		textmode_gotoxy(1, 48);

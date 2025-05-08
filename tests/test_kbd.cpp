@@ -9,18 +9,12 @@
 #include <stubs.h>
 #endif
 
+#include <assembla.h>
 #include <textmode.h>
 #include <mouse.h>
 #include <keyboard.h>
 
 #define KBD_INTERRUPT 9
-
-#ifdef __DOS__
-#pragma aux cpu_hlt = \
-	"hlt"
-#else
-inline void cpu_hlt(void) {}
-#endif
 
 bool needs_repaint;
 bool g_has_mouse;
@@ -81,7 +75,7 @@ int main(void) {
 
 	while (!done) {
 		paint();
-		cpu_hlt();
+		asm_hlt();
 		if (kbd_get_state()->changed) {
 			needs_repaint = true;
 			kbd_get_state()->changed = false;
