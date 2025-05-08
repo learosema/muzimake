@@ -7,6 +7,7 @@
 #endif
 #include "ui_event.h"
 #include "mouse.h"
+#include "keyboard.h"
 
 static MOUSE_STATUS lastMouseStatus = {0};
 static int lastKeyboardState = 0x80;
