@@ -83,7 +83,7 @@ int main(void) {
 		paint();
 		cpu_hlt();
 		if (kbd_get_state()->changed) {
-			needs_repaint = true; // todo: keyboard_statechanged flag.
+			needs_repaint = true;
 			kbd_get_state()->changed = false;
 		}
 		if (kbhit()) {
