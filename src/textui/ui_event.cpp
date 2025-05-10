@@ -12,13 +12,41 @@
 static MOUSE_STATUS lastMouseStatus = {0};
 static int lastKeyboardState = 0x80;
 
+void event_init()
+{
+	kbd_interrupt_init();
+	mouse_init();
+	mouse_set_predefined_eventhandler(EVENT_MOUSE_ALL);
+}
+
+void event_shutdown()
+{
+	kbd_interrupt_shutdown();
+	mouse_init();
+}
+
+bool event_poll_mouse(ui_event_t *result, mouse_callback_data_t *mouse)
+{
+	if (mouse->button_state > 0) {
+
+	}
+}
+
+
 void event_poll(ui_event_t *result)
 {
 	ui_event_t event = {0};
 
 	MOUSE_STATUS mouseStatus = {0};
+	mouse_callback_data_t *mouse_data = mouse_get_callback_data();
 
 	mouse_get_status(&mouseStatus);
+	if (mouse_data->has_event)
+	{
+		event_poll_mouse(mouse_data);
+	}
+
+
 	if ((mouseStatus.buttons > 0) && (lastMouseStatus.buttons == 0))
 	{
 		lastMouseStatus.buttons = mouseStatus.buttons;
