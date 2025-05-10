@@ -27,8 +27,18 @@ void event_shutdown()
 
 bool event_poll_mouse(ui_event_t *result, mouse_callback_data_t *mouse)
 {
-	if (mouse->button_state > 0) {
-
+	if (mouse->has_event == false) {
+		return;
+	}
+	
+	if (mouse->code & (EVENT_MOUSEDOWN_L | EVENT_MOUSEDOWN_R) > 0) {
+		lastMouseStatus.buttons = mouse->button_state;
+		event.type = UI_EVENT_MOUSEDOWN;
+		event.payload.mouse.x = mouse->x_pos;
+		event.payload.mouse.y = mouse->y_pos;
+		event.payload.mouse.deltaX = mouse->count_x;
+		event.payload.mouse.deltaY = mouse->count_y;
+		event.payload.mouse.buttons = mouse->button_state;
 	}
 }
 
