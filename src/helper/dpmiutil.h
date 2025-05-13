@@ -48,6 +48,20 @@ typedef struct rm_registers_s {
 } rm_registers_t;
 
 
+typedef struct rmregs_s {
+		uint32_t EDI;
+		uint32_t ESI;
+		uint32_t EBP;
+		uint32_t reserved_by_system;
+		uint32_t EBX;
+		uint32_t EDX;
+		uint32_t ECX;
+		uint32_t EAX;
+		uint16_t flags;
+		uint16_t ES,DS,FS,GS,IP,CS,SP,SS;
+} rmregs_t;
+
+
 /**
  * Allocates a block of DOS memory using DPMI (int 0x31, ax=0x0100).
  * @param size Size in bytes.
@@ -67,6 +81,8 @@ int dpmi_unlock_linear_region(void *address, uint32_t size);
 
 int dpmi_alloc_real_mode_callback(const interrupt_func_t pm_func, const dos_block_t rm_buffer, rm_address_t* result);
 int dpmi_free_real_mode_callback(rm_address_t callback);
+
+int dpmi_call_real_mode_interrupt(rm_registers_t *rm_regs);
 
 #ifdef __cplusplus
 }

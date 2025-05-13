@@ -531,7 +531,10 @@ void textmode_init_font(const uint16_t offset, const uint16_t count, const uint1
 	regs.w.cx = count;
 	regs.h.bh = charHeight & 255;
 	regs.h.bl = 0;
-	dos_block_t memblock = dpmi_alloc_dos_block((sizeInBytes+15)>>4);
+	uint16_t paras = (uint16_t)((sizeInBytes+15)>>4);
+	dos_block_t memblock = dpmi_alloc_dos_block(paras);
+	void *linear_addr = (void*)(memblock.selector<<4);
+	dpmi_lock_linear_region(linear_addr, paras<<4);
 	if (memblock.segment == 0) {
 		fprintf(stderr, "Error allocating memory for font. Exiting.\n");
 		exit(1);
@@ -539,9 +542,10 @@ void textmode_init_font(const uint16_t offset, const uint16_t count, const uint1
 	uint8_t far *rm_buffer = (uint8_t far *)MK_FP(memblock.selector, 0);
 	_fmemcpy(rm_buffer, charData, sizeInBytes);
 	regs.w.es = memblock.selector;
-	regs.w.bp = 0x0000;
+	regs.x.ebp = 0x00000000;
 	intr(0x10, &regs);
-	dpmi_free_dos_block(memblock);
+	// dpmi_unlock_linear_region(linear_addr, sizeInBytes);
+	// dpmi_free_dos_block(memblock);
 	#endif
 
 	#if defined __DOS__ && defined __I86__
