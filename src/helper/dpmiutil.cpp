@@ -48,7 +48,7 @@ void dpmi_free_dos_block(dos_block_t dblk)
 		}
 
     union REGS regs;
-
+		regs.x.edx = 0;
     regs.w.ax = 0x0101;
     regs.w.dx = dblk.selector;
 
@@ -278,6 +278,25 @@ int dpmi_free_real_mode_callback(rm_address_t callback)
 	regs.w.dx = callback.offset;
 
 	int386(0x31, &regs, &regs);
+	return (regs.x.cflag) ? 0 : -1;
+	#endif
+	return -1;
+}
+
+int dpmi_call_real_mode_interrupt(rm_registers_t *rm_regs)
+{
+	#if defined __DOS__ && defined __386__
+	union REGS regs = {0};
+	struct SREGS sregs = {0};
+
+	/* Use DPMI call 300h to issue the DOS interrupt */
+	regs.w.ax = 0x0300;
+	regs.h.bl = 0x21;
+	regs.h.bh = 0;
+	regs.w.cx = 0;
+	sregs.es = FP_SEG(rm_regs);
+	regs.x.edi = FP_OFF(rm_regs);
+	int386x( interrupt_no, &regs, &regs, &sregs );
 	return (regs.x.cflag) ? 0 : -1;
 	#endif
 	return -1;

@@ -102,7 +102,7 @@ int main()
 	g_hasMouse = mouse_init();
 	textmode_font8();
 	g_modeInfo = textmode_get_modeinfo();
-	textmode_init_font(0, 255, 8, font_data);
+	textmode_init_font(0, 256, 8, font_data);
 	APP_LOG("TextUI-Tests started.");
 
 	textmode_clear(0x1e);
@@ -171,6 +171,7 @@ int main()
 		mouse_hide();
 	}
 	ui_cleanup(&ui);
+//	textmode_font8();
 	textmode_setmode(3);
 	APP_LOG("Text-UI tests finished.");
 	return 0;
