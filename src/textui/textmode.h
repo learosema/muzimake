@@ -156,7 +156,7 @@ void textmode_dblrect(
 	uint8_t color
 );
 
-void textmode_init_font(const uint16_t offset, const uint16_t count, const uint16_t charHeight, const uint8_t *charData);
+void textmode_init_font(const uint8_t *charData, const uint16_t charHeight, const uint16_t offset, const uint16_t count);
 
 void textmode_gotoxy(const uint8_t x, const uint8_t y);
 

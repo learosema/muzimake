@@ -521,7 +521,7 @@ void textmode_gotoxy(const uint8_t x, const uint8_t y) {
 	#endif
 }
 
-void textmode_init_font(const uint16_t offset, const uint16_t count, const uint16_t charHeight, const uint8_t *charData)
+void textmode_init_font(const uint8_t *charData, const uint16_t charHeight, const uint16_t offset, const uint16_t count)
 {
 	#if defined __DOS__ && defined __386__
 	union REGPACK regs = {0};
