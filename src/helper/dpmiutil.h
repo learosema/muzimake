@@ -49,16 +49,16 @@ typedef struct rm_registers_s {
 
 
 typedef struct rmregs_s {
-		uint32_t EDI;
-		uint32_t ESI;
-		uint32_t EBP;
+		uint32_t edi;
+		uint32_t esi;
+		uint32_t ebp;
 		uint32_t reserved_by_system;
-		uint32_t EBX;
-		uint32_t EDX;
-		uint32_t ECX;
-		uint32_t EAX;
+		uint32_t ebx;
+		uint32_t edx;
+		uint32_t ecx;
+		uint32_t eax;
 		uint16_t flags;
-		uint16_t ES,DS,FS,GS,IP,CS,SP,SS;
+		uint16_t es, ds, fs, gs, ip, cs, sp, ss;
 } rmregs_t;
 
 
@@ -82,7 +82,7 @@ int dpmi_unlock_linear_region(void *address, uint32_t size);
 int dpmi_alloc_real_mode_callback(const interrupt_func_t pm_func, const dos_block_t rm_buffer, rm_address_t* result);
 int dpmi_free_real_mode_callback(rm_address_t callback);
 
-int dpmi_call_real_mode_interrupt(rm_registers_t *rm_regs);
+int dpmi_call_real_mode_interrupt(uint8_t interrupt_no, rm_registers_t *rm_regs);
 
 #ifdef __cplusplus
 }
