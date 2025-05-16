@@ -53,6 +53,7 @@ TESTINST_SRCS=$(TEST_COMMON_SRCS) instrmnt.cpp testinst.cpp
 TEST_TMR_SRCS=dpmiutil.cpp textmode.cpp timer.cpp test_tmr.cpp
 TEST_KBD_SRCS=dpmiutil.cpp textmode.cpp mouse.cpp test_kbd.cpp
 TEST_MOU_SRCS=dpmiutil.cpp textmode.cpp mouse.cpp test_mou.cpp
+TEST_FNT_SRCS=test_fnt.cpp
 TEST_UI_SRCS=$(LIB_UI_SRCS) log.cpp test_ui.cpp
 TEST_SRCS    =$(TEST_COMMON_SRCS) instrmnt.cpp test.cpp
 
@@ -65,13 +66,14 @@ TESTINST_OBJS=$(TESTINST_SRCS:.cpp=.$(O_EXT))
 TEST_TMR_OBJS=$(TEST_TMR_SRCS:.cpp=.$(O_EXT))
 TEST_MOU_OBJS=$(TEST_MOU_SRCS:.cpp=.$(O_EXT))
 TEST_KBD_OBJS=$(TEST_KBD_SRCS:.cpp=.$(O_EXT))
+TEST_FNT_OBJS=$(TEST_FNT_SRCS:.cpp=.$(O_EXT))
 TEST_UI_OBJS=$(TEST_UI_SRCS:.cpp=.$(O_EXT))
 TEST_OBJS=$(TEST_SRCS:.cpp=.$(O_EXT))
 
 # Executable name
 TARGET = muzimake.exe
 
-TESTS = testinst.exe test_evt.exe test_rol.exe test_bnk.exe test_ui.exe test_tmr.exe test_kbd.exe test_mou.exe test.exe
+TESTS = testinst.exe test_fnt.exe test_evt.exe test_rol.exe test_bnk.exe test_ui.exe test_tmr.exe test_kbd.exe test_mou.exe test.exe
 
 # Default target
 .erase
@@ -126,7 +128,10 @@ test_kbd.exe: $(TEST_KBD_OBJS)
 	*$(LD) system $(SYSTEM) $(LDFLAGS) name $(BIN_DIR)/test_kbd.exe file { $< }
 
 test_mou.exe: $(TEST_MOU_OBJS)
-		*$(LD) system $(SYSTEM) $(LDFLAGS) name $(BIN_DIR)/test_mou.exe file { $< }
+	*$(LD) system $(SYSTEM) $(LDFLAGS) name $(BIN_DIR)/test_mou.exe file { $< }
+
+test_fnt.exe: $(TEST_FNT_OBJS)
+			*$(LD) system $(SYSTEM) $(LDFLAGS) name $(BIN_DIR)/test_fnt.exe file { $< }
 
 # Clean rule
 clean: .symbolic
