@@ -7,17 +7,57 @@
 #endif
 #include "ui_event.h"
 #include "mouse.h"
+#include "keyboard.h"
 
 static MOUSE_STATUS lastMouseStatus = {0};
 static int lastKeyboardState = 0x80;
+
+void event_init()
+{
+	kbd_interrupt_init();
+	mouse_init();
+	mouse_set_predefined_eventhandler(EVENT_MOUSE_ALL);
+}
+
+void event_shutdown()
+{
+	kbd_interrupt_shutdown();
+	mouse_init();
+}
+
+bool event_poll_mouse(ui_event_t *result, mouse_callback_data_t *mouse)
+{
+	ui_event_t event = {0};
+	if (mouse->has_event == false) {
+		return;
+	}
+	
+	if (mouse->code & (EVENT_MOUSEDOWN_L | EVENT_MOUSEDOWN_R) > 0) {
+		lastMouseStatus.buttons = mouse->button_state;
+		event.type = UI_EVENT_MOUSEDOWN;
+		event.payload.mouse.x = mouse->x_pos;
+		event.payload.mouse.y = mouse->y_pos;
+		event.payload.mouse.deltaX = mouse->x_counts;
+		event.payload.mouse.deltaY = mouse->y_counts;
+		event.payload.mouse.buttons = mouse->button_state;
+	}
+}
+
 
 void event_poll(ui_event_t *result)
 {
 	ui_event_t event = {0};
 
 	MOUSE_STATUS mouseStatus = {0};
+	mouse_callback_data_t *mouse_data = mouse_get_callback_data();
 
 	mouse_get_status(&mouseStatus);
+	if (mouse_data->has_event)
+	{
+		event_poll_mouse(mouse_data);
+	}
+
+
 	if ((mouseStatus.buttons > 0) && (lastMouseStatus.buttons == 0))
 	{
 		lastMouseStatus.buttons = mouseStatus.buttons;
