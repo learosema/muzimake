@@ -25,105 +25,62 @@ void event_shutdown()
 	mouse_init();
 }
 
-bool event_poll_mouse(ui_event_t *result, mouse_callback_data_t *mouse)
+ui_event_t event_poll_mouse(mouse_callback_data_t *mouse)
 {
 	ui_event_t event = {0};
-	if (mouse->has_event == false) {
-		return;
-	}
-	
-	if (mouse->code & (EVENT_MOUSEDOWN_L | EVENT_MOUSEDOWN_R) > 0) {
+
+	if (mouse->code > 0) {
+		mouse->has_event = false;
 		lastMouseStatus.buttons = mouse->button_state;
-		event.type = UI_EVENT_MOUSEDOWN;
+		event.type = mouse->code;
 		event.payload.mouse.x = mouse->x_pos;
 		event.payload.mouse.y = mouse->y_pos;
 		event.payload.mouse.deltaX = mouse->x_counts;
 		event.payload.mouse.deltaY = mouse->y_counts;
 		event.payload.mouse.buttons = mouse->button_state;
 	}
+
+	return event;
 }
 
 
-void event_poll(ui_event_t *result)
+uint8_t event_poll(ui_event_t *events, uint16_t offset, uint16_t max_events)
 {
+	uint16_t count = 0;
+	uint16_t idx = offset;
 	ui_event_t event = {0};
 
 	MOUSE_STATUS mouseStatus = {0};
 	mouse_callback_data_t *mouse_data = mouse_get_callback_data();
 
-	mouse_get_status(&mouseStatus);
+	if (idx == max_events) {
+		return 0;
+	}
+
 	if (mouse_data->has_event)
 	{
-		event_poll_mouse(mouse_data);
+		events[idx] = event_poll_mouse(mouse_data);
+		count++;
+		idx++;
+	}
+	if (idx == max_events) {
+		return count;
+	}
+	for (uint8_t i = 0; i < 128; i++) {}
+	if (!kbhit()) {
+		return count;
 	}
 
-
-	if ((mouseStatus.buttons > 0) && (lastMouseStatus.buttons == 0))
-	{
-		lastMouseStatus.buttons = mouseStatus.buttons;
-		event.type = UI_EVENT_MOUSEDOWN;
-		event.payload.mouse.x = mouseStatus.mouseX;
-		event.payload.mouse.y = mouseStatus.mouseY;
-		event.payload.mouse.buttons = mouseStatus.buttons;
-		*result = event;
-		return;
+	uint16_t ch = getch();
+	if (ch == 0) {
+		ch = getch();
+		ch <<= 8;
 	}
-
-	if ((mouseStatus.buttons == 0) && (lastMouseStatus.buttons > 0))
-	{
-		lastMouseStatus.buttons = mouseStatus.buttons;
-		event.type = UI_EVENT_MOUSEUP;
-		event.payload.mouse.x = mouseStatus.mouseX;
-		event.payload.mouse.y = mouseStatus.mouseY;
-		event.payload.mouse.buttons = mouseStatus.buttons;
-		*result = event;
-		return;
-	}
-
-	if ((mouseStatus.mouseX != lastMouseStatus.mouseX) || (mouseStatus.mouseY != lastMouseStatus.mouseY)) {
-		lastMouseStatus.mouseX = mouseStatus.mouseX;
-		lastMouseStatus.mouseY = mouseStatus.mouseY;
-		event.type = UI_EVENT_MOUSEMOVE;
-		event.payload.mouse.x = mouseStatus.mouseX;
-		event.payload.mouse.y = mouseStatus.mouseY;
-		event.payload.mouse.buttons = mouseStatus.buttons;
-		*result = event;
-		return;
-	}
-/** ' clear keyboard buffer
-DEF SEG = &H40
-POKE &H1A, PEEK(&H1C) */
-/*
-	int keyState = inp(0x60);
-	if (keyState & 0x80 > 0 && lastKeyboardState < 0x80) {
-		lastKeyboardState = keyState;
-		event.type = UI_EVENT_KEYUP;
-		event.payload.keyboard.keyCode = keyState & 0x7f;
-		*result = event;
-		return;
-	}
-
-	if (keyState & 0x80 == 0 && lastKeyboardState >= 0x80) {
-		lastKeyboardState = keyState;
-		event.type = UI_EVENT_KEYDOWN;
-		event.payload.keyboard.keyCode = keyState & 0x7f;
-		*result = event;
-		return;
-	}
-*/
-	if (kbhit()) {
-		uint16_t ch = getch();
-		if (ch == 0) {
-			ch = getch();
-			ch <<= 8;
-		}
-		event.type = UI_EVENT_KEY;
-		event.payload.keyboard.keyCode = ch;
-		*result = event;
-		return;
-	}
-
-	event_clear(result);
+	event.type = UI_EVENT_KEY;
+	event.payload.keyboard.keyCode = ch;
+	events[idx] = event;
+	count++;
+	return count;
 }
 
 void event_clear(ui_event_t *event)
