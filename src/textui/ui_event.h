@@ -4,14 +4,26 @@
 #include <stdint.h>
 #include "mouse.h"
 
+
+#define EVENT_MOUSEMOVE    1
+#define EVENT_MOUSEDOWN_L  2
+#define EVENT_MOUSEUP_L    4
+#define EVENT_MOUSEDOWN_R  8
+#define EVENT_MOUSEUP_R    16
+
 #define UI_EVENT_NONE       0
-#define UI_EVENT_KEYDOWN    1
-#define UI_EVENT_KEYUP      2
-#define UI_EVENT_KEY        4
-#define UI_EVENT_MOUSEDOWN  8
-#define UI_EVENT_MOUSEUP    16
-#define UI_EVENT_CLICK      32
-#define UI_EVENT_MOUSEMOVE  64
+
+#define UI_EVENT_MOUSE 31
+#define UI_EVENT_MOUSEMOVE  1
+#define UI_EVENT_MOUSEDOWN  2
+#define UI_EVENT_MOUSEUP    4
+#define UI_EVENT_MOUSEDOWN_R 8
+#define UI_EVENT_MOUSEUP_R  16
+
+#define UI_EVENT_KEYDOWN    32
+#define UI_EVENT_KEYUP      64
+#define UI_EVENT_KEY        128
+#define UI_EVENT_CLICK			256
 
 #define KEY_ARROW_LEFT      0x4B00
 #define KEY_ARROW_RIGHT     0x4D00
@@ -33,6 +45,8 @@ typedef struct ui_mouse_event_s
 {
 	uint16_t x;
 	uint16_t y;
+	int16_t deltaX;
+	int16_t deltaY;
 	uint16_t buttons;
 } ui_mouse_event_t;
 
@@ -48,7 +62,7 @@ typedef struct ui_click_event_s {
 
 typedef struct ui_event_s
 {
-	uint8_t type;
+	uint16_t type;
 	union event_payload {
 		ui_mouse_event_t mouse;
 		ui_keyboard_event_t keyboard;
@@ -56,7 +70,7 @@ typedef struct ui_event_s
 	} payload;
 } ui_event_t;
 
-void event_poll(ui_event_t *event);
+uint8_t event_poll(ui_event_t *events, uint8_t max_events);
 void event_clear(ui_event_t *event);
 
 
