@@ -92,43 +92,45 @@ void listbox_render(ui_listbox_t *listbox)
 
 void listbox_process_events(ui_listbox_t *listbox, ui_event_t *event)
 {
-	switch (event->type) {
-		case UI_EVENT_MOUSEUP: {
-			ui_handle_mouseup((ui_generic_t *)listbox, event);
-			rect_t clientrect = get_clientrect(&(listbox->bounding_rect));
-			if (rect_test_mouse(&clientrect, event->payload.mouse.x, event->payload.mouse.y)) {
-				uint8_t y = (uint8_t)(event->payload.mouse.y / 8) - clientrect.y;
-				if (y + listbox->cursor_y0 < listbox->num_items) {
-					listbox->cursor_y = y;
-					listbox->paint = true;
-				}
+	uint16_t inner_height = listbox->bounding_rect.height - 2;
+	rect_t clientrect = get_clientrect(&(listbox->bounding_rect));
+
+	if ((event->type & UI_EVENT_MOUSEUP) > 0) {
+		ui_handle_mouseup((ui_generic_t *)listbox, event);
+		if (rect_test_mouse(&clientrect, event->payload.mouse.x, event->payload.mouse.y)) {
+			uint8_t y = (uint8_t)(event->payload.mouse.y / 8) - clientrect.y;
+			if (y + listbox->cursor_y0 < listbox->num_items) {
+				listbox->cursor_y = y;
+				listbox->paint = true;
 			}
-			break;
 		}
-		case UI_EVENT_KEY: {
-			if (! listbox->focused) {
-				return;
-			}
-			uint16_t inner_height = listbox->bounding_rect.height - 2;
-			if (event->payload.keyboard.keyCode == KEY_ARROW_DOWN) {
-				if (listbox->cursor_y0 + listbox->cursor_y < listbox->num_items - 1) {
-					if (listbox->cursor_y < inner_height - 1) {
-						listbox->cursor_y += 1;
-					} else {
-						listbox->cursor_y0 += 1;
-					}
-					listbox->paint = true;
-				}
-			}
-			if (event->payload.keyboard.keyCode == KEY_ARROW_UP) {
-				if (listbox->cursor_y > 0) {
-					listbox->cursor_y -= 1;
-					listbox->paint = true;
+		return;
+	}
+
+	if (event->type == UI_EVENT_KEY) {
+		if (! listbox->focused) {
+			return;
+		}
+
+		if (event->payload.keyboard.keyCode == KEY_ARROW_DOWN) {
+			if (listbox->cursor_y0 + listbox->cursor_y < listbox->num_items - 1) {
+				if (listbox->cursor_y < inner_height - 1) {
+					listbox->cursor_y += 1;
 				} else {
-					if (listbox->cursor_y0 > 0) {
-						listbox->cursor_y0 -= 1;
-						listbox->paint = true;
-					}
+					listbox->cursor_y0 += 1;
+				}
+				listbox->paint = true;
+			}
+		}
+
+		if (event->payload.keyboard.keyCode == KEY_ARROW_UP) {
+			if (listbox->cursor_y > 0) {
+				listbox->cursor_y -= 1;
+				listbox->paint = true;
+			} else {
+				if (listbox->cursor_y0 > 0) {
+					listbox->cursor_y0 -= 1;
+					listbox->paint = true;
 				}
 			}
 		}

@@ -16,6 +16,7 @@ int kbd_interrupt_init();
 void kbd_interrupt_shutdown();
 uint16_t kbd_getkey();
 kbd_state_t *kbd_get_state();
+void kbd_clear_buffer();
 
 #ifdef __cplusplus
 }

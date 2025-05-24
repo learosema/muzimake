@@ -98,7 +98,7 @@ void sheet_process_events(ui_sheet_t *sheet, ui_event_t *event)
 
 	inner.x += 4;
 	inner.width -= 4;
-	if (event->type == UI_EVENT_MOUSEUP) {
+	if ((event->type & UI_EVENT_MOUSEUP) > 0) {
 		ui_handle_mouseup((ui_generic_t *)sheet, event);
  	}
 	if (event->type == UI_EVENT_KEY && sheet->focused) {

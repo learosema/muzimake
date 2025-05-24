@@ -129,7 +129,7 @@ void piano_render(ui_piano_t *piano)
 
 void piano_process_events(ui_piano_t *piano, ui_event_t *event)
 {
-	if (event->type == UI_EVENT_MOUSEUP) {
+	if ((event->type & UI_EVENT_MOUSEUP) > 0) {
 		ui_handle_mouseup((ui_generic_t *)piano, event);
  	}
 	// todo: keyboard/mouse handling

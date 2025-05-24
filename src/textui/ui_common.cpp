@@ -31,7 +31,7 @@ rect_t get_clientrect(const rect_t *bounding_rect)
 
 void ui_handle_mouseup(ui_generic_t *generic, ui_event_t *event)
 {
-	if (event->type != UI_EVENT_MOUSEUP) {
+	if ((event->type & UI_EVENT_MOUSEUP) == 0) {
 		return;
 	}
 	ui_event_t clickEvent = {0};

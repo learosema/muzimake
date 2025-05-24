@@ -79,12 +79,10 @@ kbd_state_t *kbd_get_state()
 	return &g_keystate;
 }
 
-void kbd_clear_buffer() {
-	/** ' clear keyboard buffer
-DEF SEG = &H40
-POKE &H1A, PEEK(&H1C) */
+void kbd_clear_buffer()
+{
+	// FIXME: in Real mode, it's a far pointer to 0x0040:001a
 	uint16_t *buffer_head = (uint16_t *)0x41a;
 	uint16_t *buffer_tail = (uint16_t *)0x41c;
 	*buffer_head = *buffer_tail;
-
 }

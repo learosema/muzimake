@@ -7,7 +7,7 @@ void label_render(ui_label_t *label)
 }
 
 void label_process_events(ui_label_t *label, ui_event_t * event) {
-	if (event->type == UI_EVENT_MOUSEUP) {
+	if ((event->type & UI_EVENT_MOUSEUP) > 0) {
 		ui_handle_mouseup((ui_generic_t *)label, event);
  	}
 }
