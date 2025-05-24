@@ -70,8 +70,9 @@ typedef struct ui_event_s
 	} payload;
 } ui_event_t;
 
-uint8_t event_poll(ui_event_t *events, uint8_t max_events);
+uint8_t event_poll(ui_event_t *events, uint16_t offset, uint16_t max_events);
 void event_clear(ui_event_t *event);
-
+void event_init();
+void event_shutdown();
 
 #endif

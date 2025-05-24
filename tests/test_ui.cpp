@@ -99,7 +99,7 @@ bool needs_repaint(const ui_state_t *ui) {
 
 int main()
 {
-	ui_event_t event;
+	ui_event_t events[10] = {0};
 	bool done = false;
 	textmode_setmode(3);
 	g_hasMouse = mouse_init();
@@ -107,6 +107,8 @@ int main()
 	g_modeInfo = textmode_get_modeinfo();
 	textmode_init_font(font_data, 8, 0, 256);
 	APP_LOG("TextUI-Tests started.");
+	event_init();
+	atexit(event_shutdown);
 
 	textmode_clear(0x1e);
 	textmode_cursor(32, 0);
@@ -122,6 +124,8 @@ int main()
 	textmode_hline(0,0, 80, ' ', 0x70);
 	textmode_print("MUZIMAKE UI Test", 1, 0, 0x74);
 
+
+
 	while (!done) {
 		if (needs_repaint(&ui)) {
 			if (g_hasMouse) mouse_hide();
@@ -129,45 +133,53 @@ int main()
 			if (g_hasMouse) mouse_show();
 		}
 		asm_hlt();
-		event_poll(&event);
-		component_process_events(ui.count, ui.components, &event);
-		textmode_gotoxy(1, 48);
-		switch (event.type) {
-			case UI_EVENT_MOUSEMOVE:
+		uint8_t num_events = event_poll(events, 0, 10);
+
+		// textmode_gotoxy(21, 47);
+		// printf("%d\n", num_events);
+		for (uint8_t event_idx = 0; event_idx < num_events; event_idx++) {
+			component_process_events(ui.count, ui.components, &(events[event_idx]));
+			textmode_gotoxy(1, 48);
+
+			if (events[event_idx].type & UI_EVENT_MOUSEMOVE > 0) {
 				printf("MOVE %d | %d     \n",
-					event.payload.mouse.x,
-					event.payload.mouse.y
+					events[event_idx].payload.mouse.x,
+					events[event_idx].payload.mouse.y
 				);
-				break;
-			case UI_EVENT_MOUSEDOWN:
+			}
+
+			if (events[event_idx].type & UI_EVENT_MOUSEDOWN) {
 				printf("DOWN %d | %d     \n",
-					event.payload.mouse.x,
-					event.payload.mouse.y
+					events[event_idx].payload.mouse.x,
+					events[event_idx].payload.mouse.y
 				);
-				break;
-			case UI_EVENT_MOUSEUP:
+			}
+
+			if (events[event_idx].type & UI_EVENT_MOUSEUP) {
 				printf("UP!  %d | %d     \n",
-					event.payload.mouse.x,
-					event.payload.mouse.y
+					events[event_idx].payload.mouse.x,
+					events[event_idx].payload.mouse.y
 				);
-				break;
-			case UI_EVENT_KEYDOWN:
-				printf("KEYDOWN %d      \n", event.payload.keyboard.keyCode);
-				break;
-			case UI_EVENT_KEYUP:
-				printf("KEYUP   %d      \n", event.payload.keyboard.keyCode);
-				break;
-			case UI_EVENT_KEY:
+			}
+			if (events[event_idx].type & UI_EVENT_KEYDOWN) {
+				printf("KEYDOWN %d      \n", events[event_idx].payload.keyboard.keyCode);
+			}
+			if (events[event_idx].type & UI_EVENT_KEYUP) {
+				printf("KEYUP   %d      \n", events[event_idx].payload.keyboard.keyCode);
+			}
+			if (events[event_idx].type & UI_EVENT_KEY) {
 				textmode_gotoxy(1, 47);
-				printf("KEY     %x      \n", event.payload.keyboard.keyCode);
-				if (event.payload.keyboard.keyCode == KEY_ALT_X) {
+				printf("KEY     %x      \n", events[event_idx].payload.keyboard.keyCode);
+				if (events[event_idx].payload.keyboard.keyCode == KEY_ALT_X) {
 					// press alt+x to quit
 					done = true;
+					break;
 				}
-				break;
-			default:
-				break;
+			}
 		}
+
+
+
 		delay(8);
 	}
 
@@ -175,7 +187,6 @@ int main()
 		mouse_hide();
 	}
 	ui_cleanup(&ui);
-//	textmode_font8();
 	textmode_setmode(3);
 	APP_LOG("Text-UI tests finished.");
 	return 0;

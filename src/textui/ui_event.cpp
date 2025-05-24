@@ -66,7 +66,7 @@ uint8_t event_poll(ui_event_t *events, uint16_t offset, uint16_t max_events)
 	if (idx == max_events) {
 		return count;
 	}
-	for (uint8_t i = 0; i < 128; i++) {}
+
 	if (!kbhit()) {
 		return count;
 	}
@@ -76,6 +76,7 @@ uint8_t event_poll(ui_event_t *events, uint16_t offset, uint16_t max_events)
 		ch = getch();
 		ch <<= 8;
 	}
+	kbd_clear_buffer();
 	event.type = UI_EVENT_KEY;
 	event.payload.keyboard.keyCode = ch;
 	events[idx] = event;

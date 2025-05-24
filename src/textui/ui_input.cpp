@@ -65,11 +65,12 @@ void input_render(ui_input_t *input)
 
 void input_process_events(ui_input_t *input, ui_event_t *event)
 {
+	if ((event->type & UI_EVENT_MOUSEUP) > 0) {
+		ui_handle_mouseup((ui_generic_t *)input, event);
+		return;
+	}
+
 	switch (event->type) {
-		case UI_EVENT_MOUSEUP: {
-			ui_handle_mouseup((ui_generic_t *)input, event);
-			break;
-		}
 		case UI_EVENT_KEY: {
 			uint16_t input_width = input->bounding_rect.width;
 			if (! input->focused) {

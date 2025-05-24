@@ -61,42 +61,41 @@ void button_process_events(ui_button_t *button, ui_event_t *event)
 			return;
 		}
 	}
-	switch (event->type) {
-		case UI_EVENT_MOUSEMOVE:
-			if ((button->active)&&
-					(rect_test_mouse(&(button->bounding_rect), event->payload.mouse.x, event->payload.mouse.y)))
-			{
-				button->paint = true;
-			}
-			break;
-		case UI_EVENT_MOUSEDOWN:
-			if (rect_test_mouse(&(button->bounding_rect), event->payload.mouse.x, event->payload.mouse.y)) {
-				button->active = true;
-				button->paint = true;
-			}
-			break;
-		case UI_EVENT_MOUSEUP:
-			if (button->active) {
-				button->active = false;
-				button->paint = true;
-				if (rect_test_mouse(&(button->bounding_rect), event->payload.mouse.x, event->payload.mouse.y)) {
-					if (button->event_handler != nullptr) {
-						ui_event_t click = {0};
-						click.type = UI_EVENT_CLICK;
-						click.payload.click.buttons = event->payload.mouse.buttons;
-						click.payload.click.target = button->id;
-						bool result = button->event_handler(button->id, &click);
-						if (result == false) {
-							return;
-						}
-					}
+
+	if ((event->type & UI_EVENT_MOUSEMOVE) > 0) {
+		if ((button->active)&&
+				(rect_test_mouse(&(button->bounding_rect), event->payload.mouse.x, event->payload.mouse.y)))
+		{
+			button->paint = true;
+		}
+		return;
+	}
+
+	if ((event->type & UI_EVENT_MOUSEDOWN) > 0) {
+		if (rect_test_mouse(&(button->bounding_rect), event->payload.mouse.x, event->payload.mouse.y)) {
+			button->active = true;
+			button->paint = true;
+		}
+		return;
+	}
+
+	if ((event->type & UI_EVENT_MOUSEUP) > 0) {
+		button->active = false;
+		button->paint = true;
+		if (rect_test_mouse(&(button->bounding_rect), event->payload.mouse.x, event->payload.mouse.y)) {
+			if (button->event_handler != nullptr) {
+				ui_event_t click = {0};
+				click.type = UI_EVENT_CLICK;
+				click.payload.click.buttons = event->payload.mouse.buttons;
+				click.payload.click.target = button->id;
+				bool result = button->event_handler(button->id, &click);
+				if (result == false) {
+					return;
 				}
 			}
-			break;
-		case UI_EVENT_KEY:
-			// todo: shortcuts?
-			break;
-		default:
-			break;
+		}
 	}
+
+	// todo: kbd events, shortcuts?
+
 }
