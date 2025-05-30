@@ -8,7 +8,9 @@ extern "C" {
 #include <stdint.h>
 
 typedef struct kbd_state_s {
+	bool has_event;
 	bool changed;
+	uint8_t last;
 	bool keys[128];
 } kbd_state_t;
 

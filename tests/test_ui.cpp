@@ -9,6 +9,7 @@
 #endif
 #include "assembla.h"
 #include "textui/mouse.h"
+#include "textui/keyboard.h"
 #include "textui/textmode.h"
 #include "textui/ui_event.h"
 #include "textui/cmponent.h"
@@ -96,6 +97,12 @@ bool needs_repaint(const ui_state_t *ui) {
 	return false;
 }
 
+void wait_for_user()
+{
+	while (!mouse_get_callback_data()->has_event && !kbhit()) {
+		asm_hlt();
+	}
+}
 
 int main()
 {
@@ -124,15 +131,14 @@ int main()
 	textmode_hline(0,0, 80, ' ', 0x70);
 	textmode_print("MUZIMAKE UI Test", 1, 0, 0x74);
 
-
-
 	while (!done) {
 		if (needs_repaint(&ui)) {
 			if (g_hasMouse) mouse_hide();
 			component_render_all(ui.count, ui.components, false);
 			if (g_hasMouse) mouse_show();
 		}
-		asm_hlt();
+		wait_for_user();
+
 		uint8_t num_events = event_poll(events, 0, 10);
 
 		// textmode_gotoxy(21, 47);
@@ -177,10 +183,6 @@ int main()
 				}
 			}
 		}
-
-
-
-		delay(8);
 	}
 
 	if (g_hasMouse) {
