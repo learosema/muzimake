@@ -141,6 +141,7 @@ int mouse_set_eventhandler(far_function_ptr_t handler, uint8_t call_mask)
 	#endif
 }
 
+#pragma off ( check_stack )
 void _loadds far mouse_handler( int max, int mbx, int mcx, int mdx, int msi, int mdi )
 {
 #pragma aux mouse_handler __parm [__eax] [__ebx] [__ecx] [__edx] [__esi] [__edi]
@@ -189,6 +190,8 @@ int mouse_set_predefined_eventhandler(uint8_t call_mask)
 	return -1;
 	#endif
 }
+
+#pragma on ( check_stack )
 
 mouse_callback_data_t *mouse_get_callback_data()
 {

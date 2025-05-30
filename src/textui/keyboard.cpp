@@ -28,11 +28,11 @@ void __interrupt far new_keyboard_interrupt()
 	uint8_t kbd = inp(0x60);
 
 	uint8_t code = kbd & 0x7f;
+	g_keystate.last = kbd;
+	g_keystate.has_event = true;
+
 	bool pressed = (kbd & 0x80) == 0;
-	if (pressed != g_keystate.keys[code]) {
-		g_keystate.keys[code] = pressed;
-		g_keystate.changed = true;
-	}
+	g_keystate.keys[code] = pressed;
 
 	_chain_intr(old_keyboard_interrupt);
 	#endif
