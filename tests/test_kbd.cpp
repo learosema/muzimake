@@ -76,9 +76,9 @@ int main(void) {
 	while (!done) {
 		paint();
 		asm_hlt();
-		if (kbd_get_state()->changed) {
+		if (kbd_get_state()->has_event) {
 			needs_repaint = true;
-			kbd_get_state()->changed = false;
+			kbd_get_state()->has_event = false;
 		}
 		if (kbhit()) {
 			ch = kbd_getkey();
