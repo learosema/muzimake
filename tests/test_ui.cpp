@@ -16,6 +16,7 @@
 #include "macros.h"
 #include "helper/log.h"
 #include "textui/fontdata.h"
+#include "vga.h"
 
 static const char * LBL_OK = "Okay";
 static const char * LBL_CANCEL = "Cancel";
@@ -130,9 +131,10 @@ int main()
 
 	textmode_hline(0,0, 80, ' ', 0x70);
 	textmode_print("MUZIMAKE UI Test", 1, 0, 0x74);
-
+	// char x=0;
 	while (!done) {
 		if (needs_repaint(&ui)) {
+			// textmode_putchar(78,0, x++);
 			if (g_hasMouse) mouse_hide();
 			component_render_all(ui.count, ui.components, false);
 			if (g_hasMouse) mouse_show();
@@ -140,42 +142,11 @@ int main()
 		wait_for_user();
 
 		uint8_t num_events = event_poll(events, 0, 10);
-
-		// textmode_gotoxy(21, 47);
-		// printf("%d\n", num_events);
 		for (uint8_t event_idx = 0; event_idx < num_events; event_idx++) {
 			component_process_events(ui.count, ui.components, &(events[event_idx]));
-			textmode_gotoxy(1, 48);
-
-			if (events[event_idx].type & UI_EVENT_MOUSEMOVE > 0) {
-				printf("MOVE %d | %d     \n",
-					events[event_idx].payload.mouse.x,
-					events[event_idx].payload.mouse.y
-				);
-			}
-
-			if (events[event_idx].type & UI_EVENT_MOUSEDOWN) {
-				printf("DOWN %d | %d     \n",
-					events[event_idx].payload.mouse.x,
-					events[event_idx].payload.mouse.y
-				);
-			}
-
-			if (events[event_idx].type & UI_EVENT_MOUSEUP) {
-				printf("UP!  %d | %d     \n",
-					events[event_idx].payload.mouse.x,
-					events[event_idx].payload.mouse.y
-				);
-			}
-			if (events[event_idx].type & UI_EVENT_KEYDOWN) {
-				printf("KEYDOWN %d      \n", events[event_idx].payload.keyboard.keyCode);
-			}
-			if (events[event_idx].type & UI_EVENT_KEYUP) {
-				printf("KEYUP   %d      \n", events[event_idx].payload.keyboard.keyCode);
-			}
-			if (events[event_idx].type & UI_EVENT_KEY) {
-				textmode_gotoxy(1, 47);
-				printf("KEY     %x      \n", events[event_idx].payload.keyboard.keyCode);
+			if ((events[event_idx].type & UI_EVENT_KEY) > 0) {
+//				textmode_gotoxy(1, 47);
+//				printf("KEY     %x      \n", events[event_idx].payload.keyboard.keyCode);
 				if (events[event_idx].payload.keyboard.keyCode == KEY_ALT_X) {
 					// press alt+x to quit
 					done = true;
@@ -183,6 +154,7 @@ int main()
 				}
 			}
 		}
+		vga_wait_for_retrace();
 	}
 
 	if (g_hasMouse) {

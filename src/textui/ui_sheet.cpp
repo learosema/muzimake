@@ -31,6 +31,17 @@ void sheet_build_row(char *row_buf, size_t max_buf_len, pattern_entry_t *data, u
 	}
 }
 
+
+void sheet_move_cursor(const ui_sheet_t *sheet, const int8_t dx, const int8_t dy)
+{
+	uint8_t x = sheet->bounding_rect.x + sheet->cursor_x + 5;
+	uint8_t y = sheet->bounding_rect.y + sheet->cursor_y + 1;
+	mouse_hide();
+	textmode_colorize_area(x, y, 1, 1, sheet->color);
+	textmode_colorize_area(x + dx, y + dy, 1, 1, INPUT_CURSOR_COLOR);
+	mouse_show();
+}
+
 void sheet_render(ui_sheet_t *sheet)
 {
 	const uint8_t keys[7] = {1, 1, 0, 1, 1, 1, 0};
@@ -69,7 +80,7 @@ void sheet_render(ui_sheet_t *sheet)
 	int num_cols = sheet->pattern.num_cols;
 	int num_rows = sheet->pattern.num_rows;
 
-	char *rowBuf = (char *)malloc(MAX_BUF_LEN);
+	char rowBuf[MAX_BUF_LEN+1] = {0};
 	for (int y = 0; y < inner.height; y++) {
 		int yy = (int)(sheet->offset_y) + y;
 		char idx_buf[5] = "\0";
@@ -85,7 +96,6 @@ void sheet_render(ui_sheet_t *sheet)
 	if (sheet->focused) {
 		textmode_colorize_area(inner.x + sheet->cursor_x + 4, inner.y + sheet->cursor_y, 1, 1, INPUT_CURSOR_COLOR);
 	}
-	free(rowBuf);
 }
 
 void sheet_process_events(ui_sheet_t *sheet, ui_event_t *event)
@@ -105,40 +115,45 @@ void sheet_process_events(ui_sheet_t *sheet, ui_event_t *event)
 
 		if (event->payload.keyboard.keyCode == KEY_ARROW_RIGHT && absX < maxX - 1) {
 			if (sheet->cursor_x < inner.width - 1) {
+				sheet_move_cursor(sheet, 1, 0);
 				sheet->cursor_x += 1;
 			} else {
 				sheet->offset_x += 1;
+				sheet->paint = true;
 			}
-			sheet->paint = true;
 			return;
 		}
 		if (event->payload.keyboard.keyCode == KEY_ARROW_LEFT && absX > 0) {
 			if (sheet->cursor_x > 0) {
+				sheet_move_cursor(sheet, -1, 0);
 				sheet->cursor_x -= 1;
 			} else {
 				sheet->offset_x -= 1;
+				sheet->paint = true;
 			}
-			sheet->paint = true;
 			return;
 		}
 
 		if (event->payload.keyboard.keyCode == KEY_ARROW_DOWN && absY < maxY - 1) {
 			if (sheet->cursor_y < inner.height - 1) {
+				sheet_move_cursor(sheet, 0, 1);
 				sheet->cursor_y += 1;
+
 			} else {
 				sheet->offset_y += 1;
+				sheet->paint = true;
 			}
-			sheet->paint = true;
 			return;
 		}
 
 		if (event->payload.keyboard.keyCode == KEY_ARROW_UP && absY > 0) {
 			if (sheet->cursor_y > 0) {
+				sheet_move_cursor(sheet, 0, -1);
 				sheet->cursor_y -= 1;
 			} else {
+				sheet->paint = true;
 				sheet->offset_y -= 1;
 			}
-			sheet->paint = true;
 			return;
 		}
 	}

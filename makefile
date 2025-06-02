@@ -46,7 +46,7 @@ SRCS=main.cpp $(SRC_EVENTS) $(SRC_FILEFMT) $(SRC_HAL) $(SRC_HELPER) $(SRC_TEXTUI
 TEST_COMMON_SRCS=bnkfile.cpp rolfile.cpp fileio.cpp file.cpp
 
 TEST_EVT_SRCS=events.cpp test_evt.cpp
-LIB_UI_SRCS=dpmiutil.cpp mouse.cpp keyboard.cpp textmode.cpp ui_event.cpp ui_common.cpp ui_label.cpp ui_btn.cpp ui_input.cpp ui_lsbox.cpp ui_piano.cpp ui_range.cpp ui_sheet.cpp cmponent.cpp
+LIB_UI_SRCS=dpmiutil.cpp vga.cpp mouse.cpp keyboard.cpp textmode.cpp ui_event.cpp ui_common.cpp ui_label.cpp ui_btn.cpp ui_input.cpp ui_lsbox.cpp ui_piano.cpp ui_range.cpp ui_sheet.cpp cmponent.cpp
 TEST_ROL_SRCS=$(TEST_COMMON_SRCS) instrmnt.cpp opl2.cpp test_rol.cpp
 TEST_BNK_SRCS=$(TEST_COMMON_SRCS) instrmnt.cpp opl2.cpp test_bnk.cpp
 TESTINST_SRCS=$(TEST_COMMON_SRCS) instrmnt.cpp testinst.cpp
