@@ -14,21 +14,20 @@ static int lastKeyboardState = 0x80;
 
 void event_init()
 {
-	// kbd_interrupt_init();
+	kbd_interrupt_init();
 	mouse_init();
 	mouse_set_predefined_eventhandler(EVENT_MOUSE_ALL);
 }
 
 void event_shutdown()
 {
-	// kbd_interrupt_shutdown();
+	kbd_interrupt_shutdown();
 	mouse_init();
 }
 
 ui_event_t event_poll_mouse(mouse_callback_data_t *mouse)
 {
 	ui_event_t event = {0};
-
 	if (mouse->code > 0) {
 		mouse->has_event = false;
 		lastMouseStatus.buttons = mouse->button_state;
@@ -39,7 +38,6 @@ ui_event_t event_poll_mouse(mouse_callback_data_t *mouse)
 		event.payload.mouse.deltaY = mouse->y_counts;
 		event.payload.mouse.buttons = mouse->button_state;
 	}
-
 	return event;
 }
 
@@ -70,8 +68,6 @@ uint8_t event_poll(ui_event_t *events, uint16_t offset, uint16_t max_events)
 	if (!kbd_get_state()->has_event) {
 		kbd_get_state()->has_event = false;
 	}
-
-
 
 	if (!kbhit()) {
 		return count;
