@@ -28,6 +28,7 @@ void event_shutdown()
 ui_event_t event_poll_mouse(mouse_callback_data_t *mouse)
 {
 	ui_event_t event = {0};
+
 	if (mouse->code > 0) {
 		mouse->has_event = false;
 		lastMouseStatus.buttons = mouse->button_state;
@@ -73,16 +74,15 @@ uint8_t event_poll(ui_event_t *events, uint16_t offset, uint16_t max_events)
 		return count;
 	}
 
-	uint16_t ch = getch();
-	if (ch == 0) {
-		ch = getch();
-		ch <<= 8;
-	}
-	// kbd_clear_buffer();
+	uint16_t ch = kbd_getkey_int16();
+
 	event.type = UI_EVENT_KEY;
 	event.payload.keyboard.keyCode = ch;
 	events[idx] = event;
 	count++;
+
+	kbd_clear_buffer();
+
 	return count;
 }
 
