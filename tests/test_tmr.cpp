@@ -28,9 +28,11 @@ int main(int argc, char const *argv[])
 {
 	char buf[256];
 	int ch = 0;
+	int lock = 0;
+	lock += DPMI_LOCK_FUNC(timer_func);
+	lock += DPMI_LOCK_VAR(counter);
 
-	if ((DPMI_LOCK_FUNC(timer_func) != 0) ||
-			(DPMI_LOCK_VAR(counter) != 0)) {
+	if (lock != 0) {
 		printf("Locks failed.\n");
 		exit(-1);
 	}
