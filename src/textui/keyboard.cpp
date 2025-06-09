@@ -18,6 +18,7 @@
 #include "keyboard.h"
 #define KBD_INTERRUPT 9
 
+
 static kbd_state_t g_keystate = {0};
 static interrupt_func_t old_keyboard_interrupt = nullptr;
 
@@ -81,8 +82,65 @@ kbd_state_t *kbd_get_state()
 
 void kbd_clear_buffer()
 {
-	// FIXME: in Real mode, it's a far pointer to 0x0040:001a
+	#ifdef __DOS__
+	#ifdef __I836__
 	uint16_t *buffer_head = (uint16_t *)0x41a;
 	uint16_t *buffer_tail = (uint16_t *)0x41c;
 	*buffer_head = *buffer_tail;
+	#endif
+	#ifdef __I86__
+	uint16_t far *buffer_head = (uint16_t far *)MK_FP(0x0040, 0x001a);
+	uint16_t far *buffer_tail = (uint16_t far *)MK_FP(0x0040, 0x001c);
+	*buffer_head = *buffer_tail;
+	#endif
+	#endif
+}
+
+/**
+ * Like kbd_getkey() but uses the int16 routine rather than getch
+ */
+uint16_t kbd_getkey_int16()
+{
+	#ifdef __DOS__
+	union REGS regs = {0};
+	regs.h.ah = 0;
+	#ifdef __386__
+	int386(0x16, &regs, &regs);
+	#endif
+	#ifdef __I86__
+	int86(0x16, &regs, &regs);
+	#endif
+	return regs.h.al == 0 ? regs.w.ax : (regs.w.ax & 0xff);
+	#endif
+	return 0;
+}
+
+/**
+ * Get pressed/active states for special keys, as a 8-bit bitmask.
+ *
+ * 7 Insert active
+ * 6 Caps Lock active
+ * 5 Num Lock active
+ * 4 Scroll Lock active
+ * 3 either Alt pressed
+ * 2 either Ctrl pressed
+ * 1 Left Shift pressed
+ * 0 Right Shift pressed
+ * @returns uin8_t bitmask
+ */
+uint8_t kbd_get_shift_flags()
+{
+	uint8_t result = 0;
+	#ifdef __DOS__
+	union REGS regs = {0};
+	regs.h.ah=2;
+	#ifdef __386__
+	int386(0x16, &regs, &regs);
+	#endif
+	#ifdef __I86__
+	int86(0x16, &regs, &regs);
+	#endif
+	result = regs.h.al;
+	#endif
+	return result;
 }
