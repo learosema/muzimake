@@ -16,9 +16,11 @@ typedef struct kbd_state_s {
 
 int kbd_interrupt_init();
 void kbd_interrupt_shutdown();
-uint16_t kbd_getkey();
 kbd_state_t *kbd_get_state();
 void kbd_clear_buffer();
+uint16_t kbd_getkey_int16();
+uint16_t kbd_getkey();
+uint8_t kbd_get_shift_flags();
 
 #ifdef __cplusplus
 }
