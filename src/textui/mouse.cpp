@@ -146,6 +146,13 @@ void _loadds far mouse_handler( int max, int mbx, int mcx, int mdx, int msi, int
 {
 #pragma aux mouse_handler __parm [__eax] [__ebx] [__ecx] [__edx] [__esi] [__edi]
 
+	if (g_mouse_data.has_event && (max & 1)) {
+		// dismiss mouse move event if there is an unprocessed button event.
+		// TODO: have separate event structures for each mouse event type
+		//       (so neither clicks nor moves get lost)
+		return;
+	}
+
 	g_mouse_data.has_event = true;
 
 	g_mouse_data.code = (uint16_t)max;
