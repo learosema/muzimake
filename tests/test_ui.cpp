@@ -131,9 +131,10 @@ int main()
 
 	textmode_hline(0,0, 80, ' ', 0x70);
 	textmode_print("MUZIMAKE UI Test", 1, 0, 0x74);
-	// char x=0;
+
 	while (!done) {
 		if (needs_repaint(&ui)) {
+			vga_wait_for_retrace();
 			// textmode_putchar(78,0, x++);
 			if (g_hasMouse) mouse_hide();
 			component_render_all(ui.count, ui.components, false);
@@ -145,8 +146,8 @@ int main()
 		for (uint8_t event_idx = 0; event_idx < num_events; event_idx++) {
 			component_process_events(ui.count, ui.components, &(events[event_idx]));
 			if ((events[event_idx].type & UI_EVENT_KEY) > 0) {
-//				textmode_gotoxy(1, 47);
-//				printf("KEY     %x      \n", events[event_idx].payload.keyboard.keyCode);
+				textmode_gotoxy(1, 47);
+				printf("KEY     %04x\n", events[event_idx].payload.keyboard.keyCode);
 				if (events[event_idx].payload.keyboard.keyCode == KEY_ALT_X) {
 					// press alt+x to quit
 					done = true;
@@ -154,7 +155,6 @@ int main()
 				}
 			}
 		}
-		vga_wait_for_retrace();
 	}
 
 	if (g_hasMouse) {

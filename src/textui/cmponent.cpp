@@ -53,6 +53,7 @@ void component_set_focus(uint16_t count, ui_component_t *components, uint16_t id
 
 void component_focus_next(uint16_t count, ui_component_t *components)
 {
+	APP_LOG("component_focus_next, count: %d", count);
 	if (count == 0) {
 		// no elements at all
 		return;
@@ -90,6 +91,7 @@ void component_focus_next(uint16_t count, ui_component_t *components)
 
 void component_focus_prev(uint16_t count, ui_component_t *components)
 {
+	APP_LOG("component_focus_prev, count: %d", count);
 	if (count == 0) {
 		// no elements at all
 		return;
@@ -130,6 +132,7 @@ void component_process_events(uint16_t count, ui_component_t *components, ui_eve
 {
 	if (event->type == UI_EVENT_KEY) {
 		if (event->payload.keyboard.keyCode == KEY_TAB) {
+			APP_LOG("TAB pressed");
 			component_focus_next(count, components);
 			return;
 		}
