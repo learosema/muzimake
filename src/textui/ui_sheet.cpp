@@ -7,6 +7,39 @@
 
 static const char* tone_scale[12] = {"C-", "C#", "D-", "D#", "E-", "F-", "F#", "G-", "G#", "A-", "A#", "B-"};
 
+typedef struct sheet_key_s {
+	char key;
+	uint8_t note;
+	uint8_t octave;
+} sheet_key_t;
+
+typedef struct sheet_pos_s {
+	uint8_t cell_x;
+	uint8_t cell_y;
+	uint8_t cursor_x;
+	uint8_t reserved;
+} sheet_pos_t;
+
+static const char tone_map_kbd[26] = {
+	'z', 's', 'x', 'd',
+	'c', 'v', 'g', 'b',
+	'h', 'n', 'j', 'm',
+	',', 'q', '2', 'w',
+	'3', 'e', 'r', '5',
+	't', '6', 'y', '7',
+	'u', 'i',
+};
+
+int find_tone(char keyCode) {
+	int i;
+	for (i = 0; i < 26; i++) {
+		if (keyCode == tone_map_kbd[i]) {
+			return i;
+		}
+	}
+	return -1;
+}
+
 #define NOTE_MAX_VALUE 0x7f
 #define NUM_TOTAL_CHANNELS 9
 #define CELL_LEN 11
@@ -31,6 +64,13 @@ void sheet_build_row(char *row_buf, size_t max_buf_len, pattern_entry_t *data, u
 	}
 }
 
+sheet_pos_t sheet_get_current_cell(const ui_sheet_t *sheet) {
+	sheet_pos_t result = {0};
+	result.cell_x = (uint8_t)((sheet->cursor_x + sheet->offset_x) / 11);
+	result.cursor_x = (uint8_t)((sheet->cursor_x + sheet->offset_x) % 11);
+	result.cell_y = (sheet->cursor_y + sheet->offset_y);
+	return result;
+}
 
 void sheet_move_cursor(const ui_sheet_t *sheet, const int8_t dx, const int8_t dy)
 {
@@ -98,6 +138,19 @@ void sheet_render(ui_sheet_t *sheet)
 	}
 }
 
+void sheet_write_tone(ui_sheet_t *sheet, sheet_pos_t pos, uint8_t value)
+{
+	uint16_t offs = pos.cell_y * sheet->pattern.num_cols + pos.cell_x;
+	sheet->pattern.data[offs].has_content = true;
+	sheet->pattern.data[offs].note = value;
+}
+
+void sheet_del_tone(ui_sheet_t *sheet, sheet_pos_t pos)
+{
+	uint16_t offs = pos.cell_y * sheet->pattern.num_cols + pos.cell_x;
+	sheet->pattern.data[offs].has_content = false;
+}
+
 void sheet_process_events(ui_sheet_t *sheet, ui_event_t *event)
 {
 	rect_t inner = get_clientrect(&(sheet->bounding_rect));
@@ -155,6 +208,25 @@ void sheet_process_events(ui_sheet_t *sheet, ui_event_t *event)
 				sheet->offset_y -= 1;
 			}
 			return;
+		}
+
+		if (event->payload.keyboard.keyCode == 8) {
+			sheet_pos_t pos = sheet_get_current_cell(sheet);
+			sheet_del_tone(sheet, pos);
+			sheet->paint = true;
+			return;
+		}
+
+		int t = find_tone(event->payload.keyboard.keyCode);
+
+		if (t >= 0) {
+			sheet_pos_t pos = sheet_get_current_cell(sheet);
+			int value = (int)(t / 13) * 12 + (t % 13);
+			char dbg[40];
+			snprintf(dbg, 40, "%2d:%2d -> %2d", pos.cell_x, pos.cell_y, t);
+			textmode_print(dbg, 0, 48, 0x1a);
+			sheet_write_tone(sheet, pos, value);
+			sheet->paint = true;
 		}
 	}
 }
