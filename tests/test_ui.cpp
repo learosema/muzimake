@@ -15,7 +15,7 @@
 #include "textui/cmponent.h"
 #include "macros.h"
 #include "helper/log.h"
-#include "textui/fontdata.h"
+#include "fonts/bulkyv2.h"
 #include "vga.h"
 
 static const char * LBL_OK = "Okay";
