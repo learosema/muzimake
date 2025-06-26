@@ -17,24 +17,24 @@
 
 #include "keyboard.h"
 #define KBD_INTERRUPT 9
+#pragma aux asm_cli = \
+    "cli"
+
+#pragma aux asm_sti = \
+    "sti"
+
 
 
 static kbd_state_t g_keystate = {0};
 static interrupt_func_t old_keyboard_interrupt = nullptr;
 
+
 void __interrupt far new_keyboard_interrupt()
 {
 	#ifdef __DOS__
-	static char buf[4];
-	uint8_t kbd = inp(0x60);
-
-	uint8_t code = kbd & 0x7f;
-	g_keystate.last = kbd;
+	asm_cli();
 	g_keystate.has_event = true;
-
-	bool pressed = (kbd & 0x80) == 0;
-	g_keystate.keys[code] = pressed;
-
+	asm_sti();
 	_chain_intr(old_keyboard_interrupt);
 	#endif
 }
@@ -43,6 +43,13 @@ void new_keyboard_interrupt_end()
 {
 	/* Function-End marker */
 }
+
+void kbd_read()
+{
+	g_keystate.last = inp(0x60);
+	g_keystate.keys[(g_keystate.last & 0x7f)] = (g_keystate.last & 0x80) == 0;
+}
+
 
 int kbd_interrupt_init()
 {
@@ -77,6 +84,7 @@ uint16_t kbd_getkey()
 
 kbd_state_t *kbd_get_state()
 {
+	kbd_read();
 	return &g_keystate;
 }
 
