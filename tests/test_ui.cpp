@@ -7,7 +7,7 @@
 #else
 #include <stubs.h>
 #endif
-#include "assembla.h"
+#include "asmstuff.h"
 #include "textui/mouse.h"
 #include "textui/keyboard.h"
 #include "textui/textmode.h"
