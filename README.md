@@ -13,6 +13,10 @@ with the OPL2 chip of the old Sound Blaster and Adlib cards.
 
 - Contains some code from the <https://github.com/learosema/asciijoy> repository for basic text mode functions.
 - OPL2 lib used from <https://github.com/Superilu/lib16>, but changed the instrument_t struct to also contain a `drumType`
+- greatest.h, by Scott Vokes <vokes.s@gmail.com>
+  a test framework in a single-file header: <https://github.com/silentbicycle/greatest>
+- cp437.h, Daniel Aimé Valcour
+  definitions for codepage 437. Was <https://github.com/Journeyman1337/cp437.h>, now gone
 
 ## AdLib Programming
 
