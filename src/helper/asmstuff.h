@@ -13,7 +13,7 @@ inline void asm_hlt(void);
 #pragma aux asm_hlt = \
 	"hlt"
 #else
-inline void asm_hlt() {}
-inline void asm_rep_movsd() {}
+#define asm_hlt(...)
+#define asm_rep_movsd(...)
 #endif
 #endif
