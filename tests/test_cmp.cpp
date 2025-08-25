@@ -1,61 +1,80 @@
+#include <stdio.h>
+#include <textmode.h>
+#include <greatest.h>
 
-#include "greatest.h"
-#include <assert.h>
+#include "textui/cmponent.h"
+#include "vendor/cp437.h"
 
-int add(int a, int b) {
-	return a + b;
+static void before_each(void *data) {
+  textmode_init_headless(3);
 }
 
-
-TEST foo_should_foo() {
-  PASS();
+static void after_each(void *data) {
+	textmode_dispose();
 }
 
-TEST add_should_add() {
-	assert(add(3,4) == 7);
+#define GET_CHAR(info, x, y) (uint8_t)(*(info->vram + 2 * (info->numCols * (y) + (x))))
+#define GET_COLOR(info, x, y) (uint8_t)(*(info->vram + 1 + 2 * (info->numCols * (y) + (x))))
+
+TEST button_should_render()
+{
+	const char *label = "OK";
+	const uint8_t button_id = 1;
+	const uint8_t button_x = 0;
+	const uint8_t button_y = 0;
+	const uint8_t button_width = 10;
+	const uint8_t button_height = 3;
+	const uint8_t button_color = 0x2f;
+
+	ui_component_t button = component_create_button(
+		button_id,
+		label,
+		button_x, button_y,
+		button_width, button_height,
+		button_color
+	);
+	component_render(&button);
+
+
+	MODEINFO* info = textmode_get_modeinfo();
+
+	uint8_t color = GET_COLOR(info, 0, 0);
+	char topleft_corner = GET_CHAR(info, 0, 0);
+	char topright_corner = GET_CHAR(info, button_width - 1, 0);
+	char btmleft_corner = GET_CHAR(info, 0, button_height - 1);
+	char btmright_corner = GET_CHAR(info, button_width - 1, button_height - 1);
+
+	ASSERT_EQ(button_color, color);
+	ASSERT_EQ(CP_THIN_RIGHT_THIN_DOWN, topleft_corner);
+	ASSERT_EQ(CP_THIN_LEFT_THIN_DOWN, topright_corner);
+	ASSERT_EQ(CP_THIN_RIGHT_THIN_UP, btmleft_corner);
+	ASSERT_EQ(CP_THIN_LEFT_THIN_UP, btmright_corner);
+	for (uint8_t x = 1; x < button_width - 2; x++) {
+		ASSERT_EQ(CP_THIN_HORIZONTAL, GET_CHAR(info, x, 0));
+		ASSERT_EQ(CP_THIN_HORIZONTAL, GET_CHAR(info, x, button_height - 1));
+	}
+	for (uint8_t y = 1; y < button_height - 2; y++) {
+		ASSERT_EQ(CP_THIN_HORIZONTAL, GET_CHAR(info, 0, y));
+		ASSERT_EQ(CP_THIN_HORIZONTAL, GET_CHAR(info, button_width - 1, y));
+	}
+
 	PASS();
 }
 
-static void setup_cb(void *data) {
-    printf("setup callback for each test case\n");
+SUITE(button_tests)
+{
+	SET_SETUP(before_each, nullptr);
+	SET_TEARDOWN(after_each, nullptr);
+
+	RUN_TEST(button_should_render);
 }
 
-static void teardown_cb(void *data) {
-    printf("teardown callback for each test case\n");
-}
 
-SUITE(suite) {
-    /* Optional setup/teardown callbacks which will be run before/after
-     * every test case. If using a test suite, they will be cleared when
-     * the suite finishes. */
-    SET_SETUP(setup_cb, nullptr);
-    SET_TEARDOWN(teardown_cb, nullptr);
 
-    RUN_TEST(foo_should_foo);
-		RUN_TEST(add_should_add);
-}
-
-/* Add definitions that need to be in the test runner's main file. */
 GREATEST_MAIN_DEFS();
 
-/* Set up, run suite(s) of tests, report pass/fail/skip stats. */
-int run_tests(void) {
-    GREATEST_INIT();            /* init. greatest internals */
-    /* List of suites to run (if any). */
-    RUN_SUITE(suite);
-
-    /* Tests can also be run directly, without using test suites. */
-    RUN_TEST(foo_should_foo);
-
-    GREATEST_PRINT_REPORT();          /* display results */
-    return greatest_all_passed();
-}
-
-/* main(), for a standalone command-line test runner.
- * This replaces run_tests above, and adds command line option
- * handling and exiting with a pass/fail status. */
 int main(int argc, char **argv) {
     GREATEST_MAIN_BEGIN();      /* init & parse command-line args */
-    RUN_SUITE(suite);
+    RUN_SUITE(button_tests);
     GREATEST_MAIN_END();        /* display results */
 }

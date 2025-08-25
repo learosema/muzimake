@@ -59,6 +59,10 @@ typedef struct RECT
 
 void textmode_setmode(uint8_t mode);
 
+void textmode_init_headless(uint8_t mode);
+
+void textmode_dispose();
+
 MODEINFO *textmode_get_modeinfo();
 
 void textmode_set_page(uint8_t page);

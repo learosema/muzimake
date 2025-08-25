@@ -21,7 +21,19 @@
 
 MODEINFO g_currentMode = {0};
 
-void _retrieve_modeinfo()
+
+void _retrieve_modeinfo_headless(uint8_t mode)
+{
+	g_currentMode.mode = mode;
+	g_currentMode.numCols = (mode == 3) || (mode == 7) ? 80 : 40;
+	g_currentMode.numRows = 25;
+	g_currentMode.page = 0;
+	g_currentMode.pageSize = 160 * 25;
+	g_currentMode.videoPortAddress = 0;
+	g_currentMode.hasColors = true;
+}
+
+void _retrieve_modeinfo(uint8_t mode)
 {
 	#ifdef __DOS__
 	union REGS regs;
@@ -37,20 +49,13 @@ void _retrieve_modeinfo()
 	g_currentMode.vram = g_currentMode.hasColors ?
 		TEXT_VRAM_BASE : TEXT_VRAM_BASE_MONO;
 	#else
-	g_currentMode.mode = 3;
-	g_currentMode.numCols = 80;
-	g_currentMode.numRows = 25;
-	g_currentMode.page = 0;
-	g_currentMode.pageSize = 160 * 25;
-	g_currentMode.videoPortAddress = 0;
-	g_currentMode.hasColors = true;
-	g_currentMode.vram = nullptr;
+	_retrieve_modeinfo_headless(mode);
 	#endif
 }
 
-void textmode_setmode(uint8_t mode)
+#ifdef __DOS__
+void _setmode(uint8_t mode)
 {
-	#ifdef __DOS__
 	union REGS regs;
 	if (mode > 3 && mode != 7) {
 		printf("mode: %d not supported by library. Defaulting to mode 3\n");
@@ -59,14 +64,35 @@ void textmode_setmode(uint8_t mode)
 	regs.h.ah = 0;
 	regs.h.al = mode;
 	INTR(0x10, &regs, &regs);
+}
+#else
+#define _setmode()
+#endif
+
+void textmode_init_headless(uint8_t mode)
+{
+	#if defined __I86__
+	g_currentMode.vram = (uint8_t *)_fmalloc(160 * 25 * 8);
 	#else
 	g_currentMode.vram = (uint8_t *)malloc(160 * 25 * 8);
 	#endif
-	_retrieve_modeinfo();
+	_retrieve_modeinfo_headless(mode);
 }
 
-void textmode_dispose() {
+void textmode_setmode(uint8_t mode)
+{
+	#ifdef __DOS__
+	_setmode(3);
+	_retrieve_modeinfo(3);
+	#else
+	textmode_init_headless(mode);
+	_retrieve_modeinfo(mode);
+	#endif
+}
 
+
+void textmode_dispose()
+{
 	if (g_currentMode.vram != TEXT_VRAM_BASE && g_currentMode.vram != TEXT_VRAM_BASE_MONO) {
 		#if defined __386__
 		free(g_currentMode.vram);
@@ -74,9 +100,10 @@ void textmode_dispose() {
 		#if defined __I86__
 		_ffree(g_currentMode.vram);
 		#endif
-		g_currentMode.vram = nullptr;
+	} else {
+		_setmode(3);
 	}
-
+	g_currentMode.vram = nullptr;
 }
 
 MODEINFO *textmode_get_modeinfo()
