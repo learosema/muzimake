@@ -161,7 +161,7 @@ int main()
 		mouse_hide();
 	}
 	ui_cleanup(&ui);
-	textmode_setmode(3);
+	textmode_dispose();
 	APP_LOG("Text-UI tests finished.");
 	return 0;
 }
