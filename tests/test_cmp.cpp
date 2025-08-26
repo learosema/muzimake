@@ -31,8 +31,13 @@ static void after_each(void *data) {
 	textmode_dispose();
 }
 
-#define GET_CHAR(info, x, y) (uint8_t)(*(info->vram + 2 * (info->numCols * (y) + (x))))
-#define GET_COLOR(info, x, y) (uint8_t)(*(info->vram + 1 + 2 * (info->numCols * (y) + (x))))
+#define GET_CHAR(info, x, y) (uint8_t) \
+	((((x) < 0) || ((x) >= info->numCols) || ((y) < 0) || ((y) >= info->numRows)) ? 0 : \
+	*(info->vram + 2 * (info->numCols * (y) + (x))))
+
+#define GET_COLOR(info, x, y) (uint8_t) \
+	((((x) < 0) || ((x) >= info->numCols) || ((y) < 0) || ((y) >= info->numRows)) ? 0 : \
+	*(info->vram + 1 + 2 * (info->numCols * (y) + (x))))
 
 bool check_thin_box(uint8_t x, uint8_t y, uint8_t width, uint8_t height)
 {
