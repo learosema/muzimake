@@ -550,6 +550,10 @@ void textmode_gotoxy(const uint8_t x, const uint8_t y) {
 
 void textmode_init_font(const uint8_t *charData, const uint16_t charHeight, const uint16_t offset, const uint16_t count)
 {
+	if (charHeight == 8) {
+		g_currentMode.numRows = 50;
+		g_currentMode.pageSize = (g_currentMode.vram != TEXT_VRAM_BASE && g_currentMode.vram != TEXT_VRAM_BASE_MONO) ? (160 * 25) : PAGE_SIZE_80X50;
+	}
 	#if defined __DOS__ && defined __386__
 	union REGPACK regs = {0};
 	uint16_t sizeInBytes = count * charHeight;
