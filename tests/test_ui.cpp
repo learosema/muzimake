@@ -107,14 +107,14 @@ void wait_for_user()
 
 int main()
 {
+	APP_LOG("TextUI-Tests started.");
 	ui_event_t events[10] = {0};
 	bool done = false;
 	textmode_setmode(3);
 	g_hasMouse = mouse_init();
-	textmode_font8();
 	g_modeInfo = textmode_get_modeinfo();
+	APP_LOG("Loading font.");
 	textmode_init_font(font_data, 8, 0, 256);
-	APP_LOG("TextUI-Tests started.");
 	event_init();
 	atexit(event_shutdown);
 
@@ -124,6 +124,7 @@ int main()
 	ui_state_t ui = ui_create();
 
 	component_render_all(ui.count, ui.components, true);
+
 	if (g_hasMouse) {
 		mouse_show();
 		mouse_set_vertical_range(0, g_modeInfo->numRows * 8 - 8);
