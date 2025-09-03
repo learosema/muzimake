@@ -3,6 +3,7 @@
 #include "macros.h"
 #include "textmode.h"
 #include "ui_btn.h"
+#include "keyboard.h"
 
 void button_render(ui_button_t *button)
 {
@@ -95,7 +96,19 @@ void button_process_events(ui_button_t *button, ui_event_t *event)
 			}
 		}
 	}
+/*
+	// keyboard events
+	kbd_read();
+	kbd_state_t * kbd_state = kbd_get_state();
 
-	// todo: kbd events, shortcuts?
+	if (button->focused && button->active == false && (kbd_state->keys[KEY_SCANCODE_ENTER] || kbd_state->keys[KEY_SCANCODE_SPACE])) {
+			button->active = true;
+			button->paint = true;
+	}
 
+	if (button->focused && button->active && !(kbd_state->keys[KEY_SCANCODE_ENTER] || kbd_state->keys[KEY_SCANCODE_SPACE])) {
+		button->active = false;
+		button->paint = true;
+	}
+*/
 }

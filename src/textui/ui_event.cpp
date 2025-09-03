@@ -14,14 +14,14 @@ static int lastKeyboardState = 0x80;
 
 void event_init()
 {
-	kbd_interrupt_init();
+	// kbd_interrupt_init();
 	mouse_init();
 	mouse_set_predefined_eventhandler(EVENT_MOUSE_ALL);
 }
 
 void event_shutdown()
 {
-	kbd_interrupt_shutdown();
+	// kbd_interrupt_shutdown();
 	mouse_init();
 }
 
@@ -65,11 +65,17 @@ uint8_t event_poll(ui_event_t *events, uint16_t offset, uint16_t max_events)
 	if (idx == max_events) {
 		return count;
 	}
-
-	if (!kbd_get_state()->has_event) {
-		kbd_get_state()->has_event = false;
+/*
+	kbd_read();
+	kbd_state_t * k_state = kbd_get_state();
+	if (k_state->changed) {
+		event.type = (k_state->last >= 0x80) ? UI_EVENT_KEYUP : UI_EVENT_KEYDOWN;
+		event.payload.keyboard.keyCode = k_state->last & 0x7f;
+		events[idx] = event;
+		idx++;
+		count++;
 	}
-
+*/
 	if (!kbhit()) {
 		return count;
 	}

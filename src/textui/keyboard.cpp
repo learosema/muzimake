@@ -17,13 +17,7 @@
 
 #include "keyboard.h"
 #define KBD_INTERRUPT 9
-#pragma aux asm_cli = \
-    "cli"
-
-#pragma aux asm_sti = \
-    "sti"
-
-
+#include "asmstuff.h"
 
 static kbd_state_t g_keystate = {0};
 static interrupt_func_t old_keyboard_interrupt = nullptr;
@@ -47,7 +41,10 @@ void new_keyboard_interrupt_end()
 void kbd_read()
 {
 	g_keystate.last = inp(0x60);
-	g_keystate.keys[(g_keystate.last & 0x7f)] = (g_keystate.last & 0x80) == 0;
+	bool old_state = g_keystate.keys[(g_keystate.last & 0x7f)];
+	bool new_state = (g_keystate.last & 0x80) == 0;
+	g_keystate.keys[(g_keystate.last & 0x7f)] = new_state;
+	g_keystate.changed = old_state != new_state;
 }
 
 
