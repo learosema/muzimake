@@ -122,7 +122,6 @@ TEST button_should_render_black_when_active()
 	PASS();
 }
 
-
 SUITE(button_tests)
 {
 	SET_SETUP(before_each, nullptr);

@@ -76,6 +76,9 @@ int main(void) {
 	while (!done) {
 		paint();
 		asm_hlt();
+		kbd_read();
+		snprintf(buf, 5, "%4x", kbd_get_state()->last);
+		textmode_print(buf, 5, 22, 0x19);
 		if (kbd_get_state()->has_event) {
 			needs_repaint = true;
 			kbd_get_state()->has_event = false;

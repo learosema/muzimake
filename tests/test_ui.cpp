@@ -100,7 +100,7 @@ bool needs_repaint(const ui_state_t *ui) {
 
 void wait_for_user()
 {
-	while (!mouse_get_callback_data()->has_event && !kbhit()) {
+	while (!mouse_get_callback_data()->has_event && !(kbhit())) {
 		asm_hlt();
 	}
 }
@@ -148,7 +148,7 @@ int main()
 			component_process_events(ui.count, ui.components, &(events[event_idx]));
 			if ((events[event_idx].type & UI_EVENT_KEY) > 0) {
 				textmode_gotoxy(1, 47);
-				printf("KEY     %04x\n", events[event_idx].payload.keyboard.keyCode);
+				printf("KEY     %04x %02x\n", events[event_idx].payload.keyboard.keyCode, kbd_get_state()->last);
 				if (events[event_idx].payload.keyboard.keyCode == KEY_ALT_X) {
 					// press alt+x to quit
 					done = true;

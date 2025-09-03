@@ -21,6 +21,7 @@ void kbd_clear_buffer();
 uint16_t kbd_getkey_int16();
 uint16_t kbd_getkey();
 uint8_t kbd_get_shift_flags();
+void kbd_read();
 
 #ifdef __cplusplus
 }

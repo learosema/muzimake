@@ -38,8 +38,14 @@
 #define KEY_TAB             0x09
 #define KEY_SHIFT_TAB				0x0F00
 #define KEY_ESCAPE          0x1D
+#define KEY_SPACE						0x20
 #define KEY_ALT_X           0x2D00
 #define KEY_ALT_I           0x1700
+
+// these are the codes you get for the KEYDOWN/KEYUP events
+// they are different from the codes for the "KEY" event
+#define KEY_SCANCODE_ENTER			0x1c
+#define KEY_SCANCODE_SPACE			0x39
 
 typedef struct ui_mouse_event_s
 {
