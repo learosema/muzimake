@@ -89,26 +89,23 @@ void button_process_events(ui_button_t *button, ui_event_t *event)
 				click.type = UI_EVENT_CLICK;
 				click.payload.click.buttons = event->payload.mouse.buttons;
 				click.payload.click.target = button->id;
-				bool result = button->event_handler(button->id, &click);
-				if (result == false) {
-					return;
-				}
+				button->event_handler(button->id, &click);
+				return;
 			}
 		}
 	}
-/*
-	// keyboard events
-	kbd_read();
-	kbd_state_t * kbd_state = kbd_get_state();
 
-	if (button->focused && button->active == false && (kbd_state->keys[KEY_SCANCODE_ENTER] || kbd_state->keys[KEY_SCANCODE_SPACE])) {
-			button->active = true;
-			button->paint = true;
+	// Keyboard events
+	if (! button->focused) {
+		return;
 	}
 
-	if (button->focused && button->active && !(kbd_state->keys[KEY_SCANCODE_ENTER] || kbd_state->keys[KEY_SCANCODE_SPACE])) {
-		button->active = false;
-		button->paint = true;
+	if (((event->type & UI_EVENT_KEY) > 0) && (event->payload.keyboard.keyCode == KEY_ENTER || event->payload.keyboard.keyCode == KEY_SPACE)) {
+		ui_event_t click = {0};
+		click.type = UI_EVENT_CLICK;
+		click.payload.click.buttons = event->payload.mouse.buttons;
+		click.payload.click.target = button->id;
+		button->event_handler(button->id, &click);
+		return;
 	}
-*/
 }
