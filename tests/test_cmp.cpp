@@ -14,6 +14,14 @@ const uint8_t button_width = 10;
 const uint8_t button_height = 3;
 const uint8_t button_color = 0x2f;
 
+static int click_count = 0;
+static bool spy_callback(uint16_t id, ui_event_t *event)
+{
+	if (event->type == UI_EVENT_CLICK) {
+		click_count++;
+	} 
+	return true;
+}
 
 static void before_each(void *data) {
   textmode_init_headless(3);
@@ -25,74 +33,24 @@ static void before_each(void *data) {
 		button_width, button_height,
 		button_color
 	);
+	click_count = 0;
+	
+	button.component.button.event_handler = spy_callback;
 }
 
 static void after_each(void *data) {
 	textmode_dispose();
 }
 
-#define GET_CHAR(info, x, y) (uint8_t) \
-	((((x) < 0) || ((x) >= info->numCols) || ((y) < 0) || ((y) >= info->numRows)) ? 0 : \
-	*(info->vram + 2 * (info->numCols * (y) + (x))))
-
-#define GET_COLOR(info, x, y) (uint8_t) \
-	((((x) < 0) || ((x) >= info->numCols) || ((y) < 0) || ((y) >= info->numRows)) ? 0 : \
-	*(info->vram + 1 + 2 * (info->numCols * (y) + (x))))
-
-bool check_thin_box(uint8_t x, uint8_t y, uint8_t width, uint8_t height)
-{
-	MODEINFO* info = textmode_get_modeinfo();
-	char topleft_corner = GET_CHAR(info, x, y);
-	char topright_corner = GET_CHAR(info, x + width - 1, 0);
-	char btmleft_corner = GET_CHAR(info, y, y + height - 1);
-	char btmright_corner = GET_CHAR(info, x + width - 1, y + height - 1);
-	if (CP_THIN_RIGHT_THIN_DOWN != topleft_corner) return false;
-	if (CP_THIN_LEFT_THIN_DOWN != topright_corner) return false;
-	if (CP_THIN_RIGHT_THIN_UP != btmleft_corner) return false;
-	if (CP_THIN_LEFT_THIN_UP != btmright_corner) return false;
-	for (uint8_t i = 1; i < width - 2; i++) {
-		if (CP_THIN_HORIZONTAL != GET_CHAR(info, x + i, y)) return false;
-		if (CP_THIN_HORIZONTAL != GET_CHAR(info, x + i, y + height - 1)) return false;
-	}
-	for (uint8_t i = 1; i < height - 2; i++) {
-		if (CP_THIN_HORIZONTAL != GET_CHAR(info, x, y + i)) return false;
-		if (CP_THIN_HORIZONTAL != GET_CHAR(info, x + width - 1, y + i)) return false;
-	}
-	return true;
-}
-
-bool check_thick_box(uint8_t x, uint8_t y, uint8_t width, uint8_t height)
-{
-	MODEINFO* info = textmode_get_modeinfo();
-	char topleft_corner = GET_CHAR(info, x, y);
-	char topright_corner = GET_CHAR(info, x + width - 1, 0);
-	char btmleft_corner = GET_CHAR(info, y, y + height - 1);
-	char btmright_corner = GET_CHAR(info, x + width - 1, y + height - 1);
-	if (CP_THICK_RIGHT_THICK_DOWN != topleft_corner) return false;
-	if (CP_THICK_LEFT_THICK_DOWN != topright_corner) return false;
-	if (CP_THICK_RIGHT_THICK_UP != btmleft_corner) return false;
-	if (CP_THICK_LEFT_THICK_UP != btmright_corner) return false;
-	for (uint8_t i = 1; i < width - 2; i++) {
-		if (CP_THICK_HORIZONTAL != GET_CHAR(info, x + i, y)) return false;
-		if (CP_THICK_HORIZONTAL != GET_CHAR(info, x + i, y + height - 1)) return false;
-	}
-	for (uint8_t i = 1; i < height - 2; i++) {
-		if (CP_THICK_HORIZONTAL != GET_CHAR(info, x, y + i)) return false;
-		if (CP_THICK_HORIZONTAL != GET_CHAR(info, x + width - 1, y + i)) return false;
-	}
-	return true;
-}
-
-
 TEST button_should_render()
 {
 
 	component_render(&button);
 	MODEINFO* info = textmode_get_modeinfo();
-	uint8_t color = GET_COLOR(info, button_x, button_y);
+	uint8_t color = TEXT_GET_COLOR(info, button_x, button_y);
 
 	ASSERT_EQ(button_color, color);
-	ASSERT_EQm("Screen should have a box at the given coords", true, check_thin_box(button_x, button_y, button_width, button_height));
+	ASSERT_EQm("Screen should have a box at the given coords", true, textmode_check_box(button_x, button_y, button_width, button_height));
 
 	PASS();
 }
@@ -103,10 +61,10 @@ TEST button_should_render_thick_when_focused()
 	button.component.button.focused = true;
 	component_render(&button);
 	MODEINFO* info = textmode_get_modeinfo();
-	uint8_t color = GET_COLOR(info, button_x, button_y);
+	uint8_t color = TEXT_GET_COLOR(info, button_x, button_y);
 
 	ASSERT_EQ(button_color, color);
-	ASSERT_EQm("Screen should have a box at the given coords", true, check_thick_box(button_x, button_y, button_width, button_height));
+	ASSERT_EQm("Screen should have a box at the given coords", true, textmode_check_dblbox(button_x, button_y, button_width, button_height));
 
 	PASS();
 }
@@ -116,9 +74,70 @@ TEST button_should_render_black_when_active()
 	button.component.button.active = true;
 	component_render(&button);
 	MODEINFO* info = textmode_get_modeinfo();
-	uint8_t color = GET_COLOR(info, button_x, button_y);
+	uint8_t color = TEXT_GET_COLOR(info, button_x, button_y);
 
 	ASSERT_EQ(button_color & 0xf, color);
+
+	PASS();
+}
+
+TEST button_should_handle_space()
+{
+	ui_event_t event;
+	event.type = UI_EVENT_KEY;
+	event.payload.keyboard.keyCode = KEY_SPACE;
+
+	button.component.generic.focused = false;
+	button_process_events(&(button.component.button), &event);
+	ASSERT_EQm("button should not trigger click on hitting space when not focused", click_count, 0);
+	
+	button.component.generic.focused = true;
+	button_process_events(&(button.component.button), &event);
+	ASSERT_EQm("button should trigger click on hitting space when focused", click_count, 1);
+
+	PASS();
+}
+
+TEST button_should_handle_enter()
+{
+	ui_event_t event;
+	event.type = UI_EVENT_KEY;
+	event.payload.keyboard.keyCode = KEY_ENTER;
+
+	button.component.generic.focused = false;
+	button_process_events(&(button.component.button), &event);
+	ASSERT_EQm("button should not trigger click on hitting enter when not focused", click_count, 0);
+	
+	button.component.generic.focused = true;
+	button_process_events(&(button.component.button), &event);
+	ASSERT_EQm("button should trigger click on hitting enter when focused", click_count, 1);
+	
+	PASS();
+}
+
+TEST button_should_handle_mousedown()
+{
+	ui_event_t event;
+	event.type = UI_EVENT_MOUSEDOWN;
+	event.payload.mouse.buttons = UI_EVENT_MOUSEDOWN;
+
+	// click outside
+	event.payload.mouse.x = button_x + button_width;
+	event.payload.mouse.y = button_y + button_height;
+
+	button.component.generic.focused = false;
+
+	button_process_events(&(button.component.button), &event);
+	ASSERT_EQm("button should not trigger click on clicking outside", click_count, 0);
+	ASSERT_EQm("button should not receive focus on clicking outside", button.component.generic.focused, false);
+
+	event.payload.mouse.x = button_x;
+	event.payload.mouse.y = button_y;
+
+	button_process_events(&(button.component.button), &event);
+	ASSERT_EQm("button should trigger click on clicking inside", click_count, 1);
+	ASSERT_EQm("button should receive focus on clicking inside", button.component.generic.focused, true);
+
 	PASS();
 }
 
@@ -130,9 +149,10 @@ SUITE(button_tests)
 	RUN_TEST(button_should_render);
 	RUN_TEST(button_should_render_thick_when_focused);
 	RUN_TEST(button_should_render_black_when_active);
+	RUN_TEST(button_should_handle_space);
+	RUN_TEST(button_should_handle_enter);
+	RUN_TEST(button_should_handle_mousedown);
 }
-
-
 
 GREATEST_MAIN_DEFS();
 

@@ -36,6 +36,14 @@
 
 #define TEXT_VRAM (g_currentMode.vram+g_currentMode.page*g_currentMode.pageSize)
 
+#define TEXT_GET_CHAR(info, x, y) (uint8_t) \
+	((((x) < 0) || ((x) >= info->numCols) || ((y) < 0) || ((y) >= info->numRows)) ? 0 : \
+	*(info->vram + 2 * (info->numCols * (y) + (x))))
+
+#define TEXT_GET_COLOR(info, x, y) (uint8_t) \
+	((((x) < 0) || ((x) >= info->numCols) || ((y) < 0) || ((y) >= info->numRows)) ? 0 : \
+	*(info->vram + 1 + 2 * (info->numCols * (y) + (x))))
+
 
 typedef struct MODEINFO
 {
@@ -163,5 +171,9 @@ void textmode_dblrect(
 void textmode_init_font(const uint8_t *charData, const uint16_t charHeight, const uint16_t offset, const uint16_t count);
 
 void textmode_gotoxy(const uint8_t x, const uint8_t y);
+
+bool textmode_check_box(uint8_t x, uint8_t y, uint8_t width, uint8_t height);
+
+bool textmode_check_dblbox(uint8_t x, uint8_t y, uint8_t width, uint8_t height);
 
 #endif

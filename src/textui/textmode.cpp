@@ -591,3 +591,47 @@ void textmode_init_font(const uint8_t *charData, const uint16_t charHeight, cons
 	intr(0x10, &regs);
 	#endif
 }
+
+bool textmode_check_box(uint8_t x, uint8_t y, uint8_t width, uint8_t height)
+{
+	MODEINFO* info = textmode_get_modeinfo();
+	char topleft_corner = TEXT_GET_CHAR(info, x, y);
+	char topright_corner = TEXT_GET_CHAR(info, x + width - 1, 0);
+	char btmleft_corner = TEXT_GET_CHAR(info, y, y + height - 1);
+	char btmright_corner = TEXT_GET_CHAR(info, x + width - 1, y + height - 1);
+	if (CP_THIN_RIGHT_THIN_DOWN != topleft_corner) return false;
+	if (CP_THIN_LEFT_THIN_DOWN != topright_corner) return false;
+	if (CP_THIN_RIGHT_THIN_UP != btmleft_corner) return false;
+	if (CP_THIN_LEFT_THIN_UP != btmright_corner) return false;
+	for (uint8_t i = 1; i < width - 2; i++) {
+		if (CP_THIN_HORIZONTAL != TEXT_GET_CHAR(info, x + i, y)) return false;
+		if (CP_THIN_HORIZONTAL != TEXT_GET_CHAR(info, x + i, y + height - 1)) return false;
+	}
+	for (uint8_t i = 1; i < height - 2; i++) {
+		if (CP_THIN_HORIZONTAL != TEXT_GET_CHAR(info, x, y + i)) return false;
+		if (CP_THIN_HORIZONTAL != TEXT_GET_CHAR(info, x + width - 1, y + i)) return false;
+	}
+	return true;
+}
+
+bool textmode_check_dblbox(uint8_t x, uint8_t y, uint8_t width, uint8_t height)
+{
+	MODEINFO* info = textmode_get_modeinfo();
+	char topleft_corner = TEXT_GET_CHAR(info, x, y);
+	char topright_corner = TEXT_GET_CHAR(info, x + width - 1, 0);
+	char btmleft_corner = TEXT_GET_CHAR(info, y, y + height - 1);
+	char btmright_corner = TEXT_GET_CHAR(info, x + width - 1, y + height - 1);
+	if (CP_THICK_RIGHT_THICK_DOWN != topleft_corner) return false;
+	if (CP_THICK_LEFT_THICK_DOWN != topright_corner) return false;
+	if (CP_THICK_RIGHT_THICK_UP != btmleft_corner) return false;
+	if (CP_THICK_LEFT_THICK_UP != btmright_corner) return false;
+	for (uint8_t i = 1; i < width - 2; i++) {
+		if (CP_THICK_HORIZONTAL != TEXT_GET_CHAR(info, x + i, y)) return false;
+		if (CP_THICK_HORIZONTAL != TEXT_GET_CHAR(info, x + i, y + height - 1)) return false;
+	}
+	for (uint8_t i = 1; i < height - 2; i++) {
+		if (CP_THICK_HORIZONTAL != TEXT_GET_CHAR(info, x, y + i)) return false;
+		if (CP_THICK_HORIZONTAL != TEXT_GET_CHAR(info, x + width - 1, y + i)) return false;
+	}
+	return true;
+}

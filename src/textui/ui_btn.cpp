@@ -96,7 +96,7 @@ void button_process_events(ui_button_t *button, ui_event_t *event)
 	}
 
 	// Keyboard events
-	if (! button->focused) {
+	if (! (button->focused)) {
 		return;
 	}
 
