@@ -18,30 +18,18 @@
 #include "fonts/bulkyv5.h"
 #include "vga.h"
 
-static const char * LBL_OK = "Okay";
-static const char * LBL_CANCEL = "Cancel";
+static const char * LBL_LOAD = "Load";
+static const char * LBL_SAVE = "Save";
 static const char * LBL_PLAY = "Play";
 static const char * LBL_STOP = "Stop";
 static const char * LBL_FILENAME = "Filename";
 
-static const char *LIST_EXAMPLE[30] = {
-	"Piano", "Violin", "BaseDrum", "Beep", "Boop",
-	"Sawtooth", "Triangle", "Square", "Sine", "Pulse",
-	"Snare", "Xylophone", "Dreizehn", "Vierzehn", "Fuenfzehn",
-	"Sechzehn", "Siebzehn", "Achtzehn", "Neunzehn",
-	"Zwanzig", "Einundzwanzig", "Zweiundzwanzig", "Dreiundzwanzig",
-	"Vierundzwanzig", "Fuenfundzwanzig", "Sechsundzwanzig", "Siebenundzwanzig",
-	"Achtundzwanzig", "Neunundzwanzig", "Dreissig"
-};
-
-#define ID_OK         0
-#define ID_CANCEL     1
-#define ID_INPUTLABEL 2
-#define ID_INPUT      3
-#define ID_LIST       4
-#define ID_RANGE      5
-#define ID_SHEET			6
-#define ID_PIANO			7
+#define ID_LOAD			0
+#define ID_SAVE			1
+#define ID_PLAY			2
+#define ID_STOP			3
+#define ID_SHEET		4
+#define ID_PIANO		5
 
 bool g_hasMouse;
 MOUSE_STATUS g_mouse;
@@ -61,20 +49,16 @@ static bool event_handler(uint16_t elementId, ui_event_t *event) {
 ui_state_t ui_create() {
 	ui_state_t ui = {0};
 
-	ui.count = 8;
+	ui.count = 6;
 	ui.components = ALLOC_TYPE(ui_component_t, ui.count);
 
-	ui.components[ID_OK] = component_create_button(ID_OK, LBL_OK, 2, 2, 10, 3, 0x2f);;
-	ui.components[ID_CANCEL] = component_create_button(ID_CANCEL, LBL_CANCEL, 13, 2, 10, 3, 0x4e);
-	ui.components[ID_INPUTLABEL] = component_create_label(ID_INPUTLABEL, ID_INPUT, LBL_FILENAME, 3, 7, 0x1f);
-	ui.components[ID_INPUT] = component_create_input(ID_INPUT, 2, 8, 40, 3, 0x5f, "", 80);
-	ui.components[ID_LIST] = component_create_listbox(ID_LIST, 2, 12, 12,10, 0x6e, LIST_EXAMPLE, 30);
-	ui.components[ID_RANGE] = component_create_range(ID_RANGE, 16, 12, 22, 3, 0x3f, 20, 10, 30, 1);
-	ui.components[ID_SHEET] = component_create_sheet(ID_SHEET, 1, 24, 78, 12, 0x0f, 32, 9);
+	ui.components[ID_LOAD] = component_create_button(ID_LOAD, LBL_LOAD, 1, 2, 10, 3, 0x2f);
+	ui.components[ID_SAVE] = component_create_button(ID_SAVE, LBL_SAVE, 12, 2, 10, 3, 0x5f);
+	ui.components[ID_PLAY] = component_create_button(ID_PLAY, LBL_PLAY, 23, 2, 10, 3, 0x3f);
+	ui.components[ID_STOP] = component_create_button(ID_STOP, LBL_STOP, 34, 2, 10, 3, 0x1f);
+	ui.components[ID_SHEET] = component_create_sheet(ID_SHEET, 1, 6, 78, 30, 0x0f, 32, 9);
 	ui.components[ID_PIANO] = component_create_piano(ID_PIANO, 1, 38, 78, 8, 0x71);
 
-	ui.components[ID_OK].component.button.event_handler = event_handler;
-	ui.components[ID_CANCEL].component.button.event_handler = event_handler;
 	return ui;
 }
 
@@ -131,7 +115,7 @@ int main()
 	}
 
 	textmode_hline(0,0, 80, ' ', 0x70);
-	textmode_print("MUZIMAKE UI Test", 1, 0, 0x74);
+	textmode_print("MUZIMAKE \001", 1, 0, 0x74);
 
 	while (!done) {
 		if (needs_repaint(&ui)) {
@@ -147,8 +131,6 @@ int main()
 		for (uint8_t event_idx = 0; event_idx < num_events; event_idx++) {
 			component_process_events(ui.count, ui.components, &(events[event_idx]));
 			if ((events[event_idx].type & UI_EVENT_KEY) > 0) {
-				textmode_gotoxy(1, 47);
-				printf("KEY     %04x %02x\n", events[event_idx].payload.keyboard.keyCode, kbd_get_state()->last);
 				if (events[event_idx].payload.keyboard.keyCode == KEY_ALT_X) {
 					// press alt+x to quit
 					done = true;
