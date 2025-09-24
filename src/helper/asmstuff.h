@@ -9,6 +9,15 @@ inline void asm_rep_movsd(void *src, void *dest, int num_dwords);
     parm [esi] [edi] [ecx]  \
     modify [esi edi ecx];
 
+
+inline void asm_rep_movsw(void *src, void *dest, int num_words);
+#pragma aux asm_rep_movsw =     \
+    "cld"                   \
+    "rep movsw"             \
+    parm [esi] [edi] [ecx]  \
+    modify [esi edi ecx];
+
+
 inline void asm_end_of_interrupt();
 #pragma aux asm_end_of_interrupt = \
     "mov al,20H"                 \
