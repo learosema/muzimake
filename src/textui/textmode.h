@@ -176,4 +176,8 @@ bool textmode_check_box(uint8_t x, uint8_t y, uint8_t width, uint8_t height);
 
 bool textmode_check_dblbox(uint8_t x, uint8_t y, uint8_t width, uint8_t height);
 
+void textmode_get_area(char *buffer, uint8_t x, uint8_t y, uint8_t width, uint8_t height);
+
+void textmode_put_area(char *buffer, uint8_t x, uint8_t y, uint8_t width, uint8_t height);
+
 #endif
