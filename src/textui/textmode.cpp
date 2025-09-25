@@ -636,16 +636,52 @@ bool textmode_check_dblbox(uint8_t x, uint8_t y, uint8_t width, uint8_t height)
 	return true;
 }
 
-void textmode_get_area(char *buffer, uint8_t x, uint8_t y, uint8_t width, uint8_t height) {
+void textmode_get_area(char *buffer, uint8_t x, uint8_t y, uint8_t width, uint8_t height)
+{
 	MODEINFO* info = textmode_get_modeinfo();
-	uint8_t byte_width = width * 2;
-	char *src = g_currentMode.vram + (x + y * g_currentMode.numCols) * 2;
-	// todo: angela sent me to bed...
-	for (uint8_t yy = 0; yy < height; yy++) {
+	
+	if (x >= g_currentMode.numCols || y >= g_currentMode.numRows) {
+		// outside bounds
+		return;
+	}
+
+	uint8_t clamped_x = MAX(x, 0);
+	uint8_t clamped_y = MAX(y, 0);
+	uint8_t clamped_width = MIN(width, g_currentMode.numCols) + MIN(x, 0);
+	uint8_t clamped_height = MIN(height, g_currentMode.numRows) + MIN(y, 0); 
+
+	uint8_t byte_width = clamped_width * 2;
+	char *src = g_currentMode.vram + (clamped_x + clamped_y * g_currentMode.numCols) * 2;
+	char *dest = buffer;
+	
+	for (uint8_t yy = 0; yy < clamped_height; yy++) {
 		asm_rep_movsw(src, dest, width);
 		src += byte_width;
 		dest += byte_width;
 	}
+}
 
+void textmode_put_area(char *buffer, uint8_t x, uint8_t y, uint8_t width, uint8_t height)
+{
+	MODEINFO* info = textmode_get_modeinfo();
+	
+	if (x >= g_currentMode.numCols || y >= g_currentMode.numRows) {
+		// outside bounds
+		return;
+	}
 
+	uint8_t clamped_x = MAX(x, 0);
+	uint8_t clamped_y = MAX(y, 0);
+	uint8_t clamped_width = MIN(width, g_currentMode.numCols) + MIN(x, 0);
+	uint8_t clamped_height = MIN(height, g_currentMode.numRows) + MIN(y, 0); 
+
+	uint8_t byte_width = clamped_width * 2;
+	char *dest = g_currentMode.vram + (clamped_x + clamped_y * g_currentMode.numCols) * 2;
+	char *src = buffer;
+	
+	for (uint8_t yy = 0; yy < clamped_height; yy++) {
+		asm_rep_movsw(src, dest, width);
+		src += byte_width;
+		dest += byte_width;
+	}
 }
