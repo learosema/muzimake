@@ -36,13 +36,15 @@
 
 #define TEXT_VRAM (g_currentMode.vram+g_currentMode.page*g_currentMode.pageSize)
 
-#define TEXT_GET_CHAR(info, x, y) (uint8_t) \
-	((((x) < 0) || ((x) >= info->numCols) || ((y) < 0) || ((y) >= info->numRows)) ? 0 : \
-	*(info->vram + 2 * (info->numCols * (y) + (x))))
+#define TEXT_GET_CHAR(x, y) (uint8_t) \
+	((((x) < 0) || ((x) >= textmode_get_modeinfo()->numCols) || ((y) < 0) || ((y) >= textmode_get_modeinfo()->numRows)) ? 0 : \
+	*(textmode_get_modeinfo()->vram + 2 * (textmode_get_modeinfo()->numCols * (y) + (x))))
 
-#define TEXT_GET_COLOR(info, x, y) (uint8_t) \
-	((((x) < 0) || ((x) >= info->numCols) || ((y) < 0) || ((y) >= info->numRows)) ? 0 : \
-	*(info->vram + 1 + 2 * (info->numCols * (y) + (x))))
+#define TEXT_GET_COLOR(x, y) (uint8_t) \
+	((((x) < 0) || ((x) >= info->numCols) || ((y) < 0) || ((y) >= textmode_get_modeinfo()->numRows)) ? 0 : \
+	*(textmode_get_modeinfo()->vram + 1 + 2 * (textmode_get_modeinfo()->numCols * (y) + (x))))
+
+
 
 
 typedef struct MODEINFO
@@ -78,7 +80,7 @@ void textmode_init_headless(uint8_t mode);
 
 void textmode_dispose();
 
-MODEINFO *textmode_get_modeinfo();
+inline MODEINFO *textmode_get_modeinfo();
 
 void textmode_set_page(uint8_t page);
 
