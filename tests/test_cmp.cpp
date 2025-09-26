@@ -46,8 +46,7 @@ TEST button_should_render()
 {
 
 	component_render(&button);
-	MODEINFO* info = textmode_get_modeinfo();
-	uint8_t color = TEXT_GET_COLOR(info, button_x, button_y);
+	uint8_t color = TEXT_GET_COLOR(button_x, button_y);
 
 	ASSERT_EQ(button_color, color);
 	ASSERT_EQm("Screen should have a box at the given coords", true, textmode_check_box(button_x, button_y, button_width, button_height));
@@ -60,8 +59,8 @@ TEST button_should_render_thick_when_focused()
 {
 	button.component.button.focused = true;
 	component_render(&button);
-	MODEINFO* info = textmode_get_modeinfo();
-	uint8_t color = TEXT_GET_COLOR(info, button_x, button_y);
+
+	uint8_t color = TEXT_GET_COLOR(button_x, button_y);
 
 	ASSERT_EQ(button_color, color);
 	ASSERT_EQm("Screen should have a box at the given coords", true, textmode_check_dblbox(button_x, button_y, button_width, button_height));
@@ -73,8 +72,8 @@ TEST button_should_render_black_when_active()
 {
 	button.component.button.active = true;
 	component_render(&button);
-	MODEINFO* info = textmode_get_modeinfo();
-	uint8_t color = TEXT_GET_COLOR(info, button_x, button_y);
+
+	uint8_t color = TEXT_GET_COLOR(button_x, button_y);
 
 	ASSERT_EQ(button_color & 0xf, color);
 

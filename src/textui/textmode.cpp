@@ -106,7 +106,7 @@ void textmode_dispose()
 	g_currentMode.vram = nullptr;
 }
 
-MODEINFO *textmode_get_modeinfo()
+inline MODEINFO *textmode_get_modeinfo()
 {
 	return &g_currentMode;
 }
@@ -594,55 +594,53 @@ void textmode_init_font(const uint8_t *charData, const uint16_t charHeight, cons
 
 bool textmode_check_box(uint8_t x, uint8_t y, uint8_t width, uint8_t height)
 {
-	MODEINFO* info = textmode_get_modeinfo();
-	char topleft_corner = TEXT_GET_CHAR(info, x, y);
-	char topright_corner = TEXT_GET_CHAR(info, x + width - 1, 0);
-	char btmleft_corner = TEXT_GET_CHAR(info, y, y + height - 1);
-	char btmright_corner = TEXT_GET_CHAR(info, x + width - 1, y + height - 1);
+	char topleft_corner = TEXT_GET_CHAR(x, y);
+	char topright_corner = TEXT_GET_CHAR(x + width - 1, 0);
+	char btmleft_corner = TEXT_GET_CHAR(y, y + height - 1);
+	char btmright_corner = TEXT_GET_CHAR(x + width - 1, y + height - 1);
 	if (CP_THIN_RIGHT_THIN_DOWN != topleft_corner) return false;
 	if (CP_THIN_LEFT_THIN_DOWN != topright_corner) return false;
 	if (CP_THIN_RIGHT_THIN_UP != btmleft_corner) return false;
 	if (CP_THIN_LEFT_THIN_UP != btmright_corner) return false;
 	for (uint8_t i = 1; i < width - 2; i++) {
-		if (CP_THIN_HORIZONTAL != TEXT_GET_CHAR(info, x + i, y)) return false;
-		if (CP_THIN_HORIZONTAL != TEXT_GET_CHAR(info, x + i, y + height - 1)) return false;
+		if (CP_THIN_HORIZONTAL != TEXT_GET_CHAR(x + i, y)) return false;
+		if (CP_THIN_HORIZONTAL != TEXT_GET_CHAR(x + i, y + height - 1)) return false;
 	}
 	for (uint8_t i = 1; i < height - 2; i++) {
-		if (CP_THIN_HORIZONTAL != TEXT_GET_CHAR(info, x, y + i)) return false;
-		if (CP_THIN_HORIZONTAL != TEXT_GET_CHAR(info, x + width - 1, y + i)) return false;
+		if (CP_THIN_HORIZONTAL != TEXT_GET_CHAR(x, y + i)) return false;
+		if (CP_THIN_HORIZONTAL != TEXT_GET_CHAR(x + width - 1, y + i)) return false;
 	}
 	return true;
 }
 
 bool textmode_check_dblbox(uint8_t x, uint8_t y, uint8_t width, uint8_t height)
 {
-	MODEINFO* info = textmode_get_modeinfo();
-	char topleft_corner = TEXT_GET_CHAR(info, x, y);
-	char topright_corner = TEXT_GET_CHAR(info, x + width - 1, 0);
-	char btmleft_corner = TEXT_GET_CHAR(info, y, y + height - 1);
-	char btmright_corner = TEXT_GET_CHAR(info, x + width - 1, y + height - 1);
+	char topleft_corner = TEXT_GET_CHAR(x, y);
+	char topright_corner = TEXT_GET_CHAR(x + width - 1, 0);
+	char btmleft_corner = TEXT_GET_CHAR(y, y + height - 1);
+	char btmright_corner = TEXT_GET_CHAR(x + width - 1, y + height - 1);
 	if (CP_THICK_RIGHT_THICK_DOWN != topleft_corner) return false;
 	if (CP_THICK_LEFT_THICK_DOWN != topright_corner) return false;
 	if (CP_THICK_RIGHT_THICK_UP != btmleft_corner) return false;
 	if (CP_THICK_LEFT_THICK_UP != btmright_corner) return false;
 	for (uint8_t i = 1; i < width - 2; i++) {
-		if (CP_THICK_HORIZONTAL != TEXT_GET_CHAR(info, x + i, y)) return false;
-		if (CP_THICK_HORIZONTAL != TEXT_GET_CHAR(info, x + i, y + height - 1)) return false;
+		if (CP_THICK_HORIZONTAL != TEXT_GET_CHAR(x + i, y)) return false;
+		if (CP_THICK_HORIZONTAL != TEXT_GET_CHAR(x + i, y + height - 1)) return false;
 	}
 	for (uint8_t i = 1; i < height - 2; i++) {
-		if (CP_THICK_HORIZONTAL != TEXT_GET_CHAR(info, x, y + i)) return false;
-		if (CP_THICK_HORIZONTAL != TEXT_GET_CHAR(info, x + width - 1, y + i)) return false;
+		if (CP_THICK_HORIZONTAL != TEXT_GET_CHAR(x, y + i)) return false;
+		if (CP_THICK_HORIZONTAL != TEXT_GET_CHAR(x + width - 1, y + i)) return false;
 	}
 	return true;
 }
 
-void textmode_get_area(char *buffer, uint8_t x, uint8_t y, uint8_t width, uint8_t height)
+textmode_buffer_t textmode_get_area(char *buffer, uint8_t x, uint8_t y, uint8_t width, uint8_t height)
 {
-	MODEINFO* info = textmode_get_modeinfo();
-	
+	textmode_buffer_t result = {0};
+
 	if (x >= g_currentMode.numCols || y >= g_currentMode.numRows) {
 		// outside bounds
-		return;
+		return result;
 	}
 
 	uint8_t clamped_x = MAX(x, 0);
@@ -650,21 +648,25 @@ void textmode_get_area(char *buffer, uint8_t x, uint8_t y, uint8_t width, uint8_
 	uint8_t clamped_width = MIN(width, g_currentMode.numCols) + MIN(x, 0);
 	uint8_t clamped_height = MIN(height, g_currentMode.numRows) + MIN(y, 0); 
 
-	uint8_t byte_width = clamped_width * 2;
-	char *src = g_currentMode.vram + (clamped_x + clamped_y * g_currentMode.numCols) * 2;
-	char *dest = buffer;
+	result.width = clamped_width;
+	result.height = clamped_height;
+	result.buffer = malloc(clamped_width * clamped_height);
+
+	uint16_t *src = g_currentMode.vram + (clamped_x + clamped_y * g_currentMode.numCols) * 2;
+	uint16_t *dest = result.buffer;
 	
 	for (uint8_t yy = 0; yy < clamped_height; yy++) {
 		asm_rep_movsw(src, dest, width);
-		src += byte_width;
-		dest += byte_width;
+		src += g_currentMode.numCols * 2;
+		dest += clamped_width * 2;
 	}
+
+	return result;
 }
 
-void textmode_put_area(char *buffer, uint8_t x, uint8_t y, uint8_t width, uint8_t height)
-{
-	MODEINFO* info = textmode_get_modeinfo();
-	
+void textmode_put_area(const textmode_buffer_t * txt_buffer, uint8_t x, uint8_t y)
+{	
+
 	if (x >= g_currentMode.numCols || y >= g_currentMode.numRows) {
 		// outside bounds
 		return;
@@ -672,16 +674,15 @@ void textmode_put_area(char *buffer, uint8_t x, uint8_t y, uint8_t width, uint8_
 
 	uint8_t clamped_x = MAX(x, 0);
 	uint8_t clamped_y = MAX(y, 0);
-	uint8_t clamped_width = MIN(width, g_currentMode.numCols) + MIN(x, 0);
-	uint8_t clamped_height = MIN(height, g_currentMode.numRows) + MIN(y, 0); 
+	uint8_t clamped_width = MIN(txt_buffer->width, g_currentMode.numCols) + MIN(x, 0);
+	uint8_t clamped_height = MIN(txt_buffer->height, g_currentMode.numRows) + MIN(y, 0); 
 
-	uint8_t byte_width = clamped_width * 2;
 	char *dest = g_currentMode.vram + (clamped_x + clamped_y * g_currentMode.numCols) * 2;
 	char *src = buffer;
 	
 	for (uint8_t yy = 0; yy < clamped_height; yy++) {
 		asm_rep_movsw(src, dest, width);
-		src += byte_width;
-		dest += byte_width;
+		src += txt_buffer->width * 2;
+		dest += g_currentMode.numCols * 2;
 	}
 }
