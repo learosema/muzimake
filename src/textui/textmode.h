@@ -65,6 +65,13 @@ typedef struct RECT
 	uint8_t height;
 } RECT;
 
+typedef struct textbuffer_s
+{
+	uint8_t width;
+	uint8_t height;
+	uint16_t *buffer;
+} textbuffer_t;
+
 void textmode_setmode(uint8_t mode);
 
 void textmode_init_headless(uint8_t mode);
