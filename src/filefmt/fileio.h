@@ -22,7 +22,16 @@ extern "C" {
 #endif
 #endif
 
+#if defined __DOS__ && defined __WATCOMC__
+#include <direct.h>
+#else
+#include <dirent.h>
+#endif
+
+#define DIRPTR DIR*
 #define FILEPTR FILE*
+#define DIRENT struct dirent
+#define DIRENTPTR DIRENT *
 
 FILEPTR fileio_open(char * fileName, char *mode);
 bool fileio_eof(FILEPTR fp);
@@ -47,6 +56,11 @@ float fileio_read_f32be(FILEPTR fp);
 
 uint16_t byteswap_16(uint16_t in);
 uint32_t byteswap_32(uint32_t in);
+
+DIRPTR fileio_open_dir(const char * path);
+DIRENTPTR fileio_read_dir(DIRPTR dir);
+bool fileio_close_dir(DIRPTR dir);
+
 
 #ifdef __cplusplus
 }

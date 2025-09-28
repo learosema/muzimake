@@ -134,3 +134,18 @@ float fileio_read_f32be(FILEPTR fp)
 	#endif
 	return result;
 }
+
+DIRPTR fileio_open_dir(const char * path)
+{
+	return opendir(path);
+}
+
+DIRENTPTR fileio_read_dir(DIRPTR dir)
+{
+	return readdir(dir);
+}
+
+bool fileio_close_dir(DIRPTR dir)
+{
+	return (closedir(dir) == 0);
+}
