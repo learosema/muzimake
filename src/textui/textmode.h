@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 
-#if defined __DOS__ && defined __WATCOM__ && defined __386__
+#if defined __DOS__ && defined __WATCOMC__ && defined __386__
 #include <dpmiutil.h>
 #endif
 
@@ -71,7 +71,7 @@ typedef struct textbuffer_s
 {
 	uint8_t width;
 	uint8_t height;
-	uint16_t *buffer;
+	uint8_t *buffer;
 } textbuffer_t;
 
 void textmode_setmode(uint8_t mode);
@@ -80,7 +80,7 @@ void textmode_init_headless(uint8_t mode);
 
 void textmode_dispose();
 
-inline MODEINFO *textmode_get_modeinfo();
+MODEINFO *textmode_get_modeinfo();
 
 void textmode_set_page(uint8_t page);
 
@@ -185,8 +185,12 @@ bool textmode_check_box(uint8_t x, uint8_t y, uint8_t width, uint8_t height);
 
 bool textmode_check_dblbox(uint8_t x, uint8_t y, uint8_t width, uint8_t height);
 
-textmode_buffer_t textmode_get_area(const uint8_t x, const uint8_t y, const uint8_t width, const uint8_t height);
+textbuffer_t textmode_get_area(const uint8_t x, const uint8_t y, const uint8_t width, const uint8_t height);
 
-void textmode_put_area(const textmode_buffer_t * txt_buffer, const uint8_t x, const uint8_t y);
+void textmode_put_area(const textbuffer_t * txt_buffer, const uint8_t x, const uint8_t y);
+
+textbuffer_t textmode_get_screen();
+
+void textmode_dispose_buffer(textbuffer_t * txt_buffer);
 
 #endif

@@ -14,6 +14,8 @@
 
 #include "textmode.h"
 #include "vendor/cp437.h"
+#include "helper/asmstuff.h"
+#include "helper/log.h"
 
 #define MIN(A, B) ((A) < (B) ? (A) : (B))
 #define MAX(A, B) ((A) > (B) ? (A) : (B))
@@ -66,7 +68,7 @@ void _setmode(uint8_t mode)
 	INTR(0x10, &regs, &regs);
 }
 #else
-#define _setmode()
+#define _setmode(...)
 #endif
 
 void textmode_init_headless(uint8_t mode)
@@ -106,7 +108,7 @@ void textmode_dispose()
 	g_currentMode.vram = nullptr;
 }
 
-inline MODEINFO *textmode_get_modeinfo()
+MODEINFO *textmode_get_modeinfo()
 {
 	return &g_currentMode;
 }
@@ -634,9 +636,9 @@ bool textmode_check_dblbox(uint8_t x, uint8_t y, uint8_t width, uint8_t height)
 	return true;
 }
 
-textmode_buffer_t textmode_get_area(const uint8_t x, const uint8_t y, const uint8_t width, const uint8_t height)
+textbuffer_t textmode_get_area(const uint8_t x, const uint8_t y, const uint8_t width, const uint8_t height)
 {
-	textmode_buffer_t result = {0};
+	textbuffer_t result = {0};
 
 	if (x >= g_currentMode.numCols || y >= g_currentMode.numRows) {
 		// outside bounds
@@ -646,27 +648,29 @@ textmode_buffer_t textmode_get_area(const uint8_t x, const uint8_t y, const uint
 	uint8_t clamped_x = MAX(x, 0);
 	uint8_t clamped_y = MAX(y, 0);
 	uint8_t clamped_width = MIN(width, g_currentMode.numCols) + MIN(x, 0);
-	uint8_t clamped_height = MIN(height, g_currentMode.numRows) + MIN(y, 0); 
+	uint8_t clamped_height = MIN(height, g_currentMode.numRows) + MIN(y, 0);
 
 	result.width = clamped_width;
 	result.height = clamped_height;
-	result.buffer = malloc(clamped_width * clamped_height);
+	result.buffer = (uint8_t *)malloc(clamped_width * clamped_height * 2);
 
-	uint16_t *src = g_currentMode.vram + (clamped_x + clamped_y * g_currentMode.numCols) * 2;
-	uint16_t *dest = result.buffer;
-	
+	uint8_t *src = (uint8_t *)g_currentMode.vram + (clamped_x + clamped_y * g_currentMode.numCols) * 2;
+	uint8_t *dest = result.buffer;
+	//APP_LOG("DEST: %x, SRC: %x", dest, src);
+	//APP_LOG("x: %d, y: %d, width: %d, height: %d", clamped_x, clamped_y, clamped_width, clamped_height);
+	//APP_LOG("numCols: %d", g_currentMode.numCols);
 	for (uint8_t yy = 0; yy < clamped_height; yy++) {
-		asm_rep_movsw(src, dest, width);
+		memcpy(dest, src, clamped_width * 2);
 		src += g_currentMode.numCols * 2;
 		dest += clamped_width * 2;
+		//APP_LOG("(get) DEST: %x, SRC: %x", dest, src);
 	}
 
 	return result;
 }
 
-void textmode_put_area(const textmode_buffer_t * txt_buffer, const uint8_t x, const uint8_t y)
-{	
-
+void textmode_put_area(const textbuffer_t * txt_buffer, const uint8_t x, const uint8_t y)
+{
 	if (x >= g_currentMode.numCols || y >= g_currentMode.numRows) {
 		// outside bounds
 		return;
@@ -675,14 +679,28 @@ void textmode_put_area(const textmode_buffer_t * txt_buffer, const uint8_t x, co
 	uint8_t clamped_x = MAX(x, 0);
 	uint8_t clamped_y = MAX(y, 0);
 	uint8_t clamped_width = MIN(txt_buffer->width, g_currentMode.numCols) + MIN(x, 0);
-	uint8_t clamped_height = MIN(txt_buffer->height, g_currentMode.numRows) + MIN(y, 0); 
+	uint8_t clamped_height = MIN(txt_buffer->height, g_currentMode.numRows) + MIN(y, 0);
 
-	char *dest = g_currentMode.vram + (clamped_x + clamped_y * g_currentMode.numCols) * 2;
-	char *src = buffer;
-	
+	uint8_t *dest = (uint8_t *)g_currentMode.vram +
+		(clamped_x + clamped_y * g_currentMode.numCols) * 2;
+	uint8_t *src = (uint8_t *)txt_buffer->buffer;
+
 	for (uint8_t yy = 0; yy < clamped_height; yy++) {
-		asm_rep_movsw(src, dest, width);
-		src += txt_buffer->width * 2;
-		dest += g_currentMode.numCols * 2;
+		memcpy(dest, src, clamped_width * 2);
+		dest += (g_currentMode.numCols * 2);
+		src += (clamped_width * 2);
 	}
+}
+
+textbuffer_t textmode_get_screen()
+{
+	return textmode_get_area(0, 0, g_currentMode.numCols, g_currentMode.numRows);
+}
+
+void textmode_dispose_buffer(textbuffer_t * txt_buffer)
+{
+	free(txt_buffer->buffer);
+	txt_buffer->buffer = nullptr;
+	txt_buffer->width = 0;
+	txt_buffer->height = 0;
 }

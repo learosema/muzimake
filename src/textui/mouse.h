@@ -37,7 +37,7 @@ typedef struct mouse_callback_data_s {
 #define EVENT_MOUSEUP_R    16
 #define EVENT_MOUSE_ALL    (EVENT_MOUSEMOVE | EVENT_MOUSEDOWN_L | EVENT_MOUSEUP_L | EVENT_MOUSEDOWN_R | EVENT_MOUSEUP_R)
 
-#if defined __DOS__ && defined __WATCOM__
+#if defined __DOS__ && defined __WATCOMC__
 typedef void (far *far_function_ptr_t)();
 #else
 typedef void (*far_function_ptr_t)();

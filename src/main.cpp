@@ -16,7 +16,9 @@
 #include "macros.h"
 #include "helper/log.h"
 #include "fonts/bulkyv5.h"
-#include "vga.h"
+#include "textui/vga.h"
+
+#include "fileio.h"
 
 static const char * LBL_LOAD = "Load";
 static const char * LBL_SAVE = "Save";
@@ -35,13 +37,31 @@ bool g_hasMouse;
 MOUSE_STATUS g_mouse;
 MODEINFO * g_modeInfo;
 
+bool on_load()
+{
+	MODEINFO *info = textmode_get_modeinfo();
+	textbuffer_t screen = textmode_get_screen();
 
+	textmode_dblbox(0,1,info->numCols, info->numRows - 2, 0x5f);
+	textmode_print("Load", 2, 1, 0x5f);
+	getch();
+	DIRPTR dir = opendir(".");
 
-static bool event_handler(uint16_t elementId, ui_event_t *event) {
-	// Event :)
+	DIRENT *entry = readdir(dir);
+	closedir(dir);
+	textmode_put_area(&screen, 0, 0);
+	textmode_dispose_buffer(&screen);
+	return true;
+}
+
+static bool event_handler(uint16_t element_id, ui_event_t *event)
+{
 	if (event->type == UI_EVENT_CLICK) {
 		textmode_gotoxy(15,15);
 		textmode_print("CLICK!", 1,45, 0x2f);
+		if (element_id == ID_LOAD) {
+			return on_load();
+		}
 	}
 	return true;
 }
@@ -58,6 +78,11 @@ ui_state_t ui_create() {
 	ui.components[ID_STOP] = component_create_button(ID_STOP, LBL_STOP, 34, 2, 10, 3, 0x1f);
 	ui.components[ID_SHEET] = component_create_sheet(ID_SHEET, 1, 6, 78, 30, 0x0f, 32, 9);
 	ui.components[ID_PIANO] = component_create_piano(ID_PIANO, 1, 38, 78, 8, 0x71);
+
+	ui.components[ID_LOAD].component.button.event_handler = event_handler;
+	ui.components[ID_SAVE].component.button.event_handler = event_handler;
+	ui.components[ID_PLAY].component.button.event_handler = event_handler;
+	ui.components[ID_STOP].component.button.event_handler = event_handler;
 
 	return ui;
 }
@@ -91,10 +116,11 @@ void wait_for_user()
 
 int main()
 {
-	APP_LOG("TextUI-Tests started.");
+	APP_LOG("Main App started.");
 	ui_event_t events[10] = {0};
 	bool done = false;
 	textmode_setmode(3);
+
 	g_hasMouse = mouse_init();
 	g_modeInfo = textmode_get_modeinfo();
 	APP_LOG("Loading font.");
@@ -104,7 +130,7 @@ int main()
 
 	textmode_clear(0x1e);
 	textmode_cursor(32, 0);
-
+	APP_LOG("screen resolution: %dx%d", textmode_get_modeinfo()->numCols, textmode_get_modeinfo()->numRows);
 	ui_state_t ui = ui_create();
 
 	component_render_all(ui.count, ui.components, true);
@@ -145,6 +171,6 @@ int main()
 	}
 	ui_cleanup(&ui);
 	textmode_dispose();
-	APP_LOG("Text-UI tests finished.");
+	APP_LOG("Main App finished.");
 	return 0;
 }
