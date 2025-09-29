@@ -19,7 +19,7 @@ static bool spy_callback(uint16_t id, ui_event_t *event)
 {
 	if (event->type == UI_EVENT_CLICK) {
 		click_count++;
-	} 
+	}
 	return true;
 }
 
@@ -34,7 +34,7 @@ static void before_each(void *data) {
 		button_color
 	);
 	click_count = 0;
-	
+
 	button.component.button.event_handler = spy_callback;
 }
 
@@ -89,7 +89,7 @@ TEST button_should_handle_space()
 	button.component.generic.focused = false;
 	button_process_events(&(button.component.button), &event);
 	ASSERT_EQm("button should not trigger click on hitting space when not focused", click_count, 0);
-	
+
 	button.component.generic.focused = true;
 	button_process_events(&(button.component.button), &event);
 	ASSERT_EQm("button should trigger click on hitting space when focused", click_count, 1);
@@ -106,11 +106,11 @@ TEST button_should_handle_enter()
 	button.component.generic.focused = false;
 	button_process_events(&(button.component.button), &event);
 	ASSERT_EQm("button should not trigger click on hitting enter when not focused", click_count, 0);
-	
+
 	button.component.generic.focused = true;
 	button_process_events(&(button.component.button), &event);
 	ASSERT_EQm("button should trigger click on hitting enter when focused", click_count, 1);
-	
+
 	PASS();
 }
 
