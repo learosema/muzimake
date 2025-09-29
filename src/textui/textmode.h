@@ -41,7 +41,7 @@
 	*(textmode_get_modeinfo()->vram + 2 * (textmode_get_modeinfo()->numCols * (y) + (x))))
 
 #define TEXT_GET_COLOR(x, y) (uint8_t) \
-	((((x) < 0) || ((x) >= info->numCols) || ((y) < 0) || ((y) >= textmode_get_modeinfo()->numRows)) ? 0 : \
+	((((x) < 0) || ((x) >= textmode_get_modeinfo()->numCols) || ((y) < 0) || ((y) >= textmode_get_modeinfo()->numRows)) ? 0 : \
 	*(textmode_get_modeinfo()->vram + 1 + 2 * (textmode_get_modeinfo()->numCols * (y) + (x))))
 
 
