@@ -40,10 +40,11 @@ MD_OBJ=if not exist $(OBJ_DIR) md $(OBJ_DIR)
 # SRC_HAL=instrmnt.cpp opl2.cpp
 # SRC_HELPER=list.cpp
 # SRC_TEXTUI=mouse.cpp dpmiutil.cpp textmode.cpp vga.cpp
+LIB_HLP_SRCS=list.cpp
 LIB_UI_SRCS=dpmiutil.cpp vga.cpp mouse.cpp keyboard.cpp textmode.cpp ui_event.cpp ui_common.cpp ui_label.cpp ui_btn.cpp ui_input.cpp ui_lsbox.cpp ui_piano.cpp ui_range.cpp ui_sheet.cpp cmponent.cpp
 LIB_OPL_SRCS=bnkfile.cpp rolfile.cpp fileio.cpp file.cpp instrmnt.cpp opl2.cpp
 
-SRCS=$(LIB_UI_SRCS) $(LIB_OPL_SRCS) log.cpp main.cpp
+SRCS=$(LIB_UI_SRCS) $(LIB_HLP_SRCS) $(LIB_OPL_SRCS) log.cpp main.cpp
 
 TEST_COMMON_SRCS=bnkfile.cpp rolfile.cpp fileio.cpp file.cpp
 
@@ -55,6 +56,7 @@ TEST_TMR_SRCS=dpmiutil.cpp textmode.cpp timer.cpp test_tmr.cpp
 TEST_KBD_SRCS=dpmiutil.cpp textmode.cpp keyboard.cpp mouse.cpp test_kbd.cpp
 TEST_MOU_SRCS=dpmiutil.cpp textmode.cpp mouse.cpp test_mou.cpp
 TEST_FNT_SRCS=test_fnt.cpp
+TEST_LST_SRCS=list.cpp test_lst.cpp
 TEST_UI_SRCS=$(LIB_UI_SRCS) log.cpp test_ui.cpp
 TEST_CMP_SRCS=$(LIB_UI_SRCS) log.cpp test_cmp.cpp
 TEST_SRCS    =$(TEST_COMMON_SRCS) instrmnt.cpp test.cpp
@@ -70,13 +72,14 @@ TEST_MOU_OBJS=$(TEST_MOU_SRCS:.cpp=.$(O_EXT))
 TEST_KBD_OBJS=$(TEST_KBD_SRCS:.cpp=.$(O_EXT))
 TEST_FNT_OBJS=$(TEST_FNT_SRCS:.cpp=.$(O_EXT))
 TEST_CMP_OBJS=$(TEST_CMP_SRCS:.cpp=.$(O_EXT))
+TEST_LST_OBJS=$(TEST_LST_SRCS:.cpp=.$(O_EXT))
 TEST_UI_OBJS=$(TEST_UI_SRCS:.cpp=.$(O_EXT))
 TEST_OBJS=$(TEST_SRCS:.cpp=.$(O_EXT))
 
 # Executable name
 TARGET = muzimake.exe
 
-TESTS = testinst.exe test_fnt.exe test_evt.exe test_rol.exe test_bnk.exe test_ui.exe test_tmr.exe test_kbd.exe test_mou.exe test_cmp.exe test.exe
+TESTS = testinst.exe test_fnt.exe test_evt.exe test_rol.exe test_bnk.exe test_ui.exe test_tmr.exe test_kbd.exe test_mou.exe test_cmp.exe test_lst.exe test.exe
 
 # Default target
 .erase
@@ -137,7 +140,10 @@ test_mou.exe: $(TEST_MOU_OBJS)
 	*$(LD) system $(SYSTEM) $(LDFLAGS) name $(BIN_DIR)/test_mou.exe file { $< }
 
 test_fnt.exe: $(TEST_FNT_OBJS)
-			*$(LD) system $(SYSTEM) $(LDFLAGS) name $(BIN_DIR)/test_fnt.exe file { $< }
+	*$(LD) system $(SYSTEM) $(LDFLAGS) name $(BIN_DIR)/test_fnt.exe file { $< }
+
+test_lst.exe: $(TEST_LST_OBJS)
+	*$(LD) system $(SYSTEM) $(LDFLAGS) name $(BIN_DIR)/test_lst.exe file { $< }
 
 # Clean rule
 clean: .symbolic
