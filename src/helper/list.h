@@ -22,7 +22,6 @@ linked_list_t *linked_list_new();
 void linked_list_dispose(linked_list_t *list);
 
 /* list node operations */
-node_t *linked_list_find_node(linked_list_t *list, void *data);
 void linked_list_append_node(linked_list_t *list, node_t *node);
 void linked_list_unshift_node(linked_list_t *list, node_t *new_node);
 void linked_list_insert_node_after(linked_list_t *list, node_t *new_node, node_t *ref_node);
