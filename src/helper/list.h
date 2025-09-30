@@ -13,17 +13,28 @@ typedef struct linked_list_s {
 	node_t *tail;
 } linked_list_t;
 
+/* creating/disposing nodes */
 node_t *linked_list_create_node(void *data = NULL);
-node_t *linked_list_find_node(linked_list_t *list, void *data);
 void linked_list_dispose_node(node_t *node);
 
+/* creating/disposing lists */
 linked_list_t *linked_list_new();
 void linked_list_dispose(linked_list_t *list);
-void linked_list_append(linked_list_t *list, node_t *node);
-void linked_list_insert_after(linked_list_t *list, node_t *new_node, node_t *ref_node);
-bool linked_list_remove(linked_list_t *list, node_t *node);
 
+/* list node operations */
+node_t *linked_list_find_node(linked_list_t *list, void *data);
+void linked_list_append_node(linked_list_t *list, node_t *node);
+void linked_list_unshift_node(linked_list_t *list, node_t *new_node);
+void linked_list_insert_node_after(linked_list_t *list, node_t *new_node, node_t *ref_node);
+bool linked_list_remove_node(linked_list_t *list, node_t *node);
+
+/* traversal */
 node_t *linked_list_node_at(linked_list_t * list, int node_index);
-node_t * linked_list_find_node(linked_list_t *list, void *data);
+node_t *linked_list_find_node(linked_list_t *list, void *data);
+node_t *linked_list_prev_node(linked_list_t *list, node_t *ref_node);
+
+/* convenience shortcuts */
+void linked_list_append(linked_list_t *list, void *data);
+void linked_list_insert_after(linked_list_t *list, void *data, int node_index);
 
 #endif
