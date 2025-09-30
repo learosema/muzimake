@@ -24,7 +24,7 @@ TEST list_should_initialize()
 	PASS();
 }
 
-TEST list_append_to_new_list_should_work()
+TEST list_append_to_new_list()
 {
 	linked_list_t * list = linked_list_new();
 	int dummy_data = 1337;
@@ -41,7 +41,7 @@ TEST list_append_to_new_list_should_work()
 	PASS();
 }
 
-TEST list_append_second_element_should_work()
+TEST list_append_second_element()
 {
 	linked_list_t *list = linked_list_new();
 	int one = 1;
@@ -63,7 +63,7 @@ TEST list_append_second_element_should_work()
 	PASS();
 }
 
-TEST list_append_third_element_should_work()
+TEST list_append_third_element()
 {
 	linked_list_t *list = linked_list_new();
 	int one = 1;
@@ -88,7 +88,7 @@ TEST list_append_third_element_should_work()
 	PASS();
 }
 
-TEST list_remove_node_should_work()
+TEST list_remove_node()
 {
 	linked_list_t *list = linked_list_new();
 	int one = 1;
@@ -115,7 +115,7 @@ TEST list_remove_node_should_work()
 }
 
 
-TEST list_remove_node_at_head_should_work()
+TEST list_remove_node_at_head()
 {
 	linked_list_t *list = linked_list_new();
 	int one = 1;
@@ -140,7 +140,7 @@ TEST list_remove_node_at_head_should_work()
 	PASS();
 }
 
-TEST list_remove_node_at_tail_should_work()
+TEST list_remove_node_at_tail()
 {
 	linked_list_t *list = linked_list_new();
 	int one = 1;
@@ -165,7 +165,7 @@ TEST list_remove_node_at_tail_should_work()
 	PASS();
 }
 
-TEST list_insert_node_after_refnode_should_work()
+TEST list_insert_node_after_refnode()
 {
 	linked_list_t *list = linked_list_new();
 	int one = 1;
@@ -186,17 +186,40 @@ TEST list_insert_node_after_refnode_should_work()
 	PASS();
 }
 
+TEST list_insert_node_before_refnode()
+{
+	linked_list_t *list = linked_list_new();
+	int one = 1;
+	int two = 2;
+	int three = 3;
+
+	node_t *node_one = linked_list_create_node(&one);
+	node_t *node_two = linked_list_create_node(&two);
+
+	linked_list_append_node(list, node_one);
+	linked_list_insert_node_before(list, node_two, node_one);
+
+	ASSERT_EQm("Node 2 should be at the list head", node_two, list->head);
+	ASSERT_EQm("list->head->next should point to node 1", node_one, list->head->next);
+	ASSERT_EQm("list->tail->next should be NULL", NULL, list->tail->next);
+
+	linked_list_dispose(list);
+	PASS();
+}
+
 SUITE(linked_list_tests)
 {
 	// SET_SETUP(before_each, nullptr);
 	// SET_TEARDOWN(after_each, nullptr);
 
 	RUN_TEST(list_should_initialize);
-	RUN_TEST(list_append_to_new_list_should_work);
-	RUN_TEST(list_append_third_element_should_work);
-	RUN_TEST(list_remove_node_should_work);
-	RUN_TEST(list_remove_node_at_head_should_work);
-	RUN_TEST(list_remove_node_at_tail_should_work);
+	RUN_TEST(list_append_to_new_list);
+	RUN_TEST(list_append_third_element);
+	RUN_TEST(list_remove_node);
+	RUN_TEST(list_remove_node_at_head);
+	RUN_TEST(list_remove_node_at_tail);
+	RUN_TEST(list_insert_node_after_refnode);
+	RUN_TEST(list_insert_node_before_refnode);
 }
 
 GREATEST_MAIN_DEFS();
