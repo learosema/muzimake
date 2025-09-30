@@ -23,4 +23,7 @@ void linked_list_append(linked_list_t *list, node_t *node);
 void linked_list_insert_after(linked_list_t *list, node_t *new_node, node_t *ref_node);
 bool linked_list_remove(linked_list_t *list, node_t *node);
 
+node_t *linked_list_node_at(linked_list_t * list, int node_index);
+node_t * linked_list_find_node(linked_list_t *list, void *data);
+
 #endif

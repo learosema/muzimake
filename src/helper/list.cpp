@@ -86,3 +86,16 @@ node_t * linked_list_find_node(linked_list_t *list, void *data)
 	}
 	return NULL;
 }
+
+node_t *linked_list_node_at(linked_list_t * list, int node_index)
+{
+	int current_index = 0;
+	for (node_t *iter = list->head; iter != NULL; iter = iter->next)
+	{
+		if (current_index == node_index) {
+			return iter;
+		}
+		current_index++;
+	}
+	return NULL;
+}
