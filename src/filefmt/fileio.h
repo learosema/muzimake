@@ -24,8 +24,12 @@ extern "C" {
 
 #if defined __DOS__ && defined __WATCOMC__
 #include <direct.h>
+#define DIRENT_IS_DIR(dirent) ((dirent->d_attr & _A_SUBDIR)>0)
+#define DIRENT_IS_FILE(dirent) ((dirent->d_attr & (_A_SUBDIR | _A_VOLID)) == 0)
 #else
 #include <dirent.h>
+#define DIRENT_IS_DIR(dirent) (dirent->d_type == DT_DIR)
+#define DIRENT_IS_FILE(dirent) (dirent->d_type == DT_REG)
 #endif
 
 #define DIRPTR DIR*

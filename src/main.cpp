@@ -15,6 +15,7 @@
 #include "textui/cmponent.h"
 #include "macros.h"
 #include "helper/log.h"
+#include "helper/list.h"
 #include "fonts/bulkyv5.h"
 #include "textui/vga.h"
 
@@ -44,13 +45,41 @@ bool on_load()
 
 	textmode_dblbox(0,1,info->numCols, info->numRows - 2, 0x5f);
 	textmode_print("Load", 2, 1, 0x5f);
-	getch();
-	DIRPTR dir = opendir(".");
 
-	DIRENT *entry = readdir(dir);
+	linked_list_t *list = linked_list_new();
+
+	DIRPTR dir = fileio_open_dir(".");
+	DIRENT *entry;
+	while ((entry = fileio_read_dir(dir)) != NULL) {
+		if (DIRENT_IS_FILE(entry)) {
+			linked_list_append(list, strdup(entry->d_name));
+			continue;
+		}
+		if (DIRENT_IS_DIR(entry)) {
+			size_t len = strlen(entry->d_name) + 3;
+			char *buf = (char *)malloc(len);
+			snprintf(buf, len, "[%s]", entry->d_name);
+			linked_list_append(list, buf);
+		}
+	}
 	closedir(dir);
+
+	uint8_t y = 0; // rtodo: multi columns etc
+	for (node_t *iter = list->head; iter != NULL; iter = iter->next) {
+		textmode_print((char *)iter->data, 2, 3 + y, 0x5f);
+		y++;
+	}
+
+	getch();
 	textmode_put_area(&screen, 0, 0);
 	textmode_dispose_buffer(&screen);
+
+	for (node_t *iter = list->head; iter != NULL; iter = iter->next) {
+		if (iter->data != NULL) {
+			free(iter->data);
+		}
+	}
+	linked_list_dispose(list);
 	return true;
 }
 
