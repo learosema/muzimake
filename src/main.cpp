@@ -62,7 +62,7 @@ bool on_load()
 			linked_list_append(list, buf);
 		}
 	}
-	closedir(dir);
+	fileio_close_dir(dir);
 
 	uint8_t y = 0; // rtodo: multi columns etc
 	for (node_t *iter = list->head; iter != NULL; iter = iter->next) {
