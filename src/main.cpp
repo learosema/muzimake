@@ -38,17 +38,11 @@ bool g_hasMouse;
 MOUSE_STATUS g_mouse;
 MODEINFO * g_modeInfo;
 
-bool on_load()
+linked_list_t *list_files(const char *path)
 {
-	MODEINFO *info = textmode_get_modeinfo();
-	textbuffer_t screen = textmode_get_screen();
-
-	textmode_dblbox(0,1,info->numCols, info->numRows - 2, 0x5f);
-	textmode_print("Load", 2, 1, 0x5f);
-
 	linked_list_t *list = linked_list_new();
 
-	DIRPTR dir = fileio_open_dir(".");
+	DIRPTR dir = fileio_open_dir(path);
 	DIRENT *entry;
 	while ((entry = fileio_read_dir(dir)) != NULL) {
 		if (DIRENT_IS_FILE(entry)) {
@@ -63,23 +57,74 @@ bool on_load()
 		}
 	}
 	fileio_close_dir(dir);
+	return list;
+}
 
-	uint8_t y = 0; // rtodo: multi columns etc
-	for (node_t *iter = list->head; iter != NULL; iter = iter->next) {
-		textmode_print((char *)iter->data, 2, 3 + y, 0x5f);
-		y++;
-	}
-
-	getch();
-	textmode_put_area(&screen, 0, 0);
-	textmode_dispose_buffer(&screen);
-
-	for (node_t *iter = list->head; iter != NULL; iter = iter->next) {
+void list_files_dispose(linked_list_t *list)
+{
+	for (node_t *iter = list->head; iter != NULL; iter = iter->next)
+	{
 		if (iter->data != NULL) {
 			free(iter->data);
 		}
 	}
 	linked_list_dispose(list);
+}
+
+void display_files(
+	linked_list_t *list_files,
+	const int offset, const int rows, const int cols, const int colspacing,
+	const int x0, const int y0,
+	const uint8_t color, const uint8_t selected_color, const int selected_index
+)
+{
+	int n = 0, x = 0, y = 0;
+
+	for (node_t *iter = list_files->head; iter != NULL; iter = iter->next) {
+		if (n < offset) {
+			n++;
+			continue;
+		}
+		y = (n - offset) / cols;
+		x = (n - offset) % cols;
+
+		if (y >= rows) {
+			break;
+		}
+
+		textmode_print((char *)iter->data, x0 + x * colspacing, y0 + y,
+			n == selected_index ? selected_color : color
+		);
+		n++;
+	}
+}
+
+bool on_load()
+{
+	MODEINFO *info = textmode_get_modeinfo();
+	textbuffer_t screen = textmode_get_screen();
+
+	textmode_dblbox(0,1,info->numCols, info->numRows - 2, 0x5f);
+	textmode_print("Load", 2, 1, 0x5f);
+
+	linked_list_t * dir = list_files(".");
+	int offset = 0;
+	const int num_rows = info->numRows - 4;
+	const int num_cols = (info->numCols - 4) / 15;
+	const int col_spacing = 15;
+	const int x0 = 2;
+	const int y0 = 2;
+	const uint8_t color = 0x5f;
+	const uint8_t selected_color = 0x71;
+	int index = 0;
+
+	display_files(dir, 0, num_rows, num_cols, col_spacing, x0, y0, color, selected_color, index);
+	// wait_for_user();
+	getch();
+	textmode_put_area(&screen, 0, 0);
+	textmode_dispose_buffer(&screen);
+
+	list_files_dispose(dir);
 	return true;
 }
 
