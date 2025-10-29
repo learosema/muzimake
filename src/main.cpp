@@ -99,13 +99,17 @@ void display_files(
 	}
 }
 
-bool on_load()
+bool load()
 {
+	mouse_hide();
 	MODEINFO *info = textmode_get_modeinfo();
 	textbuffer_t screen = textmode_get_screen();
 
 	textmode_dblbox(0,1,info->numCols, info->numRows - 2, 0x5f);
 	textmode_print("Load", 2, 1, 0x5f);
+	if (g_hasMouse) {
+		mouse_show();
+	}
 
 	linked_list_t * dir = list_files(".");
 	int offset = 0;
@@ -117,11 +121,31 @@ bool on_load()
 	const uint8_t color = 0x5f;
 	const uint8_t selected_color = 0x71;
 	int index = 0;
+	ui_event_t events[2] = {0, 0};
 
-	display_files(dir, 0, num_rows, num_cols, col_spacing, x0, y0, color, selected_color, index);
-	// wait_for_user();
-	getch();
+	bool done = false;
+	bool paint = true;
+	while (! done) {
+		if (paint) {
+			mouse_hide();
+			display_files(dir, 0, num_rows, num_cols, col_spacing, x0, y0, color, selected_color, index);
+			mouse_show();
+			paint = false;
+		}
+		wait_for_user();
+		uint8_t num_events = event_poll(events, 0, 2);
+		for (uint8_t i = 0; i < num_events; i++) {
+			if (events[i].type == UI_EVENT_KEY) {
+				// load_onkey(events[i].payload.keyboard.keyCode);
+				done = true;
+			}
+		}
+	}
+	mouse_hide();
 	textmode_put_area(&screen, 0, 0);
+	if (g_hasMouse) {
+		mouse_show();
+	}
 	textmode_dispose_buffer(&screen);
 
 	list_files_dispose(dir);
@@ -134,7 +158,7 @@ static bool event_handler(uint16_t element_id, ui_event_t *event)
 		textmode_gotoxy(15,15);
 		textmode_print("CLICK!", 1,45, 0x2f);
 		if (element_id == ID_LOAD) {
-			return on_load();
+			return load();
 		}
 	}
 	return true;
@@ -181,12 +205,6 @@ bool needs_repaint(const ui_state_t *ui) {
 	return false;
 }
 
-void wait_for_user()
-{
-	while (!mouse_get_callback_data()->has_event && !(kbhit())) {
-		asm_hlt();
-	}
-}
 
 int main()
 {
