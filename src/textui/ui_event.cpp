@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <string.h>
+#include "asmstuff.h"
 #ifdef __DOS__
 #include <conio.h>
 #else
@@ -95,4 +96,11 @@ uint8_t event_poll(ui_event_t *events, uint16_t offset, uint16_t max_events)
 void event_clear(ui_event_t *event)
 {
 	memset(event,0, sizeof(ui_event_t));
+}
+
+void wait_for_user()
+{
+	while (!mouse_get_callback_data()->has_event && !(kbhit())) {
+		asm_hlt();
+	}
 }
