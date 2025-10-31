@@ -43,6 +43,31 @@ void display_files(
 	}
 }
 
+rect_t calculate_bounds_cancel(rect_t *bounding_rect)
+{
+	rect_t result;
+	uint8_t x0 = bounding_rect->x;
+	uint8_t y0 = bounding_rect->y;
+	uint8_t x1 = x0 + bounding_rect->width - 1;
+	uint8_t y1 = y0 + bounding_rect->height - 1;
+	result.height = 1;
+	result.width = 10; // [.Cancel.]
+	result.x = x1 - 2 - 10;
+	result.y = y1 - 2;
+	return result;
+}
+
+rect_t calculate_bounds_dirlist(rect_t *bounding_rect)
+{
+	rect_t result;
+	result.x = bounding_rect-> x + 2;
+	result.y = bounding_rect-> y + 2;
+	result.width = bounding_rect->width - 4;
+	result.height = bounding_rect->height - 6;
+	return result;
+}
+
+
 void ui_load_render(ui_load_t *load_state)
 {
 	uint8_t color = 0x5f;
@@ -64,7 +89,10 @@ void ui_load_render(ui_load_t *load_state)
 		);
 	}
 	textmode_print("Load", load_state->bounding_rect.x + 2, 1, 0x5f);
+	rect_t cancel_rect = calculate_bounds_cancel(&(load_state->bounding_rect));
+	rect_t dirlist_rect = calculate_bounds_dirlist(&(load_state->bounding_rect));
 
+	textmode_print("[ Cancel ]", cancel_rect.x, cancel_rect.y, 0x5f);
 }
 
 void ui_load_process_events(ui_load_t *load_state, ui_event_t *event)
