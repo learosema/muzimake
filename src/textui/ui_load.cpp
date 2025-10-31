@@ -4,27 +4,27 @@
 #include "textmode.h"
 
 void display_files(
-	ui_load_t *load_state
-	/*	linked_list_t *list_files,
-	const int offset, const int rows, const int cols, const int colspacing,
-	const int x0, const int y0,
-	const uint8_t color, const uint8_t selected_color, const int selected_index
-*/
+	linked_list_t *list_files,
+	rect_t *bounding_rect,
+	const int offset,
+	const int colspacing,
+	const uint8_t color,
+	const uint8_t selected_color,
+	const int selected_index
 )
 {
 	int n = 0, x = 0, y = 0;
 
-	const int x0 = load_state->bounding_rect.x + 1;
-	const int y0 = load_state->bounding_rect.y + 1;
+	const int x0 = bounding_rect->x + 1;
+	const int y0 = bounding_rect->y + 1;
 	const int colspacing = 15;
-	const int cols = (load_state->bounding_rect.width - 2) / colspacing;
-	const int rows = (load_state->bounding_rect.height - 2);
-	const int offset = 0; // TODO, too tired right now...
-	const int selected_index = 0;
+	const int cols = (bounding_rect->width - 2) / colspacing;
+	const int rows = (bounding_rect->height - 2);
+
 	const uint8_t selected_color = 0x71;
 	const uint8_t color = 0x5f;
 
-	for (node_t *iter = load_state->current_dir->head; iter != NULL; iter = iter->next) {
+	for (node_t *iter = list_files->head; iter != NULL; iter = iter->next) {
 		if (n < offset) {
 			n++;
 			continue;
@@ -91,7 +91,7 @@ void ui_load_render(ui_load_t *load_state)
 	textmode_print("Load", load_state->bounding_rect.x + 2, 1, 0x5f);
 	rect_t cancel_rect = calculate_bounds_cancel(&(load_state->bounding_rect));
 	rect_t dirlist_rect = calculate_bounds_dirlist(&(load_state->bounding_rect));
-
+	display_files(load_state->current_dir, &dirlist_rect, 0, 15, 0x5f, 0x71, (int)load_state->mimimii);
 	textmode_print("[ Cancel ]", cancel_rect.x, cancel_rect.y, 0x5f);
 }
 
