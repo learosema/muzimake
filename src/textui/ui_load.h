@@ -19,6 +19,8 @@ typedef struct ui_load_s {
 	int offset;
 	int selected_index;
 	uint8_t input_cursor_x;
+	char *selected_file;
+	bool done;
 } ui_load_t;
 
 typedef struct ui_load_result_s {
