@@ -1,7 +1,6 @@
 #ifndef __CMPONENT_H__
 #define __CMPONENT_H__
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif

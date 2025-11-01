@@ -1,8 +1,10 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "fileio.h"
+#include "list.h"
 
 uint16_t byteswap_16(uint16_t in)
 {
@@ -148,4 +150,37 @@ DIRENTPTR fileio_read_dir(DIRPTR dir)
 bool fileio_close_dir(DIRPTR dir)
 {
 	return (closedir(dir) == 0);
+}
+
+linked_list_t *fileio_list_files(const char *path)
+{
+	linked_list_t *list = linked_list_new();
+
+	DIRPTR dir = fileio_open_dir(path);
+	DIRENT *entry;
+	while ((entry = fileio_read_dir(dir)) != NULL) {
+		if (DIRENT_IS_FILE(entry)) {
+			linked_list_append(list, strdup(entry->d_name));
+			continue;
+		}
+		if (DIRENT_IS_DIR(entry)) {
+			size_t len = strlen(entry->d_name) + 3;
+			char *buf = (char *)malloc(len);
+			snprintf(buf, len, "[%s]", entry->d_name);
+			linked_list_append(list, buf);
+		}
+	}
+	fileio_close_dir(dir);
+	return list;
+}
+
+void fileio_list_files_dispose(linked_list_t *list)
+{
+	for (node_t *iter = list->head; iter != NULL; iter = iter->next)
+	{
+		if (iter->data != NULL) {
+			free(iter->data);
+		}
+	}
+	linked_list_dispose(list);
 }
