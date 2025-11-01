@@ -41,7 +41,7 @@ MD_OBJ=if not exist $(OBJ_DIR) md $(OBJ_DIR)
 # SRC_HELPER=list.cpp
 # SRC_TEXTUI=mouse.cpp dpmiutil.cpp textmode.cpp vga.cpp
 LIB_HLP_SRCS=list.cpp
-LIB_UI_SRCS=dpmiutil.cpp vga.cpp mouse.cpp keyboard.cpp textmode.cpp ui_event.cpp ui_common.cpp ui_label.cpp ui_btn.cpp ui_input.cpp ui_lsbox.cpp ui_piano.cpp ui_range.cpp ui_sheet.cpp cmponent.cpp
+LIB_UI_SRCS=dpmiutil.cpp vga.cpp mouse.cpp keyboard.cpp textmode.cpp ui_event.cpp ui_common.cpp ui_label.cpp ui_btn.cpp ui_input.cpp ui_lsbox.cpp ui_piano.cpp ui_range.cpp ui_sheet.cpp ui_load.cpp cmponent.cpp
 LIB_OPL_SRCS=bnkfile.cpp rolfile.cpp fileio.cpp file.cpp instrmnt.cpp opl2.cpp
 
 SRCS=$(LIB_UI_SRCS) $(LIB_HLP_SRCS) $(LIB_OPL_SRCS) log.cpp main.cpp

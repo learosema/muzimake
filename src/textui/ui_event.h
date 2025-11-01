@@ -1,6 +1,10 @@
 #ifndef __UI_EVENT_H__
 #define __UI_EVENT_H__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdint.h>
 #include "mouse.h"
 
@@ -82,4 +86,7 @@ void event_init();
 void event_shutdown();
 void wait_for_user();
 
+#ifdef __cplusplus
+}
+#endif
 #endif

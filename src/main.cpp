@@ -12,6 +12,7 @@
 #include "textui/keyboard.h"
 #include "textui/textmode.h"
 #include "textui/ui_event.h"
+#include "textui/ui_load.h"
 #include "textui/cmponent.h"
 #include "macros.h"
 #include "helper/log.h"
@@ -38,127 +39,14 @@ bool g_hasMouse;
 MOUSE_STATUS g_mouse;
 MODEINFO * g_modeInfo;
 
-linked_list_t *list_files(const char *path)
-{
-	linked_list_t *list = linked_list_new();
-
-	DIRPTR dir = fileio_open_dir(path);
-	DIRENT *entry;
-	while ((entry = fileio_read_dir(dir)) != NULL) {
-		if (DIRENT_IS_FILE(entry)) {
-			linked_list_append(list, strdup(entry->d_name));
-			continue;
-		}
-		if (DIRENT_IS_DIR(entry)) {
-			size_t len = strlen(entry->d_name) + 3;
-			char *buf = (char *)malloc(len);
-			snprintf(buf, len, "[%s]", entry->d_name);
-			linked_list_append(list, buf);
-		}
-	}
-	fileio_close_dir(dir);
-	return list;
-}
-
-void list_files_dispose(linked_list_t *list)
-{
-	for (node_t *iter = list->head; iter != NULL; iter = iter->next)
-	{
-		if (iter->data != NULL) {
-			free(iter->data);
-		}
-	}
-	linked_list_dispose(list);
-}
-
-void display_files(
-	linked_list_t *list_files,
-	const int offset, const int rows, const int cols, const int colspacing,
-	const int x0, const int y0,
-	const uint8_t color, const uint8_t selected_color, const int selected_index
-)
-{
-	int n = 0, x = 0, y = 0;
-
-	for (node_t *iter = list_files->head; iter != NULL; iter = iter->next) {
-		if (n < offset) {
-			n++;
-			continue;
-		}
-		y = (n - offset) / cols;
-		x = (n - offset) % cols;
-
-		if (y >= rows) {
-			break;
-		}
-
-		textmode_print((char *)iter->data, x0 + x * colspacing, y0 + y,
-			n == selected_index ? selected_color : color
-		);
-		n++;
-	}
-}
-
-bool load()
-{
-	mouse_hide();
-	MODEINFO *info = textmode_get_modeinfo();
-	textbuffer_t screen = textmode_get_screen();
-
-	textmode_dblbox(0,1,info->numCols, info->numRows - 2, 0x5f);
-	textmode_print("Load", 2, 1, 0x5f);
-	if (g_hasMouse) {
-		mouse_show();
-	}
-
-	linked_list_t * dir = list_files(".");
-	int offset = 0;
-	const int num_rows = info->numRows - 4;
-	const int num_cols = (info->numCols - 4) / 15;
-	const int col_spacing = 15;
-	const int x0 = 2;
-	const int y0 = 2;
-	const uint8_t color = 0x5f;
-	const uint8_t selected_color = 0x71;
-	int index = 0;
-	ui_event_t events[2] = {0, 0};
-
-	bool done = false;
-	bool paint = true;
-	while (! done) {
-		if (paint) {
-			mouse_hide();
-			display_files(dir, 0, num_rows, num_cols, col_spacing, x0, y0, color, selected_color, index);
-			mouse_show();
-			paint = false;
-		}
-		wait_for_user();
-		uint8_t num_events = event_poll(events, 0, 2);
-		for (uint8_t i = 0; i < num_events; i++) {
-			if (events[i].type == UI_EVENT_KEY) {
-				// load_onkey(events[i].payload.keyboard.keyCode);
-				done = true;
-			}
-		}
-	}
-	mouse_hide();
-	textmode_put_area(&screen, 0, 0);
-	if (g_hasMouse) {
-		mouse_show();
-	}
-	textmode_dispose_buffer(&screen);
-
-	list_files_dispose(dir);
-	return true;
-}
-
 static bool event_handler(uint16_t element_id, ui_event_t *event)
 {
+	ui_load_result_t result = {0};
 	if (event->type == UI_EVENT_CLICK) {
 		textmode_gotoxy(15,15);
 		textmode_print("CLICK!", 1,45, 0x2f);
 		if (element_id == ID_LOAD) {
-			return load();
+			return ui_load_modal(&result, g_hasMouse);
 		}
 	}
 	return true;

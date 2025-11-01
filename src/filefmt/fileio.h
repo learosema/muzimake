@@ -5,6 +5,8 @@
 #define __FILEIO_H__
 #include <stdio.h>
 #include <stdint.h>
+#include "list.h"
+
 
 #ifdef __cplusplus
 extern "C" {
@@ -65,6 +67,8 @@ DIRPTR fileio_open_dir(const char * path);
 DIRENTPTR fileio_read_dir(DIRPTR dir);
 bool fileio_close_dir(DIRPTR dir);
 
+linked_list_t *fileio_list_files(const char *path);
+void fileio_list_files_dispose(linked_list_t *list);
 
 #ifdef __cplusplus
 }

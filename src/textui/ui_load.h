@@ -1,5 +1,5 @@
-#ifndef __UI_SHEET_H__
-#define __UI_SHEET_H__
+#ifndef __UI_LOAD_H__
+#define __UI_LOAD_H__
 
 #ifdef __cplusplus
 extern "C" {
@@ -16,14 +16,20 @@ typedef struct ui_load_s {
 	bool paint;
 	ui_event_handler_t event_handler;
 	linked_list_t *current_dir;
-	uint8_t offset_x;
-	int8_t offset_y;
-	uint8_t cursor_x;
-	uint8_t cursor_y;
+	int offset;
+	int selected_index;
+	uint8_t input_cursor_x;
 } ui_load_t;
+
+typedef struct ui_load_result_s {
+	char *filename;
+} ui_load_result_t;
 
 void ui_load_render(ui_load_t *load_state);
 void ui_load_process_events(ui_load_t *load_state, ui_event_t *event);
+
+bool ui_load_modal(ui_load_result_t *result, bool has_mouse);
+void ui_load_free_result(ui_load_result_t *result);
 
 #ifdef __cplusplus
 }
