@@ -72,7 +72,7 @@ void ui_load_render(ui_load_t *load_state)
 {
 	uint8_t color = 0x5f;
 	if (load_state->focused) {
-		textmode_dblrect(
+		textmode_dblbox(
 			load_state->bounding_rect.x,
 			load_state->bounding_rect.y,
 			load_state->bounding_rect.width,
@@ -80,7 +80,7 @@ void ui_load_render(ui_load_t *load_state)
 			color
 		);
 	} else {
-		textmode_rect(
+		textmode_box(
 			load_state->bounding_rect.x,
 			load_state->bounding_rect.y,
 			load_state->bounding_rect.width,
@@ -88,6 +88,8 @@ void ui_load_render(ui_load_t *load_state)
 			color
 		);
 	}
+
+
 	textmode_print("Load", load_state->bounding_rect.x + 2, 1, 0x5f);
 	rect_t cancel_rect = calculate_bounds_cancel(&(load_state->bounding_rect));
 	rect_t dirlist_rect = calculate_bounds_dirlist(&(load_state->bounding_rect));
@@ -97,7 +99,11 @@ void ui_load_render(ui_load_t *load_state)
 
 void ui_load_process_events(ui_load_t *load_state, ui_event_t *event)
 {
-
+	if (event->type == UI_EVENT_KEY) {
+		// load_onkey(events[i].payload.keyboard.keyCode);
+		load_state->done = true;
+		load_state->selected_file = NULL;
+	}
 }
 
 bool ui_load_modal(ui_load_result_t *result, bool has_mouse)
@@ -121,10 +127,10 @@ bool ui_load_modal(ui_load_result_t *result, bool has_mouse)
 
 	ui_event_t events[2] = {0, 0};
 
-	bool done = false;
-	bool paint = true;
-	while (! done) {
-		if (paint) {
+	state.paint = true;
+	state.done = false;
+	while (! state.done) {
+		if (state.paint) {
 			if (has_mouse) {
 				mouse_hide();
 			}
@@ -132,7 +138,7 @@ bool ui_load_modal(ui_load_result_t *result, bool has_mouse)
 			if (has_mouse) {
 				mouse_show();
 			}
-			paint = false;
+			state.paint = false;
 		}
 		wait_for_user();
 		uint8_t num_events = event_poll(events, 0, 2);
