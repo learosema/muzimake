@@ -1,6 +1,10 @@
 #ifndef __LIST_H__
 #define __LIST_H__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct node_s node_t;
 typedef struct node_s
 {
@@ -32,9 +36,13 @@ bool linked_list_remove_node(linked_list_t *list, node_t *node);
 node_t *linked_list_node_at(linked_list_t * list, int node_index);
 node_t *linked_list_find_node(linked_list_t *list, void *data);
 node_t *linked_list_prev_node(linked_list_t *list, node_t *ref_node);
+int linked_list_get_count(linked_list_t *list);
 
 /* convenience shortcuts */
 void linked_list_append(linked_list_t *list, void *data);
 void linked_list_insert_after(linked_list_t *list, void *data, int node_index);
 
+#ifdef __cplusplus
+}
+#endif
 #endif

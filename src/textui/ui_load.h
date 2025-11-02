@@ -14,8 +14,11 @@ typedef struct ui_load_s {
 	bool active;
 	bool focused;
 	bool paint;
+	uint8_t dirlist_rows;
+	uint8_t dirlist_cols;
 	ui_event_handler_t event_handler;
 	linked_list_t *current_dir;
+	int count_files;
 	int offset;
 	int selected_index;
 	uint8_t input_cursor_x;

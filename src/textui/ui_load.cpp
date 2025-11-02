@@ -5,6 +5,7 @@
 #include "textui/ui_event.h"
 #include "filefmt/fileio.h"
 #include "textui/textmode.h"
+#include "helper/list.h"
 
 void display_files(
 	linked_list_t *list_files,
@@ -52,7 +53,7 @@ rect_t calculate_bounds_cancel(rect_t *bounding_rect)
 	uint8_t y1 = y0 + bounding_rect->height - 1;
 	result.height = 1;
 	result.width = 10; // [.Cancel.]
-	result.x = x1 - 2 - 10;
+	result.x = x1 - 2 - 22;
 	result.y = y1 - 2;
 	return result;
 }
@@ -68,41 +69,70 @@ rect_t calculate_bounds_dirlist(rect_t *bounding_rect)
 }
 
 
-void ui_load_render(ui_load_t *load_state)
+void ui_load_render(ui_load_t *state)
 {
 	uint8_t color = 0x5f;
-	if (load_state->focused) {
+	if (state->focused) {
 		textmode_dblbox(
-			load_state->bounding_rect.x,
-			load_state->bounding_rect.y,
-			load_state->bounding_rect.width,
-			load_state->bounding_rect.height,
+			state->bounding_rect.x,
+			state->bounding_rect.y,
+			state->bounding_rect.width,
+			state->bounding_rect.height,
 			color
 		);
 	} else {
 		textmode_box(
-			load_state->bounding_rect.x,
-			load_state->bounding_rect.y,
-			load_state->bounding_rect.width,
-			load_state->bounding_rect.height,
+			state->bounding_rect.x,
+			state->bounding_rect.y,
+			state->bounding_rect.width,
+			state->bounding_rect.height,
 			color
 		);
 	}
 
-
-	textmode_print("Load", load_state->bounding_rect.x + 2, 1, 0x5f);
-	rect_t cancel_rect = calculate_bounds_cancel(&(load_state->bounding_rect));
-	rect_t dirlist_rect = calculate_bounds_dirlist(&(load_state->bounding_rect));
-	display_files(load_state->current_dir, &dirlist_rect, load_state->offset, 15, 0x5f, 0x71, load_state->selected_index);
+	textmode_print("Load", state->bounding_rect.x + 2, state->bounding_rect.y, 0x5f);
+	rect_t cancel_rect = calculate_bounds_cancel(&(state->bounding_rect));
+	rect_t dirlist_rect = calculate_bounds_dirlist(&(state->bounding_rect));
+	display_files(state->current_dir, &dirlist_rect, state->offset, 15, 0x5f, 0x71, state->selected_index);
 	textmode_print("[ Cancel ]", cancel_rect.x, cancel_rect.y, 0x5f);
+	textmode_print("[  Load  ]", cancel_rect.x + 12, cancel_rect.y, 0x5f);
 }
 
-void ui_load_process_events(ui_load_t *load_state, ui_event_t *event)
+void ui_load_process_events(ui_load_t *state, ui_event_t *event)
 {
+	int num_cols = (state->bounding_rect.width - 2) / 15;
+
 	if (event->type == UI_EVENT_KEY) {
 		// load_onkey(events[i].payload.keyboard.keyCode);
-		load_state->done = true;
-		load_state->selected_file = NULL;
+		switch (event->payload.keyboard.keyCode) {
+			case 0x1D00:
+				state->done = true;
+				state->selected_file = NULL;
+				break;
+			case KEY_ARROW_LEFT:
+				if (state->selected_index > 0) {
+					state->selected_index -= 1;
+					state->paint = true;
+				}
+				break;
+			case KEY_ARROW_RIGHT:
+				if (state->selected_index < state->count_files - 1) {
+					state->selected_index += 1;
+					state->paint = true;
+				}
+				break;
+			case KEY_ARROW_UP:
+				if (state->selected_index >= num_cols ) {
+					state->selected_index -= num_cols;
+					state->paint = true;
+				}
+			break;
+			case KEY_ARROW_DOWN:
+				if (state->selected_index <= state->count_files - 1) {
+					state->selected_index += num_cols;
+					state->paint = true;
+				}
+		}
 	}
 }
 
@@ -120,6 +150,7 @@ bool ui_load_modal(ui_load_result_t *result, bool has_mouse)
 	state.bounding_rect.width = info->numCols - 4;
 	state.bounding_rect.height = info->numRows - 4;
 	state.current_dir = fileio_list_files(".");
+	state.count_files = linked_list_get_count(state.current_dir);
 
 	if (has_mouse) {
 		mouse_show();
@@ -143,6 +174,10 @@ bool ui_load_modal(ui_load_result_t *result, bool has_mouse)
 		wait_for_user();
 		uint8_t num_events = event_poll(events, 0, 2);
 		for (uint8_t i = 0; i < num_events; i++) {
+			if ((events[i].type & UI_EVENT_KEY) > 0) {
+				textmode_gotoxy(1, 48);
+				printf("KEY     %04x\n", events[i].payload.keyboard.keyCode);
+			}
 			ui_load_process_events(&state, &(events[i]));
 		}
 	}
