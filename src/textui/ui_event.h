@@ -41,7 +41,7 @@ extern "C" {
 #define KEY_ENTER           0x0D
 #define KEY_TAB             0x09
 #define KEY_SHIFT_TAB				0x0F00
-#define KEY_ESCAPE          0x1D
+#define KEY_ESCAPE          0x1B
 #define KEY_SPACE						0x20
 #define KEY_ALT_X           0x2D00
 #define KEY_ALT_I           0x1700

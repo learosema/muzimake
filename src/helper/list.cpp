@@ -171,3 +171,13 @@ void linked_list_insert_after(linked_list_t *list, void *data, int node_index)
 	}
 	linked_list_insert_node_after(list, new_node, ref_node);
 }
+
+int linked_list_get_count(linked_list_t * list)
+{
+	int count = 0;
+	for (node_t *iter = list->head; iter != NULL; iter = iter->next)
+	{
+		count++;
+	}
+	return count;
+}
