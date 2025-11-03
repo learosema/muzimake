@@ -98,6 +98,11 @@ void ui_load_render(ui_load_t *state)
 	textmode_print("[  Load  ]", cancel_rect.x + 12, cancel_rect.y, 0x5f);
 }
 
+void ui_load_change_directory(ui_load_t *state)
+{
+
+}
+
 void ui_load_process_events(ui_load_t *state, ui_event_t *event)
 {
 	int num_cols = (state->bounding_rect.width - 2) / 15;
@@ -105,7 +110,16 @@ void ui_load_process_events(ui_load_t *state, ui_event_t *event)
 	if (event->type == UI_EVENT_KEY) {
 		// load_onkey(events[i].payload.keyboard.keyCode);
 		switch (event->payload.keyboard.keyCode) {
-			case 0x1D00:
+			case KEY_ENTER:
+				state->selected_file = (char *)linked_list_node_at(state->current_dir, state->selected_index)->data;
+				if (state->selected_file != NULL && state->selected_file[0] == '[') {
+					ui_load_change_directory(state);
+				} else {
+					state->done = true;
+
+				}
+				break;
+			case KEY_ESCAPE:
 				state->done = true;
 				state->selected_file = NULL;
 				break;
@@ -149,7 +163,8 @@ bool ui_load_modal(ui_load_result_t *result, bool has_mouse)
 	state.bounding_rect.y = 2;
 	state.bounding_rect.width = info->numCols - 4;
 	state.bounding_rect.height = info->numRows - 4;
-	state.current_dir = fileio_list_files(".");
+	state.folder = strdup(".");
+	state.current_dir = fileio_list_files(state.folder);
 	state.count_files = linked_list_get_count(state.current_dir);
 
 	if (has_mouse) {
