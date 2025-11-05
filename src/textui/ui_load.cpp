@@ -163,8 +163,8 @@ bool ui_load_modal(ui_load_result_t *result, bool has_mouse)
 	state.bounding_rect.y = 2;
 	state.bounding_rect.width = info->numCols - 4;
 	state.bounding_rect.height = info->numRows - 4;
-	state.folder = strdup(".");
-	state.current_dir = fileio_list_files(state.folder);
+	state.folder = NULL;
+	state.current_dir = fileio_list_files(".");
 	state.count_files = linked_list_get_count(state.current_dir);
 
 	if (has_mouse) {

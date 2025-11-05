@@ -4,17 +4,17 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-#include "helper/list.h"
+#include <stdlib.h>
 
 #if defined __DOS__ || defined __WINDOWS__
-#define PATH_SEP "\\"
+#define PATH_SEP '\\'
 #else
-#define PATH_SEP "/"
+#define PATH_SEP '/'
 #endif
 
 typedef struct path_s {
-	linked_list_t *list;
-	char *string;
+	char *str;
+	size_t len;
 } path_t;
 
 path_t *path_create(char *path_string);
