@@ -8,8 +8,10 @@ extern "C" {
 
 #if defined __DOS__ || defined __WINDOWS__
 #define PATH_SEP '\\'
+#define OTHER_PATH_SEP '/'
 #else
 #define PATH_SEP '/'
+#define OTHER_PATH_SEP '\\'
 #endif
 
 typedef struct path_s {

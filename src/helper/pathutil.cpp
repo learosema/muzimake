@@ -14,7 +14,7 @@ path_t *path_join(path_t *path, char *path_string)
 {
 	int path1_end = path->len - 1;
 	int path2_start = 0;
-
+	// NOT ROCK SOLID but works for now :D
 	if (path->str[path1_end] == PATH_SEP) {
 		path1_end--;
 	}
@@ -23,18 +23,26 @@ path_t *path_join(path_t *path, char *path_string)
 	}
 	size_t newlen = path1_end + 2 + strlen(path_string) - path2_start;
 	char *newbuf = (char *)realloc(path->str, newlen);
-	/* strncpy(newbuf, path->str, path1_end + 1);
-	newbuf[path1_end + 1] = '/';
-	strcpy(&(newbuf[path1_end + 2]), &(path_string[path2_start])); */
-	snprintf(newbuf, newlen, "%s%c%s", /* TODOOOOO it's a noisy environment right now...*/);
+	strncpy(newbuf, path->str, path1_end + 1);
+	newbuf[path1_end + 1] = PATH_SEP;
+	strcpy(&(newbuf[path1_end + 2]), &(path_string[path2_start]));
+	for (int i = 0; i < newlen; i++) {
+		if (newbuf[i] == OTHER_PATH_SEP) {
+			newbuf[i] = PATH_SEP;
+		}
+	}
+	path->str = newbuf;
+	path->len = newlen;
+	return path;
 }
 
 path_t *path_normalize(path_t *path)
 {
-
+	return NULL;
 }
 
 void path_dispose(path_t *path)
 {
-
+	free(path->str);
+	free(path);
 }
