@@ -6,6 +6,7 @@ extern "C" {
 #endif
 #include "ui_common.h"
 #include "helper/list.h"
+#include "fileio.h"
 
 typedef struct ui_load_s {
 	uint16_t id;
@@ -21,7 +22,7 @@ typedef struct ui_load_s {
 	int offset;
 	int selected_index;
 	uint8_t input_cursor_x;
-	char *selected_file;
+	dir_entry_t *selected_file;
 	bool done;
 } ui_load_t;
 

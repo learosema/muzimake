@@ -152,6 +152,27 @@ bool fileio_close_dir(DIRPTR dir)
 	return (closedir(dir) == 0);
 }
 
+dir_entry_t *fileio_dir_entry_create(const char *filename, const bool is_dir)
+{
+	dir_entry_t * entry = (dir_entry_t *)malloc(sizeof(dir_entry_t));
+	if (! entry) {
+		return NULL;
+	}
+	entry->len = strlen(filename);
+	entry->filename = strdup(filename);
+	entry->is_dir = is_dir;
+	return entry;
+}
+
+void fileio_dir_entry_dispose(dir_entry_t * entry)
+{
+	if (entry == NULL) {
+		return;
+	}
+	if (entry->filename) free(entry->filename);
+	free(entry);
+}
+
 linked_list_t *fileio_list_files(const char *path)
 {
 	linked_list_t *list = linked_list_new();
@@ -160,14 +181,11 @@ linked_list_t *fileio_list_files(const char *path)
 	DIRENT *entry;
 	while ((entry = fileio_read_dir(dir)) != NULL) {
 		if (DIRENT_IS_FILE(entry)) {
-			linked_list_append(list, strdup(entry->d_name));
+			linked_list_append(list, fileio_dir_entry_create(entry->d_name, false));
 			continue;
 		}
 		if (DIRENT_IS_DIR(entry)) {
-			size_t len = strlen(entry->d_name) + 3;
-			char *buf = (char *)malloc(len);
-			snprintf(buf, len, "[%s]", entry->d_name);
-			linked_list_append(list, buf);
+			linked_list_append(list, fileio_dir_entry_create(entry->d_name, true));
 		}
 	}
 	fileio_close_dir(dir);
