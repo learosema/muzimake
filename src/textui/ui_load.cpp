@@ -37,9 +37,19 @@ void display_files(
 			break;
 		}
 
-		textmode_print((char *)iter->data, x0 + x * colspacing, y0 + y,
-			n == selected_index ? selected_color : color
-		);
+		dir_entry_t *entry = (dir_entry_t *)(iter->data);
+
+		if (entry->is_dir) {
+			char buf[15];
+			snprintf(buf,15, "[%s]", entry->filename);
+			textmode_print(buf, x0 + x * colspacing, y0 + y,
+				n == selected_index ? selected_color : (color ^ 5)
+			);
+		} else {
+			textmode_print(entry->filename, x0 + x * colspacing, y0 + y,
+				n == selected_index ? selected_color : color
+			);
+		}
 		n++;
 	}
 }
@@ -111,8 +121,8 @@ void ui_load_process_events(ui_load_t *state, ui_event_t *event)
 		// load_onkey(events[i].payload.keyboard.keyCode);
 		switch (event->payload.keyboard.keyCode) {
 			case KEY_ENTER:
-				state->selected_file = (char *)linked_list_node_at(state->current_dir, state->selected_index)->data;
-				if (state->selected_file != NULL && state->selected_file[0] == '[') {
+				state->selected_file = (dir_entry_t *)linked_list_node_at(state->current_dir, state->selected_index)->data;
+				if (state->selected_file != NULL && state->selected_file->is_dir) {
 					ui_load_change_directory(state);
 				} else {
 					state->done = true;
@@ -142,7 +152,7 @@ void ui_load_process_events(ui_load_t *state, ui_event_t *event)
 				}
 			break;
 			case KEY_ARROW_DOWN:
-				if (state->selected_index <= state->count_files - 1) {
+				if (state->selected_index + num_cols <= state->count_files - 1) {
 					state->selected_index += num_cols;
 					state->paint = true;
 				}

@@ -3,14 +3,13 @@
  */
 #ifndef __FILEIO_H__
 #define __FILEIO_H__
-#include <stdio.h>
-#include <stdint.h>
-#include "list.h"
-
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+#include <stdio.h>
+#include <stdint.h>
+#include "list.h"
 
 #ifndef __LITTLE_ENDIAN__
 #ifdef __DOS__
@@ -39,6 +38,12 @@ extern "C" {
 #define DIRENT struct dirent
 #define DIRENTPTR DIRENT *
 
+typedef struct dir_entry_s {
+	char *filename;
+	size_t len;
+	bool is_dir;
+} dir_entry_t;
+
 FILEPTR fileio_open(char * fileName, char *mode);
 bool fileio_eof(FILEPTR fp);
 
@@ -62,6 +67,9 @@ float fileio_read_f32be(FILEPTR fp);
 
 uint16_t byteswap_16(uint16_t in);
 uint32_t byteswap_32(uint32_t in);
+
+dir_entry_t *fileio_dir_entry_create(const char *filename, const bool is_dir);
+void fileio_dir_entry_dispose(dir_entry_t * entry);
 
 DIRPTR fileio_open_dir(const char * path);
 DIRENTPTR fileio_read_dir(DIRPTR dir);
