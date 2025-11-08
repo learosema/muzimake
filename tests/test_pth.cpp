@@ -6,8 +6,11 @@ TEST path_join_should_concatenate_two_paths()
 {
 	path_t *path = path_create(".");
 	path_join(path, "..");
-
+#ifdef __DOS__
+	ASSERT_EQm("path '.' and '..' should be joined to '.\\..'", strcmp(path->str, ".\\.."), 0);
+#else
 	ASSERT_EQm("path '.' and '..' should be joined to './..'", strcmp(path->str, "./.."), 0);
+#endif
 	path_dispose(path);
 	PASS();
 }
