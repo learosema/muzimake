@@ -6,6 +6,7 @@
 #include "filefmt/fileio.h"
 #include "textui/textmode.h"
 #include "helper/list.h"
+#include "helper/pathutil.h"
 
 void display_files(
 	linked_list_t *list_files,
@@ -110,7 +111,12 @@ void ui_load_render(ui_load_t *state)
 
 void ui_load_change_directory(ui_load_t *state)
 {
-
+	path_chdir(state->selected_file->filename);
+	fileio_list_files_dispose(state->current_dir);
+	state->current_dir = fileio_list_files(".");
+	state->selected_index = 0;
+	state->selected_file = (dir_entry_t *)(state->current_dir->head->data);
+	state->paint = true;
 }
 
 void ui_load_process_events(ui_load_t *state, ui_event_t *event)
@@ -126,7 +132,6 @@ void ui_load_process_events(ui_load_t *state, ui_event_t *event)
 					ui_load_change_directory(state);
 				} else {
 					state->done = true;
-
 				}
 				break;
 			case KEY_ESCAPE:

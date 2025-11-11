@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-path_t *path_create(char *path_string)
+path_t *path_create(const char *path_string)
 {
 	path_t *result = (path_t *)malloc(sizeof(path_t));
 	result->len = strlen(path_string);
@@ -10,7 +10,7 @@ path_t *path_create(char *path_string)
 	return result;
 }
 
-path_t *path_join(path_t *path, char *path_string)
+path_t *path_join(path_t *path, const char *path_string)
 {
 	if (path == NULL || path_string == NULL) {
 		return path;
@@ -50,4 +50,9 @@ void path_dispose(path_t *path)
 {
 	free(path->str);
 	free(path);
+}
+
+bool path_chdir(const char *path_string)
+{
+	return _chdir(path_string) == 0;
 }
