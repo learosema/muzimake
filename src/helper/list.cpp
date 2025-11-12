@@ -1,11 +1,11 @@
 #include <stdlib.h>
-#include <list.h>
+#include "list.h"
 
-node_t *linked_list_create_node(void *data)
+node_t * const linked_list_create_node(const void * const data)
 {
 	node_t *node = (node_t *)malloc(sizeof(node_t));
-	node->data = data;
-	node->next = nullptr;
+	node->data = (void *)data;
+	node->next = NULL;
 	return node;
 }
 
@@ -14,7 +14,7 @@ void linked_list_dispose_node(node_t *node)
 	free(node);
 }
 
-linked_list_t *linked_list_new()
+linked_list_t * const linked_list_new()
 {
 	linked_list_t *list = (linked_list_t *)malloc(sizeof(linked_list_t));
 	list->head = NULL;
@@ -32,22 +32,22 @@ void linked_list_dispose(linked_list_t *list)
 	free(list);
 }
 
-void linked_list_append_node(linked_list_t *list, node_t *node)
+void linked_list_append_node(linked_list_t * const list, node_t * const node)
 {
 	if (list->tail == NULL) {
-		list->head = node;
-		list->tail = node;
+		list->head = (node_t *)node;
+		list->tail = (node_t *)node;
 		node->next = NULL;
 		return;
 	}
 
 	node_t *old_tail = list->tail;
-	list->tail->next = node;
-	list->tail = node;
+	list->tail->next = (node_t *)node;
+	list->tail = (node_t *)node;
 	node->next = NULL;
 }
 
-void linked_list_insert_node_after(linked_list_t *list, node_t *new_node, node_t *ref_node)
+void linked_list_insert_node_after(linked_list_t * const list, node_t * const new_node, const node_t * const ref_node)
 {
 	for (node_t *iter = list->head; iter != NULL; iter = iter->next)
 	{
@@ -69,10 +69,11 @@ void linked_list_insert_node_after(linked_list_t *list, node_t *new_node, node_t
 	new_node->next = NULL;
 }
 
-bool linked_list_remove_node(linked_list_t *list, node_t *node)
+bool linked_list_remove_node(linked_list_t * const list, node_t *node)
 {
 	if (node == list->head) {
 		list->head = list->head->next;
+		linked_list_dispose_node(node);
 		return true;
 	}
 	for (node_t *iter = list->head; iter != NULL; iter = iter->next)
@@ -91,7 +92,7 @@ bool linked_list_remove_node(linked_list_t *list, node_t *node)
 	return false;
 }
 
-node_t * linked_list_find_node(linked_list_t *list, void *data)
+node_t * linked_list_find_node(const linked_list_t * const list, const void * const data)
 {
 	for (node_t *iter = list->head; iter != NULL; iter = iter->next)
 	{
@@ -102,7 +103,7 @@ node_t * linked_list_find_node(linked_list_t *list, void *data)
 	return NULL;
 }
 
-node_t *linked_list_node_at(linked_list_t * list, int node_index)
+node_t *linked_list_node_at(const linked_list_t * const list, const int node_index)
 {
 	int current_index = 0;
 	for (node_t *iter = list->head; iter != NULL; iter = iter->next)
@@ -115,7 +116,7 @@ node_t *linked_list_node_at(linked_list_t * list, int node_index)
 	return NULL;
 }
 
-node_t *linked_list_prev_node(linked_list_t *list, node_t *ref_node)
+node_t *linked_list_prev_node(const linked_list_t * const list, const node_t * const ref_node)
 {
 	if (ref_node == list->head)
 	{
@@ -130,7 +131,7 @@ node_t *linked_list_prev_node(linked_list_t *list, node_t *ref_node)
 	return NULL;
 }
 
-void linked_list_unshift_node(linked_list_t *list, node_t *new_node)
+void linked_list_unshift_node(linked_list_t * const list, node_t * const new_node)
 {
 	if (list->tail == NULL)
 	{
@@ -145,7 +146,7 @@ void linked_list_unshift_node(linked_list_t *list, node_t *new_node)
 	list->head->next = old_head;
 }
 
-void linked_list_insert_node_before(linked_list_t *list, node_t *new_node, node_t *ref_node)
+void linked_list_insert_node_before(linked_list_t * const list, node_t *new_node, node_t *ref_node)
 {
 	if (ref_node == list->head) {
 		linked_list_unshift_node(list, new_node);
@@ -155,12 +156,12 @@ void linked_list_insert_node_before(linked_list_t *list, node_t *new_node, node_
 	linked_list_insert_node_after(list, new_node, prev);
 }
 
-void linked_list_append(linked_list_t *list, void *data)
+void linked_list_append(linked_list_t * const list, const void * const data)
 {
 	linked_list_append_node(list, linked_list_create_node(data));
 }
 
-void linked_list_insert_after(linked_list_t *list, void *data, int node_index)
+void linked_list_insert_after(linked_list_t * const list, const void * const data, const int node_index)
 {
 	node_t *ref_node = linked_list_node_at(list, node_index);
 	node_t *new_node = linked_list_create_node(data);
@@ -172,7 +173,7 @@ void linked_list_insert_after(linked_list_t *list, void *data, int node_index)
 	linked_list_insert_node_after(list, new_node, ref_node);
 }
 
-int linked_list_get_count(linked_list_t * list)
+int linked_list_get_count(const linked_list_t * const list)
 {
 	int count = 0;
 	for (node_t *iter = list->head; iter != NULL; iter = iter->next)
