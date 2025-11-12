@@ -5,9 +5,9 @@
 #include <conio.h>
 #include <dos.h>
 #else
-#include <stubs.h>
+#include "helper/stubs.h"
 #endif
-#include "asmstuff.h"
+#include "helper/asmstuff.h"
 #include "textui/mouse.h"
 #include "textui/keyboard.h"
 #include "textui/textmode.h"
