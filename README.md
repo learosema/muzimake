@@ -64,6 +64,11 @@ Type `wmake /f makefile.16`
 Not yet. I need to understand how video ram access works and put together the makefile.
 I guess this is a good place to start: <https://www.delorie.com/djgpp/doc/ug/compiling/port16.html>
 
+## CMake
+
+A cross-platform CMake-based build is in the works. As of current, it should build, but it is far from functional, as
+a lot of DOS-specific code is ifdeffed away.
+
 ## Why?
 
 Because I can. Yeah, there is perfect music software out there.

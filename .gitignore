@@ -15,6 +15,7 @@
 
 obj/*
 bin/*
+build/*
 
 .DS_Store
 .cache/

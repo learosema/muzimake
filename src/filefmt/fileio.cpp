@@ -3,8 +3,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "fileio.h"
 #include "list.h"
+#include "fileio.h"
 
 uint16_t byteswap_16(uint16_t in)
 {
