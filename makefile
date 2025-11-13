@@ -2,7 +2,7 @@
 CXX=wpp386
 LD=wlink
 SYSTEM=dos4g
-CFLAGS=-zq -zastd=c++0x -bt=dos -dDEBUG_LOGS -d2
+CFLAGS=-zq -zastd=c++0x -bt=dos -dDEBUG_LOGS -d0
 LDFLAGS=option quiet
 
 SRC_DIR=src
