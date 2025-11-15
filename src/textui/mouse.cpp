@@ -19,8 +19,8 @@
 #else
 #define DPMI_LOCK_FUNC(x) 0
 #define DPMI_LOCK_VAR(x)  0
-#define INTR
-#define INTRX
+#define INTR(...)
+#define INTRX(...)
 #endif
 
 #include "mouse.h"
@@ -137,8 +137,8 @@ int mouse_set_eventhandler(far_function_ptr_t handler, uint8_t call_mask)
 	sregs.es = FP_SEG(handler);
 	regs.x.edx = FP_OFF(handler);
 	INTRX(0x33, &regs, &oregs, &sregs);
-	return 0;
 	#endif
+	return 0;
 }
 
 #pragma off ( check_stack )

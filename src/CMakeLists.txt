@@ -32,4 +32,4 @@ set(LIB_OPL_SRCS
 )
 
 add_executable(MuziMake ${LIB_CORE_SRCS} ${LIB_UI_SRCS} ${LIB_OPL_SRCS})
-target_include_directories(MuziMake PUBLIC events filefmt hal helper textui)
+target_include_directories(MuziMake PUBLIC events fonts filefmt hal helper textui)

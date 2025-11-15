@@ -1,14 +1,26 @@
+#ifndef __STUBS_H__
+#define __STUBS_H__
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #if !defined(__DOS__)
 
-	#define _loadds
-	#define __interrupt
-	#define far
-	#define near
+#define _loadds
+#define __interrupt
+#define far
+#define near
 
-	void delay(int) { /* stub */ }
-	bool kbhit() { return true; }
-	int getch() { return 0; }
-	int inp(unsigned short) { return 0; }
-	void outp(int, int) { /* stub */ };
+inline void delay(int) { /* stub */ }
+inline bool kbhit() { return true; }
+inline int getch() { return 0; }
+inline int inp(unsigned short) { return 0; }
+inline void outp(int, int) { /* stub */ };
 
-	#endif
+#ifdef __cplusplus
+}
+#endif
+
+#endif
+#endif
