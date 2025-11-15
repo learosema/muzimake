@@ -6,8 +6,6 @@ extern "C" {
 #endif
 
 #include <stdint.h>
-#include "helper/intrhelp.h"
-#include "dpmiutil.h"
 
 typedef struct MOUSE_STATUS {
 	uint16_t mouseX;

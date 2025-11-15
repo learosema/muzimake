@@ -354,7 +354,7 @@ void set_mode(const uint8_t mode)
 	#endif
 }
 #else
-#define set_mode(mode)
+#define set_mode(...)
 #endif
 
 
@@ -400,7 +400,7 @@ void set_font(const uint8_t *charData, const uint16_t charHeight, const uint16_t
 	#endif
 }
 #else
-#define set_font(charData, charHeight, offset, count)
+#define set_font(...)
 #endif
 
 

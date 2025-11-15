@@ -5,8 +5,12 @@
         Compile and link: wcl386 -l=dos4g mouse
 */
 #include <stdio.h>
+#ifdef __DOS__
 #include <dos.h>
 #include <i86.h>
+#else
+#include <stubs.h>
+#endif
 
 
 #include <mouse.h>

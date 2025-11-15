@@ -59,8 +59,8 @@ TEST_MOU_SRCS=dpmiutil.cpp textmode.cpp mouse.cpp test_mou.cpp
 TEST_FNT_SRCS=test_fnt.cpp
 TEST_LST_SRCS=list.cpp test_lst.cpp
 TEST_PTH_SRCS=pathutil.cpp test_pth.cpp
-TEST_UI_SRCS=$(LIB_UI_SRCS) log.cpp test_ui.cpp
-TEST_CMP_SRCS=$(LIB_UI_SRCS) log.cpp test_cmp.cpp
+TEST_UI_SRCS=$(LIB_CORE_SRCS) $(LIB_UI_SRCS) log.cpp test_ui.cpp
+TEST_CMP_SRCS=$(LIB_CORE_SRCS) $(LIB_UI_SRCS) log.cpp test_cmp.cpp
 TEST_SRCS    =$(TEST_COMMON_SRCS) instrmnt.cpp test.cpp
 
 OBJS=$(SRCS:.cpp=.$(O_EXT))

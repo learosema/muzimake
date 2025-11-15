@@ -1,22 +1,16 @@
-#include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #if defined(__DOS__)
 #include <conio.h>
 #include <dos.h>
 #else
-#include "helper/stubs.h"
 #endif
-#include "helper/asmstuff.h"
 #include "textui/mouse.h"
-#include "textui/keyboard.h"
 #include "textui/textmode.h"
 #include "textui/ui_event.h"
 #include "textui/ui_load.h"
 #include "textui/cmponent.h"
 #include "macros.h"
 #include "helper/log.h"
-#include "helper/list.h"
 #include "fonts/bulkyv5.h"
 #include "textui/vga.h"
 
