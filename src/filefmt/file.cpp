@@ -42,7 +42,7 @@ file_result_t file_init(sound_file_t* file, file_format_t file_format)
 	return *file != NULL ? SUCCESS : ERROR;
 }
 
-file_result_t file_open(sound_file_t* file, char *filename, file_opts_t file_opts)
+file_result_t file_open(sound_file_t* file, const char *filename, file_opts_t file_opts)
 {
 	sound_file_t soundfile = *file;
 

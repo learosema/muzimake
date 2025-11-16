@@ -10,7 +10,7 @@ int main() {
 	file_result_t result;
 	result = file_init(&soundfile, FORMAT_ROL);
 
-	result = file_open(&soundfile, "STARTREK.ROL");
+	result = file_open(&soundfile, (char *)"STARTREK.ROL");
 
 	if(result == ERROR){
 		printf("*** Error ***\n");
@@ -23,7 +23,7 @@ int main() {
 
 	rol_file_t rol = *rolFile; // TODO: to be removed, when structure is refactored
 
-	printf("ROL Header size...: %d\n", sizeof(rol_header_t));
+	printf("ROL Header size...: %lu\n", sizeof(rol_header_t));
 
 	printf("isMelodic.........: %s\n", rol.header.isMelodic ? "true" : "false");
 	printf("tickBeat..........: %d\n", rol.header.tickBeat);

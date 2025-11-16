@@ -19,7 +19,7 @@ uint32_t byteswap_32(uint32_t in)
   	(in >> 24);
 }
 
-FILEPTR fileio_open(char * fileName, char *mode)
+FILEPTR fileio_open(const char * fileName, const char *mode)
 {
 	return fopen(fileName, mode);
 }
