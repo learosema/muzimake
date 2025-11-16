@@ -120,7 +120,7 @@ void rolfile_init(file_data_t* file)
 	file->type = MUSIC;
 }
 
-void rolfile_read(file_data_t* file, char* filename)
+void rolfile_read(file_data_t* file, const char* filename)
 {
 	FILEPTR fp = fileio_open(filename, "rb");
 	long len = fileio_get_size(fp);
@@ -150,7 +150,7 @@ void rolfile_read(file_data_t* file, char* filename)
 	file->data = rolFile; // TODO: to be removed, when structure is refactored
 }
 
-bool rolfile_write(file_data_t* file, char *filename)
+bool rolfile_write(file_data_t* file, const char *filename)
 {
 	return false;
 }

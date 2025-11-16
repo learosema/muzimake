@@ -8,14 +8,14 @@
 #include <stubs.h>
 #endif
 #include "asmstuff.h"
-#include "textui/mouse.h"
-#include "textui/keyboard.h"
-#include "textui/textmode.h"
-#include "textui/ui_event.h"
-#include "textui/cmponent.h"
+#include "mouse.h"
+#include "keyboard.h"
+#include "textmode.h"
+#include "ui_event.h"
+#include "cmponent.h"
 #include "macros.h"
-#include "helper/log.h"
-#include "fonts/bulkyv5.h"
+#include "log.h"
+#include "bulkyv5.h"
 #include "vga.h"
 
 static const char * LBL_OK = "Okay";

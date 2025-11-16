@@ -44,7 +44,7 @@ typedef struct dir_entry_s {
 	bool is_dir;
 } dir_entry_t;
 
-FILEPTR fileio_open(char * fileName, char *mode);
+FILEPTR fileio_open(const char * fileName, const char *mode);
 bool fileio_eof(FILEPTR fp);
 
 size_t fileio_read(void * buffer, size_t size, size_t nItems, FILEPTR fp);

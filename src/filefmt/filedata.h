@@ -49,7 +49,7 @@ typedef struct file_data {
 // --> return_type (*pointer_name)(parameter_types);
 typedef struct file_func {
 	void (*init_file)(file_data_t*);
-	void (*read_file)(file_data_t*, char*);
+	void (*read_file)(file_data_t*, const char*);
 	void (*close_file)(file_data_t*);
 
 	// Debug only
