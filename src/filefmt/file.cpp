@@ -14,7 +14,7 @@ struct sound_file_s {
 	const file_func_t* func_ptr;
 };
 
-file_result_t file_init(sound_file_t* file, file_format_t file_format)
+file_result_t file_init(sound_file_t * const file, const file_format_t file_format)
 {
 	sound_file_t soundfile = (sound_file_t)calloc(1, sizeof(struct sound_file_s));
 
@@ -42,7 +42,7 @@ file_result_t file_init(sound_file_t* file, file_format_t file_format)
 	return *file != NULL ? SUCCESS : ERROR;
 }
 
-file_result_t file_open(sound_file_t* file, const char *filename, file_opts_t file_opts)
+file_result_t file_open(sound_file_t* const file, const char *filename, file_opts_t file_opts)
 {
 	sound_file_t soundfile = *file;
 

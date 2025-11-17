@@ -1,7 +1,8 @@
 #include <stdio.h>
-#include <greatest.h>
 
-#include "helper/list.h"
+#include "greatest.h"
+
+#include "list.h"
 /*
 static void before_each(void *data)
 {

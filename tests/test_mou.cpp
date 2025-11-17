@@ -68,7 +68,7 @@ int main (void)
     /* check for mouse driver */
 
 
-    if( installed = mouse_init() )
+    if( (installed = mouse_init()) )
         printf( "Mouse installed...\n" );
     else
         printf( "Mouse NOT installed...\n" );

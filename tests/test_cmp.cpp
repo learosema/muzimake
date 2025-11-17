@@ -1,9 +1,8 @@
-#include <stdio.h>
 #include <textmode.h>
 #include <greatest.h>
 
 #include "textui/cmponent.h"
-#include "vendor/cp437.h"
+#include "cp437.h"
 
 static ui_component_t button;
 const char *label = "OK";

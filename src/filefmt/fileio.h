@@ -44,39 +44,39 @@ typedef struct dir_entry_s {
 	bool is_dir;
 } dir_entry_t;
 
-FILEPTR fileio_open(const char * fileName, const char *mode);
-bool fileio_eof(FILEPTR fp);
+FILEPTR fileio_open(const char * const fileName, const char * const mode);
+bool fileio_eof(const FILEPTR fp);
 
-size_t fileio_read(void * buffer, size_t size, size_t nItems, FILEPTR fp);
-size_t fileio_write(void * buffer, size_t size, size_t nItems, FILEPTR fp);
+size_t fileio_read(void * const buffer, const size_t size, const size_t nItems, FILEPTR const fp);
+size_t fileio_write(void * const buffer, const size_t size, const size_t nItems, FILEPTR const fp);
 
-bool fileio_close(FILEPTR fp);
-long fileio_get_size(FILEPTR fp);
+bool fileio_close(FILEPTR const fp);
+long fileio_get_size(FILEPTR const fp);
 
-size_t fileio_read_chars(FILEPTR fp, char *chars, int n);
-uint8_t fileio_read_u8(FILEPTR fp);
+size_t fileio_read_chars(FILEPTR const fp, char * const chars, const size_t num_chars);
+uint8_t fileio_read_u8(FILEPTR const fp);
 
-uint16_t fileio_read_u16le(FILEPTR fp);
-uint16_t fileio_read_u16be(FILEPTR fp);
+uint16_t fileio_read_u16le(FILEPTR const fp);
+uint16_t fileio_read_u16be(FILEPTR const fp);
 
-uint32_t fileio_read_u32le(FILEPTR fp);
-uint32_t fileio_read_u32be(FILEPTR fp);
+uint32_t fileio_read_u32le(FILEPTR const fp);
+uint32_t fileio_read_u32be(FILEPTR const fp);
 
-float fileio_read_f32le(FILEPTR fp);
-float fileio_read_f32be(FILEPTR fp);
+float fileio_read_f32le(FILEPTR const fp);
+float fileio_read_f32be(FILEPTR const fp);
 
-uint16_t byteswap_16(uint16_t in);
-uint32_t byteswap_32(uint32_t in);
+uint16_t byteswap_16(const uint16_t in);
+uint32_t byteswap_32(const uint32_t in);
 
 dir_entry_t *fileio_dir_entry_create(const char *filename, const bool is_dir);
 void fileio_dir_entry_dispose(dir_entry_t * entry);
 
-DIRPTR fileio_open_dir(const char * path);
-DIRENTPTR fileio_read_dir(DIRPTR dir);
-bool fileio_close_dir(DIRPTR dir);
+DIRPTR fileio_open_dir(const char * const path);
+DIRENTPTR fileio_read_dir(DIRPTR const dir);
+bool fileio_close_dir(DIRPTR const dir);
 
 linked_list_t *fileio_list_files(const char *path);
-void fileio_list_files_dispose(linked_list_t *list);
+void fileio_list_files_dispose(linked_list_t * const list);
 
 #ifdef __cplusplus
 }

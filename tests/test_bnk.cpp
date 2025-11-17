@@ -53,7 +53,7 @@ int main()
 	assert(strncmp(bnkFile->header->signature, "ADLIB-", 6) == 0);
 	printf("bankfile loaded: %d instruments\n", bnkFile->header->numInstuments);
 
-	printf("sizeof(bnkinstrument) = %d\n", sizeof(bnk_instrument_t));
+	printf("sizeof(bnkinstrument) = %lu\n", sizeof(bnk_instrument_t));
 	printf("\n\nNow testing all instruments. Sometimes it can get noisy.\n");
 	printf("Then, press R to make this program shut up.\n");
 	printf("Or ESC to cancel the test.\n\n");
