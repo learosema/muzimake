@@ -6,12 +6,12 @@
 #include "list.h"
 #include "fileio.h"
 
-uint16_t byteswap_16(uint16_t in)
+uint16_t byteswap_16(const uint16_t in)
 {
 	return ((in & 0xFF) << 8) | (in >> 8);
 }
 
-uint32_t byteswap_32(uint32_t in)
+uint32_t byteswap_32(const uint32_t in)
 {
 	return ((in & 0xFF) << 24) |
   	((in & 0xFF00) << 8) |
@@ -19,31 +19,31 @@ uint32_t byteswap_32(uint32_t in)
   	(in >> 24);
 }
 
-FILEPTR fileio_open(const char * fileName, const char *mode)
+FILEPTR fileio_open(const char * const fileName, const char * const mode)
 {
 	return fopen(fileName, mode);
 }
 
-bool fileio_eof(FILEPTR fp) {
+bool fileio_eof(FILEPTR const fp) {
 	return feof(fp) != 0;
 }
 
-bool fileio_close(FILEPTR fp)
+bool fileio_close(FILEPTR const fp)
 {
 	return (fclose(fp) == 0);
 }
 
-size_t fileio_write(void * buffer, size_t size, size_t nItems, FILEPTR fp)
+size_t fileio_write(void * const buffer, const size_t size,  const size_t nItems, FILEPTR const fp)
 {
 	return fwrite(buffer, size, nItems, fp);
 }
 
-size_t fileio_read(void * buffer, size_t size, size_t nItems, FILEPTR fp)
+size_t fileio_read(void * const buffer, const size_t size, const size_t nItems, FILEPTR const fp)
 {
 	return fread(buffer, size, nItems, fp);
 }
 
-long fileio_get_size(FILEPTR fp)
+long fileio_get_size(FILEPTR const fp)
 {
 	long len;
 	if (fp == NULL) {
@@ -65,19 +65,19 @@ long fileio_get_size(FILEPTR fp)
 	return len;
 }
 
-size_t fileio_read_chars(FILEPTR fp, char *chars, int n)
+size_t fileio_read_chars(FILEPTR const fp, char * const chars, const size_t num_chars)
 {
-	return fileio_read(chars, sizeof(char), n, fp);
+	return fileio_read(chars, sizeof(char), num_chars, fp);
 }
 
-uint8_t fileio_read_u8(FILEPTR fp)
+uint8_t fileio_read_u8(FILEPTR const fp)
 {
 	uint8_t b = 0;
 	fileio_read(&b, sizeof(uint8_t), 1, fp);
 	return b;
 }
 
-uint16_t fileio_read_u16le(FILEPTR fp)
+uint16_t fileio_read_u16le(FILEPTR const fp)
 {
 	uint16_t result = 0;
 	fileio_read(&result, sizeof(uint16_t), 1, fp);
@@ -87,7 +87,7 @@ uint16_t fileio_read_u16le(FILEPTR fp)
 	return result;
 }
 
-uint16_t fileio_read_u16be(FILEPTR fp)
+uint16_t fileio_read_u16be(FILEPTR const fp)
 {
 	uint16_t result = 0;
 	fileio_read(&result, sizeof(uint16_t), 1, fp);
@@ -97,7 +97,7 @@ uint16_t fileio_read_u16be(FILEPTR fp)
 	return result;
 }
 
-uint32_t fileio_read_u32le(FILEPTR fp)
+uint32_t fileio_read_u32le(FILEPTR const fp)
 {
 	uint32_t result = 0;
 	fileio_read(&result, sizeof(uint32_t), 1, fp);
@@ -107,7 +107,7 @@ uint32_t fileio_read_u32le(FILEPTR fp)
 	return result;
 }
 
-uint32_t fileio_read_u32be(FILEPTR fp)
+uint32_t fileio_read_u32be(FILEPTR const fp)
 {
 	uint32_t result = 0;
 	fileio_read(&result, sizeof(uint32_t), 1, fp);
@@ -117,7 +117,7 @@ uint32_t fileio_read_u32be(FILEPTR fp)
 	return result;
 }
 
-float fileio_read_f32le(FILEPTR fp)
+float fileio_read_f32le(FILEPTR const fp)
 {
 	float result = 0;
 	fileio_read(&result, sizeof(float), 1, fp);
@@ -127,7 +127,7 @@ float fileio_read_f32le(FILEPTR fp)
 	return result;
 }
 
-float fileio_read_f32be(FILEPTR fp)
+float fileio_read_f32be(FILEPTR const fp)
 {
 	float result = 0;
 	fileio_read(&result, sizeof(uint32_t), 1, fp);
@@ -137,17 +137,17 @@ float fileio_read_f32be(FILEPTR fp)
 	return result;
 }
 
-DIRPTR fileio_open_dir(const char * path)
+DIRPTR fileio_open_dir(const char * const path)
 {
 	return opendir(path);
 }
 
-DIRENTPTR fileio_read_dir(DIRPTR dir)
+DIRENTPTR fileio_read_dir(DIRPTR const dir)
 {
 	return readdir(dir);
 }
 
-bool fileio_close_dir(DIRPTR dir)
+bool fileio_close_dir(DIRPTR const dir)
 {
 	return (closedir(dir) == 0);
 }
@@ -173,7 +173,7 @@ void fileio_dir_entry_dispose(dir_entry_t * entry)
 	free(entry);
 }
 
-linked_list_t *fileio_list_files(const char *path)
+linked_list_t *fileio_list_files(const char * const path)
 {
 	linked_list_t *list = linked_list_new();
 
@@ -192,7 +192,7 @@ linked_list_t *fileio_list_files(const char *path)
 	return list;
 }
 
-void fileio_list_files_dispose(linked_list_t *list)
+void fileio_list_files_dispose(linked_list_t * const list)
 {
 	for (node_t *iter = list->head; iter != NULL; iter = iter->next)
 	{

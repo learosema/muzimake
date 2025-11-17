@@ -122,7 +122,7 @@ void bnkfile_debug(file_data_t* file)
 {
 	bnk_file_t* bnkFile = (bnk_file_t*)file->data; // TODO: to be removed, when structure is refactored
 
-	fprintf(stderr, "bnkfile version %d\.%d\n%d instruments. total %d\noffset names: %d\noffset data: %d\n",
+	fprintf(stderr, "bnkfile version %d.%d\n%d instruments. total %d\noffset names: %d\noffset data: %d\n",
 		bnkFile->header->versionMajor,
 		bnkFile->header->versionMinor,
 		bnkFile->header->numInstuments,
