@@ -13,10 +13,11 @@ int main() {
 
 	if(result == ERROR){
 		printf("*** Error ***\n");
+		return -1;
 	}
-	else {
-		printf("*** Success ***\n");
-	}
+
+	printf("*** Success ***\n");
+
 
 	//---
 
@@ -25,4 +26,5 @@ int main() {
 	//---
 
 	file_close(&soundfile);
+	return 0;
 }
