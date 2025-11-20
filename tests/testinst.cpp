@@ -19,6 +19,7 @@ int main()
 
 	if(result == ERROR){
 		printf("*** Error ***\n");
+		return -1;
 	}
 	else {
 		printf("*** Success ***\n");
@@ -45,4 +46,5 @@ int main()
 	EXPECT("expect the first entry to be 000_test", strcmp(map.entries[0].name, "000_test") == 0);
 
 	file_close(&soundfile);
+	return 0;
 }
