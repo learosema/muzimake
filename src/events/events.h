@@ -1,6 +1,10 @@
 #ifndef __EVENTS_H__
 #define __EVENTS_H__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "my_mutex.h"
 
 /* === Datenstrukturen für das Eventsystem === */
@@ -45,4 +49,7 @@ void ProcessMessageQueue(EventManager_t *manager);
 /* === Cleanup-Funktion für den Event Manager === */
 void DestroyEventManager(EventManager_t *manager);
 
+#ifdef __cplusplus
+}
+#endif
 #endif

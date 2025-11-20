@@ -1,6 +1,10 @@
 #ifndef __VGA_H__
 #define __VGA_H__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* VGA ports */
 #define PALETTE_INDEX 0x3C8
 #define PALETTE_DATA 0x3C9
@@ -21,4 +25,7 @@
 
 void vga_wait_for_retrace();
 
+#ifdef __cplusplus
+}
+#endif
 #endif

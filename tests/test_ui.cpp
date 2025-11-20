@@ -1,21 +1,20 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #if defined(__DOS__)
 #include <conio.h>
 #include <dos.h>
+#include "asmstuff.h"
 #else
 #include <stubs.h>
 #endif
-#include "asmstuff.h"
+#include "log.h"
 #include "mouse.h"
 #include "keyboard.h"
 #include "textmode.h"
 #include "ui_event.h"
 #include "cmponent.h"
 #include "macros.h"
-#include "log.h"
-#include "bulkyv5.h"
+#include "fontdata.h"
 #include "vga.h"
 
 static const char * LBL_OK = "Okay";
@@ -96,13 +95,6 @@ bool needs_repaint(const ui_state_t *ui) {
 		}
 	}
 	return false;
-}
-
-void wait_for_user()
-{
-	while (!mouse_get_callback_data()->has_event && !(kbhit())) {
-		asm_hlt();
-	}
 }
 
 int main()

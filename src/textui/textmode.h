@@ -1,6 +1,11 @@
 #ifndef TEXTMODE_HPP
 #define TEXTMODE_HPP
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdint.h>
 
 #if defined __DOS__ && defined __WATCOMC__ && defined __386__
@@ -43,6 +48,8 @@
 #define TEXT_GET_COLOR(x, y) (uint8_t) \
 	((((x) < 0) || ((x) >= textmode_get_modeinfo()->numCols) || ((y) < 0) || ((y) >= textmode_get_modeinfo()->numRows)) ? 0 : \
 	*(textmode_get_modeinfo()->vram + 1 + 2 * (textmode_get_modeinfo()->numCols * (y) + (x))))
+
+
 
 
 
@@ -193,4 +200,23 @@ textbuffer_t textmode_get_screen();
 
 void textmode_dispose_buffer(textbuffer_t * txt_buffer);
 
+inline uint8_t text_get_char(const uint8_t x, const uint8_t y) {
+	const MODEINFO * const info = textmode_get_modeinfo();
+	if ((x < 0) || (x >= textmode_get_modeinfo()->numCols) || (y < 0) || (y >= textmode_get_modeinfo()->numRows)) {
+		return 0;
+	}
+	return *(textmode_get_modeinfo()->vram + 2 * (textmode_get_modeinfo()->numCols * (y) + (x)));
+}
+
+inline uint8_t text_get_color(const uint8_t x, const uint8_t y) {
+	const MODEINFO * const info = textmode_get_modeinfo();
+	if ((x < 0) || (x >= textmode_get_modeinfo()->numCols) || (y < 0) || (y >= textmode_get_modeinfo()->numRows)) {
+		return 0;
+	}
+	return *(textmode_get_modeinfo()->vram + 2 * (textmode_get_modeinfo()->numCols * (y) + (x)));
+}
+
+#ifdef __cplusplus
+}
+#endif
 #endif

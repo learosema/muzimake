@@ -10,6 +10,7 @@ BIN_DIR=bin
 OBJ_DIR=obj
 TEST_DIR=tests
 VENDOR_DIR=vendor
+FONTS_DIR=fonts
 
 SRC_DIR_EVT=$(SRC_DIR)/events
 SRC_DIR_FMT=$(SRC_DIR)/filefmt
@@ -17,7 +18,8 @@ SRC_DIR_HAL=$(SRC_DIR)/hal
 SRC_DIR_HLP=$(SRC_DIR)/helper
 SRC_DIR_TUI=$(SRC_DIR)/textui
 
-CXX_INCL=-i=$(SRC_DIR) -i=$(SRC_DIR_EVT) -i=$(SRC_DIR_FMT) -i=$(SRC_DIR_HAL) -i=$(SRC_DIR_HLP) -i=$(SRC_DIR_TUI) -i=$(VENDOR_DIR)
+
+CXX_INCL=-i=$(SRC_DIR) -i=$(SRC_DIR_EVT) -i=$(SRC_DIR_FMT) -i=$(SRC_DIR_HAL) -i=$(SRC_DIR_HLP) -i=$(SRC_DIR_TUI) -i=$(VENDOR_DIR) -i=$(FONTS_DIR)
 
 !ifdef __UNIX__
 O_EXT=o
@@ -41,13 +43,13 @@ MD_OBJ=if not exist $(OBJ_DIR) md $(OBJ_DIR)
 # SRC_HELPER=list.cpp
 # SRC_TEXTUI=mouse.cpp dpmiutil.cpp textmode.cpp vga.cpp
 
-LIB_CORE_SRCS=dpmiutil.cpp vga.cpp mouse.cpp keyboard.cpp textmode.cpp list.cpp fileio.cpp pathutil.cpp
+LIB_CORE_SRCS=log.cpp dpmiutil.cpp vga.cpp mouse.cpp keyboard.cpp textmode.cpp list.cpp fileio.cpp pathutil.cpp
 LIB_UI_SRCS=ui_event.cpp ui_common.cpp ui_label.cpp ui_btn.cpp ui_input.cpp ui_lsbox.cpp ui_piano.cpp ui_range.cpp ui_sheet.cpp ui_load.cpp cmponent.cpp
 LIB_OPL_SRCS=bnkfile.cpp rolfile.cpp file.cpp instrmnt.cpp opl2.cpp
 
-SRCS=$(LIB_CORE_SRCS) $(LIB_UI_SRCS) $(LIB_OPL_SRCS) log.cpp main.cpp
+SRCS=$(LIB_CORE_SRCS) $(LIB_UI_SRCS) $(LIB_OPL_SRCS) main.cpp
 
-TEST_COMMON_SRCS=bnkfile.cpp rolfile.cpp list.cpp fileio.cpp file.cpp
+TEST_COMMON_SRCS=log.cpp bnkfile.cpp rolfile.cpp list.cpp fileio.cpp file.cpp
 
 TEST_EVT_SRCS=events.cpp test_evt.cpp
 TEST_ROL_SRCS=$(TEST_COMMON_SRCS) instrmnt.cpp opl2.cpp test_rol.cpp
@@ -59,8 +61,8 @@ TEST_MOU_SRCS=dpmiutil.cpp textmode.cpp mouse.cpp test_mou.cpp
 TEST_FNT_SRCS=test_fnt.cpp
 TEST_LST_SRCS=list.cpp test_lst.cpp
 TEST_PTH_SRCS=pathutil.cpp test_pth.cpp
-TEST_UI_SRCS=$(LIB_CORE_SRCS) $(LIB_UI_SRCS) log.cpp test_ui.cpp
-TEST_CMP_SRCS=$(LIB_CORE_SRCS) $(LIB_UI_SRCS) log.cpp test_cmp.cpp
+TEST_UI_SRCS=$(LIB_CORE_SRCS) $(LIB_UI_SRCS) test_ui.cpp
+TEST_CMP_SRCS=$(LIB_CORE_SRCS) $(LIB_UI_SRCS) test_cmp.cpp
 TEST_SRCS    =$(TEST_COMMON_SRCS) instrmnt.cpp test.cpp
 
 OBJS=$(SRCS:.cpp=.$(O_EXT))

@@ -3,7 +3,6 @@
 #include "macros.h"
 #include "textmode.h"
 #include "ui_btn.h"
-#include "keyboard.h"
 
 void button_render(ui_button_t *button)
 {

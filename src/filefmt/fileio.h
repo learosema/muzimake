@@ -12,14 +12,12 @@ extern "C" {
 #include "list.h"
 
 #ifndef __LITTLE_ENDIAN__
-#ifdef __DOS__
+#if defined(__DOS__) || defined(__WINDOWS__)
 #define __LITTLE_ENDIAN__ 1
-#else defined(__BYTE_ORDER__)
-#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+#elif defined(__BYTE_ORDER__) && __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
 #define __LITTLE_ENDIAN__ 1
 #else
 #define __LITTLE_ENDIAN__ 0
-#endif
 #endif
 #endif
 

@@ -1,21 +1,20 @@
-#include <stdio.h>
 #include <stdlib.h>
 #if defined __DOS__ && defined __386__
 #include <dpmiutil.h>
 #include <i86.h>
 #endif
 #ifdef __DOS__
+#include <stdio.h>
 #include <dos.h>
 #include <malloc.h>
+#include "asmstuff.h"
 #else
 #include <intstubs.h>
 #endif
 #include <string.h>
 
 #include "textmode.h"
-#include "vendor/cp437.h"
-#include "helper/asmstuff.h"
-#include "helper/log.h"
+#include "cp437.h"
 
 #define MIN(A, B) ((A) < (B) ? (A) : (B))
 #define MAX(A, B) ((A) > (B) ? (A) : (B))
@@ -596,42 +595,42 @@ void textmode_init_font(const uint8_t *charData, const uint16_t charHeight, cons
 
 bool textmode_check_box(uint8_t x, uint8_t y, uint8_t width, uint8_t height)
 {
-	char topleft_corner = TEXT_GET_CHAR(x, y);
-	char topright_corner = TEXT_GET_CHAR(x + width - 1, 0);
-	char btmleft_corner = TEXT_GET_CHAR(y, y + height - 1);
-	char btmright_corner = TEXT_GET_CHAR(x + width - 1, y + height - 1);
+	uint8_t topleft_corner = text_get_char(x, y);
+	uint8_t topright_corner = text_get_char(x + width - 1, 0);
+	uint8_t btmleft_corner = text_get_char(y, y + height - 1);
+	uint8_t btmright_corner = text_get_char(x + width - 1, y + height - 1);
 	if (CP_THIN_RIGHT_THIN_DOWN != topleft_corner) return false;
 	if (CP_THIN_LEFT_THIN_DOWN != topright_corner) return false;
 	if (CP_THIN_RIGHT_THIN_UP != btmleft_corner) return false;
 	if (CP_THIN_LEFT_THIN_UP != btmright_corner) return false;
 	for (uint8_t i = 1; i < width - 2; i++) {
-		if (CP_THIN_HORIZONTAL != TEXT_GET_CHAR(x + i, y)) return false;
-		if (CP_THIN_HORIZONTAL != TEXT_GET_CHAR(x + i, y + height - 1)) return false;
+		if (CP_THIN_HORIZONTAL != text_get_char(x + i, y)) return false;
+		if (CP_THIN_HORIZONTAL != text_get_char(x + i, y + height - 1)) return false;
 	}
 	for (uint8_t i = 1; i < height - 2; i++) {
-		if (CP_THIN_HORIZONTAL != TEXT_GET_CHAR(x, y + i)) return false;
-		if (CP_THIN_HORIZONTAL != TEXT_GET_CHAR(x + width - 1, y + i)) return false;
+		if (CP_THIN_HORIZONTAL != text_get_char(x, y + i)) return false;
+		if (CP_THIN_HORIZONTAL != text_get_char(x + width - 1, y + i)) return false;
 	}
 	return true;
 }
 
 bool textmode_check_dblbox(uint8_t x, uint8_t y, uint8_t width, uint8_t height)
 {
-	char topleft_corner = TEXT_GET_CHAR(x, y);
-	char topright_corner = TEXT_GET_CHAR(x + width - 1, 0);
-	char btmleft_corner = TEXT_GET_CHAR(y, y + height - 1);
-	char btmright_corner = TEXT_GET_CHAR(x + width - 1, y + height - 1);
+	uint8_t topleft_corner = text_get_char(x, y);
+	uint8_t topright_corner = text_get_char(x + width - 1, 0);
+	uint8_t btmleft_corner = text_get_char(y, y + height - 1);
+	uint8_t btmright_corner = text_get_char(x + width - 1, y + height - 1);
 	if (CP_THICK_RIGHT_THICK_DOWN != topleft_corner) return false;
 	if (CP_THICK_LEFT_THICK_DOWN != topright_corner) return false;
 	if (CP_THICK_RIGHT_THICK_UP != btmleft_corner) return false;
 	if (CP_THICK_LEFT_THICK_UP != btmright_corner) return false;
 	for (uint8_t i = 1; i < width - 2; i++) {
-		if (CP_THICK_HORIZONTAL != TEXT_GET_CHAR(x + i, y)) return false;
-		if (CP_THICK_HORIZONTAL != TEXT_GET_CHAR(x + i, y + height - 1)) return false;
+		if (CP_THICK_HORIZONTAL != text_get_char(x + i, y)) return false;
+		if (CP_THICK_HORIZONTAL != text_get_char(x + i, y + height - 1)) return false;
 	}
 	for (uint8_t i = 1; i < height - 2; i++) {
-		if (CP_THICK_HORIZONTAL != TEXT_GET_CHAR(x, y + i)) return false;
-		if (CP_THICK_HORIZONTAL != TEXT_GET_CHAR(x + width - 1, y + i)) return false;
+		if (CP_THICK_HORIZONTAL != text_get_char(x, y + i)) return false;
+		if (CP_THICK_HORIZONTAL != text_get_char(x + width - 1, y + i)) return false;
 	}
 	return true;
 }

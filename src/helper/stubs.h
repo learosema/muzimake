@@ -5,8 +5,6 @@
 extern "C" {
 #endif
 
-#if !defined(__DOS__)
-
 #define _loadds
 #define __interrupt
 #define far
@@ -21,6 +19,5 @@ inline void outp(int, int) { /* stub */ };
 #ifdef __cplusplus
 }
 #endif
+#endif
 
-#endif
-#endif

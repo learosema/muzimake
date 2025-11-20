@@ -97,7 +97,7 @@ void bnkfile_init(file_data_t* file)
 	file->type = INSTRUMENT_BANK;
 }
 
-void bnkfile_read(file_data_t* file, char* filename)
+void bnkfile_read(file_data_t* file, const char* filename)
 {
 	FILEPTR fp = fileio_open(filename, "rb");
 
@@ -132,7 +132,7 @@ void bnkfile_debug(file_data_t* file)
 	);
 }
 
-bool bnkfile_write(file_data_t* file, char* filename)
+bool bnkfile_write(file_data_t* file, const char* filename)
 {
 	bnk_file_t* bnkFile = (bnk_file_t*)file->data; // TODO: to be removed, when structure is refactored
 

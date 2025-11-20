@@ -1,12 +1,13 @@
-#include <stdio.h>
 #ifdef __DOS__
+#include <stdio.h>
 #include <dos.h>
 #include <conio.h>
+#include "asmstuff.h"
 #ifdef __386__
 #include <dpmiutil.h>
 #else
-#define DPMI_LOCK_FUNC(x) 0
-#define DPMU_LOCK_VAR(x) 0
+#define DPMI_LOCK_FUNC(x)
+#define DPMU_LOCK_VAR(x)
 #endif
 #else
 #include <stubs.h>
@@ -17,7 +18,6 @@
 
 #include "keyboard.h"
 #define KBD_INTERRUPT 9
-#include "asmstuff.h"
 
 static kbd_state_t g_keystate = {0};
 static interrupt_func_t old_keyboard_interrupt = nullptr;
