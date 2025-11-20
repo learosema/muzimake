@@ -1,7 +1,7 @@
 #ifndef FONTDATA_H__
 #define FONTDATA_H__
 
-#ifndef __cplusplus
+#ifdef __cplusplus
 extern "C" {
 #endif
 #include <stdint.h>
@@ -265,7 +265,7 @@ static const uint8_t font_data[] = {
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 };
 
-#ifndef __cplusplus
+#ifdef __cplusplus
 }
 #endif
 #endif

@@ -1,3 +1,10 @@
+#ifndef __MY_MUTEX_H__
+#define __MY_MUTEX_H__
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* === Eigene Mutex-Implementierung (allgemein, C11) === */
 
 typedef struct my_mutex {
@@ -22,3 +29,8 @@ void my_mutex_unlock(my_mutex_t* mutex) {
 void my_mutex_destroy(my_mutex_t* mutex) {
 	// Kein Cleanup nötig.
 }
+
+#ifdef __cplusplus
+}
+#endif
+#endif

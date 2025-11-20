@@ -2,10 +2,10 @@
 #include <dos.h>
 #else
 #include <intstubs.h>
+#include <stubs.h>
 #endif
 
 #include <intrhelp.h>
-#include <stubs.h>
 
 #if defined __DOS__ && defined __386__
 #include <dpmiutil.h>
@@ -17,10 +17,10 @@
 #define INTR int86
 #define INTRX int86x
 #else
-#define DPMI_LOCK_FUNC(x) 0
-#define DPMI_LOCK_VAR(x)  0
-#define INTR(...)
-#define INTRX(...)
+#define DPMI_LOCK_FUNC(x)
+#define DPMI_LOCK_VAR(x)
+#define INTR(...) ;
+#define INTRX(...) ;
 #endif
 
 #include "mouse.h"
@@ -204,3 +204,6 @@ mouse_callback_data_t *mouse_get_callback_data()
 {
 	return &g_mouse_data;
 }
+
+
+;;;;

@@ -1,7 +1,3 @@
-set(SRC_DIR ${CMAKE_SOURCE_DIR}/src)
-set(VENDOR_DIR ${CMAKE_SOURCE_DIR}/vendor)
-set(FONTS_DIR ${CMAKE_SOURCE_DIR}/fonts)
-
 set(LIB_CORE_SRCS
 	${SRC_DIR}/helper/dpmiutil.cpp
 	${SRC_DIR}/textui/vga.cpp

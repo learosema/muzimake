@@ -1,6 +1,10 @@
 #ifndef __FILEDATA_H__
 #define __FILEDATA_H__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdint.h>
 
 // Opaque pointer (s. https://blog.mbedded.ninja/programming/design-patterns/opaque-pointers/)
@@ -56,4 +60,7 @@ typedef struct file_func {
 	void (*dbg_file)(file_data_t*);
 } file_func_t;
 
+#ifdef __cplusplus
+}
+#endif
 #endif // __FILEDATA_H__

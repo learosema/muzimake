@@ -2,6 +2,10 @@
 #include <stdlib.h>
 #include <string.h>
 
+#if defined __UNIX__ || defined __linux__ || defined __macosx__
+#include <unistd.h>
+#endif
+
 path_t *path_create(const char *path_string)
 {
 	path_t *result = (path_t *)malloc(sizeof(path_t));
@@ -54,5 +58,10 @@ void path_dispose(path_t *path)
 
 bool path_chdir(const char *path_string)
 {
-	return _chdir(path_string) == 0;
+	#ifdef __DOS__
+	return ((_chdir(path_string)) == 0);
+	#endif
+	#if defined __UNIX__ || defined __linux__
+	return ((chdir(path_string)) == 0);
+	#endif
 }

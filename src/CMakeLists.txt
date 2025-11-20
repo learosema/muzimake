@@ -31,5 +31,17 @@ set(LIB_OPL_SRCS
 	hal/opl2.cpp
 )
 
-add_executable(MuziMake ${LIB_CORE_SRCS} ${LIB_UI_SRCS} ${LIB_OPL_SRCS})
-target_include_directories(MuziMake PUBLIC events fonts filefmt hal helper textui)
+
+
+add_executable(MuziMake ${LIB_CORE_SRCS} ${LIB_UI_SRCS} ${LIB_OPL_SRCS} main.cpp)
+target_include_directories(MuziMake PRIVATE
+	${SRC_DIR}
+	${SRC_DIR}/events
+	${SRC_DIR}/fonts
+	${SRC_DIR}/filefmt
+	${SRC_DIR}/hal
+	${SRC_DIR}/helper
+	${SRC_DIR}/textui
+	${VENDOR_DIR}
+	${FONTS_DIR}
+)

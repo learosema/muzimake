@@ -1,6 +1,10 @@
 #ifndef __BNKFILE_H__
 #define __BNKFILE_H__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define BNK_ERR_OK 0
 #define BNK_ERR_READ_FAILED 1
 #define BNK_ERR_WRITE_FAILED 2
@@ -11,9 +15,7 @@
 
 #include <filedata.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 static int bnk_last_error = 0;
 

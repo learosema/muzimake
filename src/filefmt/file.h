@@ -1,6 +1,11 @@
 #ifndef __FILE_H__
 #define __FILE_H__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 #include <stdint.h>
 
 // Nice to have later:
@@ -44,4 +49,7 @@ void file_dbg(sound_file_t* file);
 
 void* file_get_raw(sound_file_t* file); // TODO: to be removed, when structure is refactored
 
+#ifdef __cplusplus
+}
+#endif
 #endif // __FILE_H__

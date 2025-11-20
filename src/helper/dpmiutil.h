@@ -14,8 +14,8 @@ extern "C" {
 #define DPMI_UNLOCK_FUNC(x) dpmi_unlock_linear_region((void near *)x, (char *)x##_end - (char near *)x)
 #define DPMI_UNLOCK_VAR(x) dpmi_unlock_linear_region((void *)&x, sizeof(x))
 #else
-#define DPMI_LOCK_FUNC(x) 0
-#define DPMI_LOCK_VAR(x) 0
+#define DPMI_LOCK_FUNC(x)
+#define DPMI_LOCK_VAR(x)
 #endif
 
 

@@ -3,6 +3,10 @@
 #include <stdarg.h>
 #include <time.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 static FILE * log_fd = nullptr;
 
 void log_open()
@@ -31,9 +35,12 @@ void log_write(const char* fmt, ...)
 	}
 
 	strftime(datetime_str, sizeof(datetime_str), "[%Y-%m-%d - %H:%M:%S] ", tm);
-	fprintf(log_fd, datetime_str);
+	fprintf(log_fd, (const char *)datetime_str);
 	vfprintf(log_fd, fmt, args);
 	fprintf(log_fd, "\n");
 	va_end(args);
 }
 
+#ifdef __cplusplus
+}
+#endif
