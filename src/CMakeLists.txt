@@ -31,9 +31,11 @@ set(LIB_OPL_SRCS
 	hal/opl2.cpp
 )
 
+set(LIB_APP_SRCS
+	app/sdlapp.cpp
+)
 
-
-add_executable(MuziMake ${LIB_CORE_SRCS} ${LIB_UI_SRCS} ${LIB_OPL_SRCS} main.cpp)
+add_executable(MuziMake ${LIB_CORE_SRCS} ${LIB_UI_SRCS} ${LIB_OPL_SRCS} ${LIB_APP_SRCS} main.cpp)
 target_include_directories(MuziMake PRIVATE
 	${SRC_DIR}
 	${SRC_DIR}/events
@@ -42,6 +44,7 @@ target_include_directories(MuziMake PRIVATE
 	${SRC_DIR}/hal
 	${SRC_DIR}/helper
 	${SRC_DIR}/textui
+	${SRC_DIR}/app
 	${VENDOR_DIR}
 	${FONTS_DIR}
 )

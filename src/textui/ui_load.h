@@ -33,7 +33,7 @@ typedef struct ui_load_result_s {
 void ui_load_render(ui_load_t *load_state);
 void ui_load_process_events(ui_load_t *load_state, ui_event_t *event);
 
-bool ui_load_modal(ui_load_result_t *result, bool has_mouse);
+bool ui_load_modal(ui_load_result_t *result);
 void ui_load_free_result(ui_load_result_t *result);
 
 #ifdef __cplusplus

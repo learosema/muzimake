@@ -12,14 +12,14 @@ TEST_DIR=tests
 VENDOR_DIR=vendor
 FONTS_DIR=fonts
 
+SRC_DIR_APP=$(SRC_DIR)/app
 SRC_DIR_EVT=$(SRC_DIR)/events
 SRC_DIR_FMT=$(SRC_DIR)/filefmt
 SRC_DIR_HAL=$(SRC_DIR)/hal
 SRC_DIR_HLP=$(SRC_DIR)/helper
 SRC_DIR_TUI=$(SRC_DIR)/textui
 
-
-CXX_INCL=-i=$(SRC_DIR) -i=$(SRC_DIR_EVT) -i=$(SRC_DIR_FMT) -i=$(SRC_DIR_HAL) -i=$(SRC_DIR_HLP) -i=$(SRC_DIR_TUI) -i=$(VENDOR_DIR) -i=$(FONTS_DIR)
+CXX_INCL=-i=$(SRC_DIR) -i=$(SRC_DIR_EVT) -i=$(SRC_DIR_FMT) -i=$(SRC_DIR_HAL) -i=$(SRC_DIR_HLP) -i=$(SRC_DIR_TUI) -i=$(SRC_DIR_APP) -i=$(VENDOR_DIR)/cp437 -i=$(VENDOR_DIR)/greatest -i=$(FONTS_DIR)
 
 !ifdef __UNIX__
 O_EXT=o
@@ -46,8 +46,8 @@ MD_OBJ=if not exist $(OBJ_DIR) md $(OBJ_DIR)
 LIB_CORE_SRCS=log.cpp dpmiutil.cpp vga.cpp mouse.cpp keyboard.cpp textmode.cpp list.cpp fileio.cpp pathutil.cpp
 LIB_UI_SRCS=ui_event.cpp ui_common.cpp ui_label.cpp ui_btn.cpp ui_input.cpp ui_lsbox.cpp ui_piano.cpp ui_range.cpp ui_sheet.cpp ui_load.cpp cmponent.cpp
 LIB_OPL_SRCS=bnkfile.cpp rolfile.cpp file.cpp instrmnt.cpp opl2.cpp
-
-SRCS=$(LIB_CORE_SRCS) $(LIB_UI_SRCS) $(LIB_OPL_SRCS) main.cpp
+LIB_APP_SRCS=mainui.cpp dosapp.cpp
+SRCS=$(LIB_CORE_SRCS) $(LIB_UI_SRCS) $(LIB_OPL_SRCS) $(LIB_APP_SRCS) main.cpp
 
 TEST_COMMON_SRCS=log.cpp bnkfile.cpp rolfile.cpp list.cpp fileio.cpp file.cpp
 
@@ -105,7 +105,7 @@ postbuild: .symbolic
 .o: $(OBJ_DIR)
 .obj: $(OBJ_DIR)
 .exe: $(BIN_DIR)
-.cpp: $(SRC_DIR);$(SRC_DIR_EVT);$(SRC_DIR_FMT);$(SRC_DIR_HAL);$(SRC_DIR_HLP);$(SRC_DIR_TUI);$(TEST_DIR)
+.cpp: $(SRC_DIR);$(SRC_DIR_EVT);$(SRC_DIR_FMT);$(SRC_DIR_HAL);$(SRC_DIR_HLP);$(SRC_DIR_TUI);$(SRC_DIR_APP);$(TEST_DIR)
 
 .cpp.$(O_EXT):
 	*$(CXX) $[@ $(CXX_INCL) -fo=$(OBJ_DIR)/$[&.$(O_EXT) $(CFLAGS)

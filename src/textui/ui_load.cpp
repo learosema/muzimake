@@ -2,6 +2,7 @@
 
 #include "ui_load.h"
 
+#include "mouse.h"
 #include "textui/ui_event.h"
 #include "filefmt/fileio.h"
 #include "textui/textmode.h"
@@ -165,8 +166,9 @@ void ui_load_process_events(ui_load_t *state, ui_event_t *event)
 	}
 }
 
-bool ui_load_modal(ui_load_result_t *result, bool has_mouse)
+bool ui_load_modal(ui_load_result_t *result)
 {
+	bool has_mouse = mouse_init();
 	if (has_mouse) {
 		mouse_hide();
 	}
