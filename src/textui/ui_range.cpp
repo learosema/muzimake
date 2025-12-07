@@ -63,7 +63,7 @@ void range_process_events(ui_range_t *range, ui_event_t *event)
 {
 
 	if ((event->type & (UI_EVENT_MOUSEMOVE | UI_EVENT_MOUSEDOWN)) > 0) {
-		if (event->payload.mouse.buttons & 1 > 0) {
+		if ((event->payload.mouse.buttons & 1) > 0) {
 			rect_t clientrect = get_clientrect(&(range->bounding_rect));
 			clientrect.width -= 4;
 			if ((clientrect.width<3) || (clientrect.height < 1)) {
