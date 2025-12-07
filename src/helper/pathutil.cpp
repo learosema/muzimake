@@ -2,7 +2,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-#if defined __UNIX__ || defined __linux__ || defined __macosx__
+#if defined __DOS__ && defined __WATCOM__
+#include <dos.h>
+#else
 #include <unistd.h>
 #endif
 
@@ -58,10 +60,10 @@ void path_dispose(path_t *path)
 
 bool path_chdir(const char *path_string)
 {
-	#ifdef __DOS__
+	#if defined __DOS__ && defined __WATCOM__
 	return ((_chdir(path_string)) == 0);
-	#endif
-	#if defined __UNIX__ || defined __linux__
+	#else
 	return ((chdir(path_string)) == 0);
 	#endif
+	return false;
 }
