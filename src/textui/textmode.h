@@ -142,9 +142,9 @@ uint8_t textmode_printn_color(const char *str, uint8_t len, int x, int y, uint8_
 
 uint8_t textmode_printn(const char *str, uint8_t len, int x, int y);
 
-void textmode_putchar(int x, int y, char ch);
+void textmode_putchar(int x, int y, uint8_t ch);
 
-void textmode_putchar_color(int x, int y, char ch, uint8_t color);
+void textmode_putchar_color(int x, int y, uint8_t ch, uint8_t color);
 
 void textmode_putcolor(int x, int y, uint8_t color);
 

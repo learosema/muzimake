@@ -369,7 +369,7 @@ uint8_t textmode_printn(const char *str, uint8_t len, int x, int y)
 	return i;
 }
 
-void textmode_putchar(int x, int y, char ch)
+void textmode_putchar(int x, int y, uint8_t ch)
 {
 	VRAMPTR ptr;
 	if ((y < 0) || (y >= g_currentMode.numRows) || (x < 0) || (x >= g_currentMode.numCols))
@@ -395,7 +395,7 @@ void textmode_putcolor(int x, int y, uint8_t color)
 	*(ptr+1) = color;
 }
 
-void textmode_putchar_color(int x, int y, char ch, uint8_t color)
+void textmode_putchar_color(int x, int y, uint8_t ch, uint8_t color)
 {
 	VRAMPTR ptr;
 	if ((y < 0) || (y >= g_currentMode.numRows) || (x < 0) || (x >= g_currentMode.numCols))

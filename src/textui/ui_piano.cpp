@@ -48,11 +48,11 @@ void piano_render(ui_piano_t *piano)
 			inner.y, inner.height, CP_THICK_VERTICAL, piano->color);
 
 		for (uint8_t innerX = 0; innerX < inner.width; innerX++) {
-			char chTop = (innerX % 2 == 0) ?
+			uint8_t chTop = (innerX % 2 == 0) ?
 				CP_THIN_HORIZONTAL :
 				(keys[((innerX>>1) % 7)]) ? CP_LOWER_BLOCK :
 				CP_THIN_HORIZONTAL_THIN_DOWN;
-			char chBottom = (innerX % 2 == 0) ?
+			uint8_t chBottom = (innerX % 2 == 0) ?
 				CP_THIN_HORIZONTAL :
 				CP_THIN_HORIZONTAL_THIN_UP;
 
@@ -98,11 +98,11 @@ void piano_render(ui_piano_t *piano)
 			inner.y, inner.height, CP_THIN_VERTICAL, piano->color);
 
 		for (uint8_t innerX = 0; innerX < inner.width; innerX++) {
-			char chTop = (innerX % 2 == 0) ?
+			uint8_t chTop = (innerX % 2 == 0) ?
 				CP_THIN_HORIZONTAL :
 				(keys[((innerX>>1) % 7)]) ? CP_LOWER_BLOCK :
 				CP_THIN_HORIZONTAL_THIN_DOWN;
-			char chBottom = (innerX % 2 == 0) ?
+			uint8_t chBottom = (innerX % 2 == 0) ?
 				CP_THIN_HORIZONTAL :
 				CP_THIN_HORIZONTAL_THIN_UP;
 
@@ -120,7 +120,7 @@ void piano_render(ui_piano_t *piano)
 
 	for (uint8_t y = 0; y < inner.height; y++) {
 		for (uint8_t x = 0; x < inner.width; x++) {
-			char ch = (x%2 == 0) ? ' ' :
+			uint8_t ch = (x%2 == 0) ? ' ' :
 				(y < black_height * keys[((x>>1) % 7)]) ? CP_BLOCK : CP_THIN_VERTICAL;
 			textmode_putchar_color(inner.x + x, inner.y + y, ch, color);
 		}
