@@ -21,21 +21,24 @@ typedef enum file_type {
 // Properties
 typedef struct file_prop {
 	//
+	void *data;
 } file_prop_t;
 
 // Instrument
 typedef struct file_inst {
 	//
+	void *data;
 } file_inst_t;
 
 // Instrument bank
 typedef struct file_bank {
+	void *data;
 	//
 } file_bank_t;
 
 // Items / Entries / Tracks
 typedef struct file_trck {
-	//
+	void *data;
 } file_trck_t;
 
 // Full sound file data
