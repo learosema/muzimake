@@ -36,7 +36,7 @@ dos_block_t dpmi_alloc_dos_block(uint32_t size)
 
     dblk.segment = regs.w.ax;
     dblk.selector = regs.w.dx;
-	#endif;
+	#endif
 	return dblk;
 }
 
