@@ -203,12 +203,18 @@ if(TARGET testinst)
 endif()
 if(TARGET test_tmr)
 	add_test(NAME test_tmr COMMAND $<TARGET_FILE:test_tmr>)
+	# Interactive keyboard test — disable by default so automated runs skip it.
+	set_tests_properties(test_tmr PROPERTIES LABELS "interactive" DISABLED "1")
 endif()
 if(TARGET test_kbd)
 	add_test(NAME test_kbd COMMAND $<TARGET_FILE:test_kbd>)
+	# Interactive keyboard test — disable by default so automated runs skip it.
+	set_tests_properties(test_kbd PROPERTIES LABELS "interactive" DISABLED "1")
 endif()
 if(TARGET test_mou)
 	add_test(NAME test_mou COMMAND $<TARGET_FILE:test_mou>)
+	# Interactive keyboard test — disable by default so automated runs skip it.
+	set_tests_properties(test_mou PROPERTIES LABELS "interactive" DISABLED "1")
 endif()
 if(TARGET test_fnt)
 	add_test(NAME test_fnt COMMAND $<TARGET_FILE:test_fnt>)
