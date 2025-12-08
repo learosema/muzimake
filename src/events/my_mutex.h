@@ -12,22 +12,25 @@ typedef struct my_mutex {
 	bool flag;
 } my_mutex_t;
 
-void my_mutex_init(my_mutex_t* mutex) {
-	// atomic_flag_clear(&mutex->flag);
+/* Provide inline implementations to avoid duplicate external symbols when
+ * this header is included by multiple translation units. The implementations
+ * are no-ops for the host build (they're a placeholder for the DOS spinlock
+ * implementation used on older toolchains). */
+
+static inline void my_mutex_init(my_mutex_t* mutex) {
+    (void)mutex;
 }
 
-void my_mutex_lock(my_mutex_t* mutex) {
-	// while (atomic_flag_test_and_set(&mutex->flag)) {
-	//     // busy-wait: ggf. kurze Wartezyklen einbauen, um CPU zu schonen.
-	// }
+static inline void my_mutex_lock(my_mutex_t* mutex) {
+    (void)mutex;
 }
 
-void my_mutex_unlock(my_mutex_t* mutex) {
-	// atomic_flag_clear(&mutex->flag);
+static inline void my_mutex_unlock(my_mutex_t* mutex) {
+    (void)mutex;
 }
 
-void my_mutex_destroy(my_mutex_t* mutex) {
-	// Kein Cleanup nötig.
+static inline void my_mutex_destroy(my_mutex_t* mutex) {
+    (void)mutex;
 }
 
 #ifdef __cplusplus

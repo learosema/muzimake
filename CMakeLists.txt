@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
 project(MuziMake LANGUAGES CXX)
 
+option(DEBUG_LOGS "Enable debug logging (defines DEBUG_LOGS)" OFF)
+
 set(SRC_DIR ${CMAKE_SOURCE_DIR}/src)
 set(VENDOR_DIR
 	${CMAKE_SOURCE_DIR}/vendor/cp437

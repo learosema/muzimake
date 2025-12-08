@@ -27,6 +27,7 @@ set(LIB_UI_SRCS
 set(INCLUDE_DIRS
 	${VENDOR_DIR}
 	${SRC_DIR}
+	${SRC_DIR}/app
 	${SRC_DIR}/textui
 	${SRC_DIR}/events
 	${SRC_DIR}/filefmt
@@ -98,9 +99,9 @@ add_executable(test_lst test_lst.cpp ${VENDOR_DIR}/greatest.h ${SRC_DIR}/helper/
 
 add_executable(test_pth ${SRC_DIR}/helper/pathutil.cpp test_pth.cpp)
 
-add_executable(test_ui ${LIB_CORE_SRCS} ${SRC_DIR}/helper/log.cpp test_ui.cpp)
+add_executable(test_ui ${LIB_CORE_SRCS} ${LIB_UI_SRCS} ${SRC_DIR}/helper/log.cpp test_ui.cpp)
 
-add_executable(test_cmp ${LIB_CORE_SRCS} test_cmp.cpp ${VENDOR_DIR}/greatest.h ${SRC_DIR}/helper/log.cpp)
+add_executable(test_cmp ${LIB_CORE_SRCS} ${LIB_UI_SRCS} test_cmp.cpp ${VENDOR_DIR}/greatest.h ${SRC_DIR}/helper/log.cpp)
 
 add_executable(testfile
 	${SRC_DIR}/filefmt/bnkfile.cpp
@@ -125,3 +126,111 @@ target_include_directories(test_pth PRIVATE ${INCLUDE_DIRS})
 target_include_directories(test_ui PRIVATE ${INCLUDE_DIRS})
 target_include_directories(test_cmp PRIVATE ${INCLUDE_DIRS})
 target_include_directories(testfile PRIVATE ${INCLUDE_DIRS})
+
+add_executable(test_mainui
+	${LIB_CORE_SRCS}
+	${LIB_UI_SRCS}
+	${SRC_DIR}/app/mainui.cpp
+	test_mainui.cpp
+	${VENDOR_DIR}/greatest.h
+)
+
+target_include_directories(test_mainui PRIVATE ${INCLUDE_DIRS})
+
+add_executable(test_event_queue
+    ${LIB_CORE_SRCS}
+    ${LIB_UI_SRCS}
+    ${SRC_DIR}/app/mainui.cpp
+    test_event_queue.cpp
+    ${VENDOR_DIR}/greatest.h
+)
+
+target_include_directories(test_event_queue PRIVATE ${INCLUDE_DIRS})
+add_test(NAME test_event_queue COMMAND test_event_queue)
+
+add_executable(test_event_queue_edge
+	${LIB_CORE_SRCS}
+	${LIB_UI_SRCS}
+	${SRC_DIR}/app/mainui.cpp
+	test_event_queue_edge.cpp
+	${VENDOR_DIR}/greatest.h
+)
+
+target_include_directories(test_event_queue_edge PRIVATE ${INCLUDE_DIRS})
+add_test(NAME test_event_queue_edge COMMAND test_event_queue_edge)
+
+if(DEBUG_LOGS)
+	set(_test_targets
+		test_evt
+		test_rol
+		test_bnk
+		testinst
+		test_tmr
+		test_kbd
+		test_mou
+		test_fnt
+		test_lst
+		test_pth
+		test_ui
+		test_cmp
+		testfile
+		test_mainui
+		test_event_queue
+		test_event_queue_edge
+	)
+	foreach(tgt IN LISTS _test_targets)
+		if(TARGET ${tgt})
+			target_compile_definitions(${tgt} PRIVATE DEBUG_LOGS=1)
+		endif()
+	endforeach()
+endif()
+
+# Register test executables with CTest so `ctest` will discover and run them.
+# Use generator expressions to refer to the built target files.
+if(TARGET test_evt)
+	add_test(NAME test_evt COMMAND $<TARGET_FILE:test_evt>)
+endif()
+if(TARGET test_rol)
+	add_test(NAME test_rol COMMAND $<TARGET_FILE:test_rol>)
+endif()
+if(TARGET test_bnk)
+	add_test(NAME test_bnk COMMAND $<TARGET_FILE:test_bnk>)
+	# Interactive / integration-style test — disable by default for ctest runs.
+	set_tests_properties(test_bnk PROPERTIES LABELS "interactive" DISABLED "1")
+endif()
+if(TARGET testinst)
+	add_test(NAME testinst COMMAND $<TARGET_FILE:testinst>)
+endif()
+if(TARGET test_tmr)
+	add_test(NAME test_tmr COMMAND $<TARGET_FILE:test_tmr>)
+endif()
+if(TARGET test_kbd)
+	add_test(NAME test_kbd COMMAND $<TARGET_FILE:test_kbd>)
+endif()
+if(TARGET test_mou)
+	add_test(NAME test_mou COMMAND $<TARGET_FILE:test_mou>)
+endif()
+if(TARGET test_fnt)
+	add_test(NAME test_fnt COMMAND $<TARGET_FILE:test_fnt>)
+endif()
+if(TARGET test_lst)
+	add_test(NAME test_lst COMMAND $<TARGET_FILE:test_lst>)
+endif()
+if(TARGET test_pth)
+	add_test(NAME test_pth COMMAND $<TARGET_FILE:test_pth>)
+endif()
+if(TARGET test_ui)
+	add_test(NAME test_ui COMMAND $<TARGET_FILE:test_ui>)
+	# Interactive UI test — disable by default so automated runs skip it.
+	set_tests_properties(test_ui PROPERTIES LABELS "interactive" DISABLED "1")
+endif()
+if(TARGET test_cmp)
+	add_test(NAME test_cmp COMMAND $<TARGET_FILE:test_cmp>)
+endif()
+if(TARGET testfile)
+	add_test(NAME testfile COMMAND $<TARGET_FILE:testfile>)
+endif()
+if(TARGET test_mainui)
+	add_test(NAME test_mainui COMMAND $<TARGET_FILE:test_mainui>)
+endif()
+# `test_event_queue` and `test_event_queue_edge` were already registered earlier.

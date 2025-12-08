@@ -7,6 +7,10 @@
 #include "cp437.h"
 #include "log.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 ui_component_t *component_get_by_id(uint16_t count, ui_component_t *components, uint16_t id)
 {
 	for (uint16_t i = 0; i < count; i++) {
@@ -16,6 +20,12 @@ ui_component_t *component_get_by_id(uint16_t count, ui_component_t *components, 
 	}
 	return 0;
 }
+
+#ifdef __cplusplus
+}
+#endif
+
+
 
 int component_find_focused(uint16_t count, ui_component_t *components)
 {
