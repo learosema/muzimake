@@ -66,25 +66,4 @@ private:
 	MainUI& operator=(const MainUI&);
 	// Forwarder used by C-style callback registry. Member so it can access Impl.
 	static bool impl_forwarder(uint16_t element_id, ui_event_t *event, void* ctx);
-
-	/*
-	 * NOTE: Instance-scoped element ids
-	 * -------------------------------
-	 * To support multiple `MainUI` instances coexisting, component element ids
-	 * are remapped internally by the implementation. The low byte of the id
-	 * contains the local element id (the `ID_*` constants such as `ID_LOAD`),
-	 * and the high byte encodes a small instance index allocated at `Initialize`
-	 * time. This lets the C callback ABI remain `bool (*)(uint16_t, ui_event_t*)`
-	 * while making ids unique across instances.
-	 *
-	 * Practical implications:
-	 * - Callbacks registered with C-style function pointers will receive the
-	 *   remapped id (high byte = instance index). If you compare ids in your
-	 *   handler, mask the low byte (e.g. `element_id & 0xff`) to obtain the
-	 *   original local id.
-	 * - The `MainUI` implementation already masks the low byte when matching
-	 *   local ids (so built-in handlers still use `ID_LOAD`, `ID_SAVE`, etc.).
-	 * - The number of simultaneous instances is limited by the implementation
-	 *   (defaults to 16); adjust the implementation if you need more.
-	 */
 };

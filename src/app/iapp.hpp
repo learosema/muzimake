@@ -6,4 +6,5 @@ class IApp {
 
 		virtual int Setup() = 0;
 		virtual int MainLoop() = 0;
+
 };
