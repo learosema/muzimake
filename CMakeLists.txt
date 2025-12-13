@@ -10,5 +10,7 @@ set(VENDOR_DIR
 )
 set(FONTS_DIR ${CMAKE_SOURCE_DIR}/fonts)
 
+enable_testing()
+
 add_subdirectory(src)
 add_subdirectory(tests)
