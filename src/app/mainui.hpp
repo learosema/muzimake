@@ -75,6 +75,4 @@ private:
 	// prevent copying (old-style; compatible with older compilers)
 	MainUI(const MainUI&);
 	MainUI& operator=(const MainUI&);
-	// Note: `forwarder` is declared above and dispatches to the instance
-	// `onEvent` method.
 };
