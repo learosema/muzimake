@@ -8,17 +8,16 @@
 //
 #include "timer.h"
 #include <stdio.h>
-#include <string.h>
+#include <stdlib.h>
+#include <stdint.h>
 
 #ifdef __DOS__
 #include <conio.h>
 #include <dos.h>
-#else
-#include <stubs.h>
+#ifndef __I86__
+#include "dpmiutil.h"
 #endif
-#include <stdlib.h>
-#include <stdint.h>
-#include <dpmiutil.h>
+#endif
 
 // This is a different one that gets called from 0x08.
 //#define TIMER_INTERRUPT 0x1c

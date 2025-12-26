@@ -1,8 +1,6 @@
 #ifdef __DOS__
 #include <conio.h>
 #include <dos.h>
-#else
-#include <stubs.h>
 #endif
 
 #include "vga.h"

@@ -127,6 +127,8 @@ target_include_directories(test_ui PRIVATE ${INCLUDE_DIRS})
 target_include_directories(test_cmp PRIVATE ${INCLUDE_DIRS})
 target_include_directories(testfile PRIVATE ${INCLUDE_DIRS})
 
+target_link_libraries(test_lst INTERFACE greatest)
+
 add_executable(test_mainui
 	${LIB_CORE_SRCS}
 	${LIB_UI_SRCS}

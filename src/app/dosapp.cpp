@@ -26,7 +26,7 @@ int DOSApp::Setup() {
 	textmode_init_font(font_data, 8, 0, 256);
 	event_init();
 	atexit(event_shutdown);
-	m_mainUI.Setup();
+	m_mainUI.Initialize();
 	RenderMainScreen();
 	if (m_hasMouse) {
 		mouse_show();

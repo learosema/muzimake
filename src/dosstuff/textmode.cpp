@@ -8,8 +8,6 @@
 #include <dos.h>
 #include <malloc.h>
 #include "asmstuff.h"
-#else
-#include <intstubs.h>
 #endif
 #include <string.h>
 

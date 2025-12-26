@@ -23,7 +23,5 @@ inline void asm_hlt(void);
 #define asm_sti(...)
 #define asm_cli(...)
 #define asm_end_of_interrupt()
-#define asm_rep_movsd(...) memcpy(dest, src, (n_dwords)<<2)
-#define asm_rep_movsw(src, dest, n_words) memcpy(dest, src, (n_words)<<1)
 #endif
 #endif

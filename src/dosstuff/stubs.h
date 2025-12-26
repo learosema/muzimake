@@ -10,11 +10,11 @@ extern "C" {
 #define far
 #define near
 
-inline void delay(int) { /* stub */ }
+inline void delay(int millis) { /* stub */ }
 inline bool kbhit() { return true; }
 inline int getch() { return 0; }
-inline int inp(unsigned short) { return 0; }
-inline void outp(int, int) { /* stub */ };
+inline int inp(unsigned short port) { return 0; }
+inline void outp(int portno, int value) { /* stub */ };
 
 #ifdef __cplusplus
 }

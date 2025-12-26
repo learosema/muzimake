@@ -25,7 +25,7 @@ union REGS {
 	struct BYTEREGS h;
 };
 
-inline void int86(int, union REGS *, union REGS *) {}
+inline void int86(int intno, union REGS *inregs, union REGS *outregs) {}
 
 #endif
 #endif

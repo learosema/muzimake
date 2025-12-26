@@ -6,7 +6,7 @@ extern "C" {
 #endif
 
 #ifndef __DOS__
-#include <stubs.h>
+#include "stubs.h"
 #endif
 
 typedef void (__interrupt far *interrupt_func_t)();

@@ -27,8 +27,6 @@ extern "C" {
 #define TEXT_VRAM_BASE_MONO (uint8_t far *)(0xb0000000)
 #endif
 #else
-#include <intstubs.h>
-#define INTR int86
 #define VRAMPTR uint8_t *
 #define TEXT_VRAM_BASE (uint8_t *)0x0
 #define TEXT_VRAM_BASE_MONO (uint8_t *)0x0
@@ -48,11 +46,6 @@ extern "C" {
 #define TEXT_GET_COLOR(x, y) (uint8_t) \
 	((((x) < 0) || ((x) >= textmode_get_modeinfo()->numCols) || ((y) < 0) || ((y) >= textmode_get_modeinfo()->numRows)) ? 0 : \
 	*(textmode_get_modeinfo()->vram + 1 + 2 * (textmode_get_modeinfo()->numCols * (y) + (x))))
-
-
-
-
-
 
 typedef struct MODEINFO
 {
