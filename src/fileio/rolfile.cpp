@@ -6,12 +6,12 @@
 #include <dos.h>
 #endif
 
-#include <macros.h>
-
 #include "fileio.h"
 #include "rolfile.h"
 
-
+#define ALLOC_TYPE(T, N) ((T *)malloc(sizeof(T) * N))
+#define CALLOC_TYPE(T, N) ((T *)calloc(sizeof(T) * N))
+#define REALLOC_TYPE(P, T, N) ((T *)realloc(P, sizeof(T) * N))
 
 int rol_last_error = 0;
 

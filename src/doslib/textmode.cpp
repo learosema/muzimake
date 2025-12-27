@@ -10,9 +10,8 @@
 #include "asmstuff.h"
 #endif
 #include <string.h>
-
+#include <cp437.h>
 #include "textmode.h"
-#include "cp437.h"
 
 #define MIN(A, B) ((A) < (B) ? (A) : (B))
 #define MAX(A, B) ((A) > (B) ? (A) : (B))

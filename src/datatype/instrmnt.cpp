@@ -1,17 +1,20 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-#include <macros.h>
-
 #include "instrmnt.h"
+
+#define ALLOC_TYPE(T, N) ((T *)malloc(sizeof(T) * N))
+#define CALLOC_TYPE(T, N) ((T *)calloc(sizeof(T) * N))
+#define REALLOC_TYPE(P, T, N) ((T *)realloc(P, sizeof(T) * N))
+
 
 
 instrument_map_t instrument_map_create(uint16_t numInstruments)
 {
 	instrument_map_t map;
 	map.numItems = numInstruments;
-	map.entries = ALLOC_TYPE(instrument_map_entry_t, numInstruments);
+	map.entries = (instrument_map_entry_t *)
+		malloc(sizeof(instrument_map_entry_t) * numInstruments);
 	memset(map.entries, 0,  numInstruments * sizeof(instrument_map_entry_t));
 
 	return map;

@@ -1,12 +1,20 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <fileio.h>
-#include <opl2.h>
-
+#include "fileio.h"
 #include "bnkfile.h"
 
 #define ALLOC_TYPE(T, N) ((T *)malloc(sizeof(T) * N))
+#define CALLOC_TYPE(T, N) ((T *)calloc(sizeof(T) * N))
+#define REALLOC_TYPE(P, T, N) ((T *)realloc(P, sizeof(T) * N))
+
+
+#define OPL2_DRUM_BASS 0
+#define OPL2_DRUM_SNARE 1
+#define OPL2_DRUM_TOM 2
+#define OPL2_DRUM_CYMBAL 3
+#define OPL2_DRUM_HI_HAT 4
+
 
 uint8_t bnk_convert_voiceNum_to_drumType(uint8_t voiceNum) {
 	switch (voiceNum) {
