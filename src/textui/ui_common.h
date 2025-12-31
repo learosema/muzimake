@@ -7,7 +7,7 @@ extern "C" {
 
 #include <stdint.h>
 
-
+#include "geometry.h"
 #include "ui_event.h"
 
 #define COMPONENT_BUTTON  1
@@ -22,13 +22,7 @@ extern "C" {
 
 typedef bool (*ui_event_handler_t)(uint16_t, ui_event_t *);
 
-typedef struct rect_s
-{
-	uint8_t x;
-	uint8_t y;
-	uint8_t width;
-	uint8_t height;
-} rect_t;
+
 
 typedef struct ui_generic_s
 {
