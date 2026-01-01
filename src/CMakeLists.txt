@@ -1,5 +1,9 @@
 add_subdirectory(log)
 add_subdirectory(datatype)
 add_subdirectory(fileio)
-add_subdirectory(doslib)
+
+if (CMAKE_SYSTEM_NAME STREQUAL "DOS")
+	add_subdirectory(doslib)
+endif()
+
 add_subdirectory(textui)
