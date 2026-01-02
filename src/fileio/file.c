@@ -42,7 +42,7 @@ file_result_t file_init(sound_file_t * const file, const file_format_t file_form
 	return *file != NULL ? SUCCESS : ERROR;
 }
 
-file_result_t file_open(sound_file_t* const file, const char *filename, file_opts_t file_opts)
+file_result_t file_open(sound_file_t* const file, const char *filename)
 {
 	sound_file_t soundfile = *file;
 
@@ -50,6 +50,16 @@ file_result_t file_open(sound_file_t* const file, const char *filename, file_opt
 
 	return SUCCESS;
 }
+
+file_result_t file_open_ext(sound_file_t* const file, const char *filename, file_opts_t file_opts)
+{
+	sound_file_t soundfile = *file;
+
+	soundfile->func_ptr->read_file(&soundfile->file_data, filename);
+
+	return SUCCESS;
+}
+
 
 void file_close(sound_file_t* file)
 {
