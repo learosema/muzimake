@@ -74,15 +74,15 @@ typedef struct textbuffer_s
 	uint8_t *buffer;
 } textbuffer_t;
 
-void textmode_setmode(uint8_t mode);
+void textmode_setmode(const uint8_t mode);
 
-void textmode_init_headless(uint8_t mode);
+void textmode_init_headless(const uint8_t mode);
 
 void textmode_dispose();
 
 MODEINFO *textmode_get_modeinfo();
 
-void textmode_set_page(uint8_t page);
+void textmode_set_page(const uint8_t page);
 
 void textmode_font8();
 

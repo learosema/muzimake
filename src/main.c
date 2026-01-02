@@ -12,6 +12,7 @@ int main()
 	DOSApp app;
 	app.Setup();
 	app.MainLoop();
+	app_destroy();
 #else
 	SDLApp app;
 	app.Setup();

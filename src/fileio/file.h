@@ -7,6 +7,9 @@ extern "C" {
 
 
 #include <stdint.h>
+#ifndef __WATCOMC__
+#include <stdbool.h>
+#endif
 
 // Nice to have later:
 // dynamic plugin system: https://homepage.stat.uiowa.edu/~luke/xls/projects/dlbasics/dlbasics.html#NWDE

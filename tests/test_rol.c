@@ -2,7 +2,7 @@
 
 #include <file.h>
 
-#include "rolfile.h" // TODO: to be removed, when structure is refactored
+#include <rolfile.h> // TODO: to be removed, when structure is refactored
 
 int main() {
 	sound_file_t soundfile = NULL;

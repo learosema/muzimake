@@ -4,9 +4,8 @@
 #include "iapp.hpp"
 #include "mainui.hpp"
 
-class DOSApp : public IApp {
 
-public:
+
 	DOSApp();
 	virtual ~DOSApp();
 
@@ -20,3 +19,6 @@ private:
 	bool m_hasMouse;
 
 };
+
+
+void app_init();

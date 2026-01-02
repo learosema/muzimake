@@ -1,4 +1,4 @@
-#include <stdlib.h>
+
 #include <string.h>
 #include "asmstuff.h"
 #ifdef __DOS__
@@ -6,7 +6,8 @@
 #else
 #include <stubs.h>
 #endif
-#include "ui_event.h"
+#include <ui_event.h>
+#include "evt_poll.h"
 #include "mouse.h"
 #include "keyboard.h"
 

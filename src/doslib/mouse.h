@@ -6,7 +6,9 @@ extern "C" {
 #endif
 
 #include <stdint.h>
-
+#ifndef __WATCOMC__
+#include <stdbool.h>
+#endif
 typedef struct MOUSE_STATUS {
 	uint16_t mouseX;
 	uint16_t mouseY;

@@ -15,9 +15,7 @@
 
 MODEINFO * g_modeInfo;
 
-DOSApp::DOSApp() {}
-
-int DOSApp::Setup() {
+int app_setup() {
 	textmode_setmode(3);
 
 	m_hasMouse = mouse_init();
@@ -35,7 +33,7 @@ int DOSApp::Setup() {
 	return 0;
 }
 
-void DOSApp::RenderMainScreen() {
+void app_render() {
 
 	textmode_clear(0x1e);
 	textmode_cursor(32, 0);
@@ -47,7 +45,7 @@ void DOSApp::RenderMainScreen() {
 	textmode_print("MUZIMAKE \002", 1, 0, 0x74);
 }
 
-int DOSApp::MainLoop()
+int app_mainloop()
 {
 	while (! m_mainUI.IsDone()) {
 		if (m_mainUI.NeedsRepaint()) {
@@ -66,7 +64,7 @@ int DOSApp::MainLoop()
 	return 0;
 }
 
-DOSApp::~DOSApp() {
+void app_destroy() {
 	if (m_hasMouse) {
 		mouse_hide();
 	}

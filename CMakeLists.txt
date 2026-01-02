@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.10 FATAL_ERROR)
-project(MuziMake LANGUAGES CXX)
+project(MuziMake LANGUAGES C)
 
 option(DEBUG_LOGS "Enable debug logging (defines DEBUG_LOGS)" OFF)
 

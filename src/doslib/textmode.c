@@ -20,7 +20,7 @@
 MODEINFO g_currentMode = {0};
 
 
-void _retrieve_modeinfo_headless(uint8_t mode)
+void _retrieve_modeinfo_headless(const uint8_t mode)
 {
 	g_currentMode.mode = mode;
 	g_currentMode.numCols = (mode == 3) || (mode == 7) ? 80 : 40;
@@ -31,7 +31,7 @@ void _retrieve_modeinfo_headless(uint8_t mode)
 	g_currentMode.hasColors = true;
 }
 
-void _retrieve_modeinfo(uint8_t mode)
+void _retrieve_modeinfo(const uint8_t mode)
 {
 	#ifdef __DOS__
 	union REGS regs;
@@ -67,7 +67,7 @@ void _setmode(uint8_t mode)
 #define _setmode(...)
 #endif
 
-void textmode_init_headless(uint8_t mode)
+void textmode_init_headless(const uint8_t mode)
 {
 	#if defined __I86__
 	g_currentMode.vram = (uint8_t *)_fmalloc(160 * 25 * 8);
@@ -77,7 +77,7 @@ void textmode_init_headless(uint8_t mode)
 	_retrieve_modeinfo_headless(mode);
 }
 
-void textmode_setmode(uint8_t mode)
+void textmode_setmode(const uint8_t mode)
 {
 	#ifdef __DOS__
 	_setmode(3);
@@ -101,7 +101,7 @@ void textmode_dispose()
 	} else {
 		_setmode(3);
 	}
-	g_currentMode.vram = nullptr;
+	g_currentMode.vram = NULL;
 }
 
 MODEINFO *textmode_get_modeinfo()
@@ -125,7 +125,7 @@ void textmode_font8()
 	g_currentMode.numRows = 50;
 }
 
-void textmode_set_page(uint8_t page)
+void textmode_set_page(const uint8_t page)
 {
 	if (g_currentMode.pageSize == PAGE_SIZE_80X25 && page >= 8) {
 		page = page % 8;
