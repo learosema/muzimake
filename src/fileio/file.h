@@ -44,7 +44,8 @@ const file_opts_t default_file_opts = {
 
 file_result_t file_init(sound_file_t * const file, const file_format_t file_format);
 
-file_result_t file_open(sound_file_t* file, const char* filename, file_opts_t file_opts = default_file_opts);
+file_result_t file_open_ext(sound_file_t* file, const char* filename, file_opts_t file_opts);
+file_result_t file_open(sound_file_t* file, const char* filename);
 
 void file_close(sound_file_t* file);
 
