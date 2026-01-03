@@ -27,6 +27,7 @@ void _retrieve_modeinfo_headless(const uint8_t mode)
 	g_currentMode.numRows = 25;
 	g_currentMode.page = 0;
 	g_currentMode.pageSize = 160 * 25;
+	g_currentMode.numPages = g_currentMode.numCols == 80 ? 8 : 16;
 	g_currentMode.videoPortAddress = 0;
 	g_currentMode.hasColors = true;
 }
@@ -46,6 +47,7 @@ void _retrieve_modeinfo(const uint8_t mode)
 	g_currentMode.hasColors = (g_currentMode.videoPortAddress == 0x3d4);
 	g_currentMode.vram = g_currentMode.hasColors ?
 		TEXT_VRAM_BASE : TEXT_VRAM_BASE_MONO;
+	g_currentMode.numPages = g_currentMode.numCols == 80 ? 8 : 16;
 	#else
 	_retrieve_modeinfo_headless(mode);
 	#endif
@@ -123,24 +125,18 @@ void textmode_font8()
 	#endif
 	g_currentMode.pageSize= PAGE_SIZE_80X50;
 	g_currentMode.numRows = 50;
+	g_currentMode.numPages = 4;
 }
 
 void textmode_set_page(const uint8_t page)
 {
-	if (g_currentMode.pageSize == PAGE_SIZE_80X25 && page >= 8) {
-		page = page % 8;
-	}
-
-	if (g_currentMode.pageSize == PAGE_SIZE_80X50 && page >= 4) {
-		page = page % 4;
-	}
 	#ifdef __DOS__
 	union REGS regs;
 	regs.h.ah = 0x05;
 	regs.h.al = page;
 	INTR(0x10, &regs, &regs);
 	#endif
-	g_currentMode.page = page;
+	g_currentMode.page = MIN(page, g_currentMode.numPages - 1);
 }
 
 void textmode_cursor(const uint8_t startRow, const uint8_t endRow)
@@ -154,7 +150,7 @@ void textmode_cursor(const uint8_t startRow, const uint8_t endRow)
 	#endif
 }
 
-void textmode_clear(uint8_t color)
+void textmode_clear(const uint8_t color)
 {
 	VRAMPTR ptr = TEXT_VRAM;
 	uint16_t size = ((uint16_t)g_currentMode.numRows) * 160;
@@ -170,11 +166,11 @@ void textmode_clear(uint8_t color)
 }
 
 void textmode_hline(
-	int x,
-	int y,
-	uint8_t width,
-	uint8_t character,
-	uint8_t color)
+	const int x,
+	const int y,
+	const uint8_t width,
+	const uint8_t character,
+	const uint8_t color)
 {
 	uint8_t x0 = (uint8_t)(MAX(0, x));
 	uint8_t y0 = (uint8_t)(MAX(0, y));
@@ -195,11 +191,11 @@ void textmode_hline(
 }
 
 void textmode_vline(
-		int x,
-		int y,
-		uint8_t height,
-		uint8_t character,
-		uint8_t color)
+	const int x,
+	const int y,
+	const uint8_t height,
+	const uint8_t character,
+	const uint8_t color)
 {
 	uint8_t x0 = (uint8_t)(MAX(0, x));
 	uint8_t y0 = (uint8_t)(MAX(0, y));
@@ -219,10 +215,10 @@ void textmode_vline(
 }
 
 void textmode_colorize_line(
-	int x,
-	int y,
-	uint8_t width,
-	uint8_t color
+	const int x,
+	const int y,
+	const uint8_t width,
+	const uint8_t color
 )
 {
 	uint8_t x0 = (uint8_t)(MAX(0, x));
@@ -243,12 +239,12 @@ void textmode_colorize_line(
 }
 
 void textmode_fill_area(
-		int x,
-		int y,
-		uint8_t width,
-		uint8_t height,
-		uint8_t character,
-		uint8_t color)
+	const int x,
+	const int y,
+	const uint8_t width,
+	const uint8_t height,
+	const uint8_t character,
+	const uint8_t color)
 {
 	uint8_t y0 = MAX(0, y);
 	uint8_t y1 = MIN(y0 + height - 1, g_currentMode.numRows - 1);
@@ -277,7 +273,7 @@ void textmode_colorize_area(
 	}
 }
 
-void textmode_print(const char *str, const int x, const int y, const uint8_t color)
+void textmode_print(const char * const str, const int x, const int y, const uint8_t color)
 {
 	VRAMPTR ptr;
 	uint8_t i;
@@ -303,7 +299,7 @@ void textmode_print(const char *str, const int x, const int y, const uint8_t col
 	}
 }
 
-uint8_t textmode_printn_color(const char *str, uint8_t len, int x, int y, uint8_t color)
+uint8_t textmode_printn_color(const char * const str, uint8_t len, int x, int y, uint8_t color)
 {
 	VRAMPTR ptr;
 	uint8_t i;
@@ -335,7 +331,7 @@ uint8_t textmode_printn_color(const char *str, uint8_t len, int x, int y, uint8_
 	return i;
 }
 
-uint8_t textmode_printn(const char *str, uint8_t len, int x, int y)
+uint8_t textmode_printn(const char * const str, uint8_t len, int x, int y)
 {
 	VRAMPTR ptr;
 	uint8_t i;
@@ -366,7 +362,7 @@ uint8_t textmode_printn(const char *str, uint8_t len, int x, int y)
 	return i;
 }
 
-void textmode_putchar(int x, int y, uint8_t ch)
+void textmode_putchar(const int x, const int y, const uint8_t ch)
 {
 	VRAMPTR ptr;
 	if ((y < 0) || (y >= g_currentMode.numRows) || (x < 0) || (x >= g_currentMode.numCols))
@@ -379,7 +375,7 @@ void textmode_putchar(int x, int y, uint8_t ch)
 	*ptr = ch;
 }
 
-void textmode_putcolor(int x, int y, uint8_t color)
+void textmode_putcolor(const int x, const int y, const uint8_t color)
 {
 	VRAMPTR ptr;
 	if ((y < 0) || (y >= g_currentMode.numRows) || (x < 0) || (x >= g_currentMode.numCols))
@@ -392,7 +388,7 @@ void textmode_putcolor(int x, int y, uint8_t color)
 	*(ptr+1) = color;
 }
 
-void textmode_putchar_color(int x, int y, uint8_t ch, uint8_t color)
+void textmode_putchar_color(const int x, const int y, const uint8_t ch, const uint8_t color)
 {
 	VRAMPTR ptr;
 	if ((y < 0) || (y >= g_currentMode.numRows) || (x < 0) || (x >= g_currentMode.numCols))
@@ -406,7 +402,7 @@ void textmode_putchar_color(int x, int y, uint8_t ch, uint8_t color)
 	*(ptr+1) = color;
 }
 
-char textmode_getchar(int x, int y)
+char textmode_getchar(const int x, const int y)
 {
 	VRAMPTR ptr;
 	if ((y < 0) || (y >= g_currentMode.numRows) || (x < 0) || (x >= g_currentMode.numCols))
@@ -419,7 +415,7 @@ char textmode_getchar(int x, int y)
 	return (*ptr);
 }
 
-uint8_t textmode_getcolor(int x, int y)
+uint8_t textmode_getcolor(const int x, const int y)
 {
 	VRAMPTR ptr;
 	if ((y < 0) || (y >= g_currentMode.numRows) || (x < 0) || (x >= g_currentMode.numCols))
@@ -432,7 +428,7 @@ uint8_t textmode_getcolor(int x, int y)
 	return (*ptr + 1);
 }
 
-void textmode_rect(int x, int y, uint8_t width, uint8_t height, uint8_t color)
+void textmode_rect(const int x, const int y, const uint8_t width, const uint8_t height, const uint8_t color)
 {
 	uint8_t i;
 
@@ -468,7 +464,7 @@ void textmode_rect(int x, int y, uint8_t width, uint8_t height, uint8_t color)
 
 }
 
-void textmode_box(int x, int y, uint8_t width, uint8_t height, uint8_t color)
+void textmode_box(const int x, const int y, const uint8_t width, const uint8_t height, const uint8_t color)
 {
 	textmode_rect(x, y, width, height, color);
 	if (width > 2 && height > 2) {
@@ -478,15 +474,13 @@ void textmode_box(int x, int y, uint8_t width, uint8_t height, uint8_t color)
 }
 
 void textmode_dblrect(
-	int x,
-	int y,
-	uint8_t width,
-	uint8_t height,
-	uint8_t color
+	const int x,
+	const int y,
+	const uint8_t width,
+	const uint8_t height,
+	const uint8_t color
 )
 {
-	uint8_t i;
-
 	textmode_hline(
 		x, y, 1,
 		CP_THICK_RIGHT_THICK_DOWN, color);
@@ -519,11 +513,11 @@ void textmode_dblrect(
 }
 
 void textmode_dblbox(
-	int x,
-	int y,
-	uint8_t width,
-	uint8_t height,
-	uint8_t color
+	const int x,
+	const int y,
+	const uint8_t width,
+	const uint8_t height,
+	const uint8_t color
 )
 {
 	textmode_dblrect(x, y, width, height, color);
@@ -546,7 +540,7 @@ void textmode_gotoxy(const uint8_t x, const uint8_t y) {
 	#endif
 }
 
-void textmode_init_font(const uint8_t *charData, const uint16_t charHeight, const uint16_t offset, const uint16_t count)
+void textmode_init_font(const uint8_t * const charData, const uint16_t charHeight, const uint16_t offset, const uint16_t count)
 {
 	if (charHeight == 8) {
 		g_currentMode.numRows = 50;
@@ -590,7 +584,7 @@ void textmode_init_font(const uint8_t *charData, const uint16_t charHeight, cons
 	#endif
 }
 
-bool textmode_check_box(uint8_t x, uint8_t y, uint8_t width, uint8_t height)
+bool textmode_check_box(const uint8_t x, const uint8_t y, const uint8_t width, const uint8_t height)
 {
 	uint8_t topleft_corner = text_get_char(x, y);
 	uint8_t topright_corner = text_get_char(x + width - 1, 0);
@@ -611,7 +605,7 @@ bool textmode_check_box(uint8_t x, uint8_t y, uint8_t width, uint8_t height)
 	return true;
 }
 
-bool textmode_check_dblbox(uint8_t x, uint8_t y, uint8_t width, uint8_t height)
+bool textmode_check_dblbox(const uint8_t x, const uint8_t y, const uint8_t width, const uint8_t height)
 {
 	uint8_t topleft_corner = text_get_char(x, y);
 	uint8_t topright_corner = text_get_char(x + width - 1, 0);
@@ -665,7 +659,7 @@ textbuffer_t textmode_get_area(const uint8_t x, const uint8_t y, const uint8_t w
 	return result;
 }
 
-void textmode_put_area(const textbuffer_t * txt_buffer, const uint8_t x, const uint8_t y)
+void textmode_put_area(const textbuffer_t * const txt_buffer, const uint8_t x, const uint8_t y)
 {
 	if (x >= g_currentMode.numCols || y >= g_currentMode.numRows) {
 		// outside bounds
@@ -693,10 +687,10 @@ textbuffer_t textmode_get_screen()
 	return textmode_get_area(0, 0, g_currentMode.numCols, g_currentMode.numRows);
 }
 
-void textmode_dispose_buffer(textbuffer_t * txt_buffer)
+void textmode_dispose_buffer(textbuffer_t * const txt_buffer)
 {
 	free(txt_buffer->buffer);
-	txt_buffer->buffer = nullptr;
+	txt_buffer->buffer = NULL;
 	txt_buffer->width = 0;
 	txt_buffer->height = 0;
 }

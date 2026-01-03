@@ -7,6 +7,7 @@ extern "C" {
 #endif
 
 #include <stdint.h>
+#include <stdbool.h>
 
 #if defined __DOS__ && defined __WATCOMC__ && defined __386__
 #include <dpmiutil.h>
@@ -55,6 +56,7 @@ typedef struct MODEINFO
 	uint8_t numRows;
 	uint8_t page;
 	uint16_t pageSize;
+	uint8_t numPages;
 	bool  hasColors;
 	uint16_t videoPortAddress;
 } MODEINFO;
@@ -88,96 +90,96 @@ void textmode_font8();
 
 void textmode_cursor(const uint8_t startRow, const uint8_t endRow);
 
-void textmode_clear(uint8_t color);
+void textmode_clear(const uint8_t color);
 
 void textmode_hline(
-	int x,
-	int y,
-	uint8_t width,
-	uint8_t character,
-	uint8_t color
+	const int x,
+	const int y,
+	const uint8_t width,
+	const uint8_t character,
+	const uint8_t color
 );
 
 void textmode_vline(
-		int x,
-		int y,
-		uint8_t height,
-		uint8_t character,
-		uint8_t color);
+		const int x,
+		const int y,
+		const uint8_t height,
+		const uint8_t character,
+		const uint8_t color);
 
 void textmode_colorize_line(
-	int x,
-	int y,
-	uint8_t width,
-	uint8_t color
+	const int x,
+	const int y,
+	const uint8_t width,
+	const uint8_t color
 );
 
 void textmode_fill_area(
-	int x,
-	int y,
-	uint8_t width,
-	uint8_t height,
-	uint8_t character,
-	uint8_t color
+	const int x,
+	const int y,
+	const uint8_t width,
+	const uint8_t height,
+	const uint8_t character,
+	const uint8_t color
 );
 
 void textmode_colorize_area(
-	int x,
-	int y,
-	uint8_t width,
-	uint8_t height,
-	uint8_t color
+	const int x,
+	const int y,
+	const uint8_t width,
+	const uint8_t height,
+	const uint8_t color
 );
 
-void textmode_print(const char *str, const int x, const int y, const uint8_t color);
+void textmode_print(const char * const str, const int x, const int y, const uint8_t color);
 
-uint8_t textmode_printn_color(const char *str, uint8_t len, int x, int y, uint8_t color);
+uint8_t textmode_printn_color(const char * const str, uint8_t len, int x, int y, uint8_t color);
 
-uint8_t textmode_printn(const char *str, uint8_t len, int x, int y);
+uint8_t textmode_printn(const char * const str, uint8_t len, int x, int y);
 
-void textmode_putchar(int x, int y, uint8_t ch);
+void textmode_putchar(const int x, const int y, const uint8_t ch);
 
-void textmode_putchar_color(int x, int y, uint8_t ch, uint8_t color);
+void textmode_putchar_color(const int x, const int y, const uint8_t ch, const uint8_t color);
 
-void textmode_putcolor(int x, int y, uint8_t color);
+void textmode_putcolor(const int x, const int y, const uint8_t color);
 
-char textmode_getchar(int x, int y);
+char textmode_getchar(const int x, const int y);
 
-uint8_t textmode_getcolor(int x, int y);
+uint8_t textmode_getcolor(const int x, const int y);
 
 void textmode_box(
-	int x,
-	int y,
-	uint8_t width,
-	uint8_t height,
-	uint8_t color
+	const int x,
+	const int y,
+	const uint8_t width,
+	const uint8_t height,
+	const uint8_t color
 );
 
 void textmode_dblbox(
-	int x,
-	int y,
-	uint8_t width,
-	uint8_t height,
-	uint8_t color
+	const int x,
+	const int y,
+	const uint8_t width,
+	const uint8_t height,
+	const uint8_t color
 );
 
 void textmode_rect(
-	int x,
-	int y,
-	uint8_t width,
-	uint8_t height,
-	uint8_t color
+	const int x,
+	const int y,
+	const uint8_t width,
+	const uint8_t height,
+	const uint8_t color
 );
 
 void textmode_dblrect(
-	int x,
-	int y,
-	uint8_t width,
-	uint8_t height,
-	uint8_t color
+	const int x,
+	const int y,
+	const uint8_t width,
+	const uint8_t height,
+	const uint8_t color
 );
 
-void textmode_init_font(const uint8_t *charData, const uint16_t charHeight, const uint16_t offset, const uint16_t count);
+void textmode_init_font(const uint8_t * const charData, const uint16_t charHeight, const uint16_t offset, const uint16_t count);
 
 void textmode_gotoxy(const uint8_t x, const uint8_t y);
 
@@ -187,11 +189,11 @@ bool textmode_check_dblbox(uint8_t x, uint8_t y, uint8_t width, uint8_t height);
 
 textbuffer_t textmode_get_area(const uint8_t x, const uint8_t y, const uint8_t width, const uint8_t height);
 
-void textmode_put_area(const textbuffer_t * txt_buffer, const uint8_t x, const uint8_t y);
+void textmode_put_area(const textbuffer_t * const txt_buffer, const uint8_t x, const uint8_t y);
 
 textbuffer_t textmode_get_screen();
 
-void textmode_dispose_buffer(textbuffer_t * txt_buffer);
+void textmode_dispose_buffer(textbuffer_t * const txt_buffer);
 
 inline uint8_t text_get_char(const uint8_t x, const uint8_t y) {
 	const MODEINFO * const info = textmode_get_modeinfo();
