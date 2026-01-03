@@ -7,9 +7,7 @@ extern "C" {
 
 
 #include <stdint.h>
-#ifndef __WATCOMC__
 #include <stdbool.h>
-#endif
 
 // Nice to have later:
 // dynamic plugin system: https://homepage.stat.uiowa.edu/~luke/xls/projects/dlbasics/dlbasics.html#NWDE
@@ -44,8 +42,8 @@ const file_opts_t default_file_opts = {
 
 file_result_t file_init(sound_file_t * const file, const file_format_t file_format);
 
-file_result_t file_open_ext(sound_file_t* file, const char* filename, file_opts_t file_opts);
 file_result_t file_open(sound_file_t* file, const char* filename);
+file_result_t file_open_ext(sound_file_t* file, const char* filename, file_opts_t file_opts);
 
 void file_close(sound_file_t* file);
 
