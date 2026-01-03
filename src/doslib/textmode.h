@@ -71,9 +71,9 @@ typedef struct RECT
 
 typedef struct textbuffer_s
 {
+	uint8_t *buffer;
 	uint8_t width;
 	uint8_t height;
-	uint8_t *buffer;
 } textbuffer_t;
 
 void textmode_setmode(const uint8_t mode);

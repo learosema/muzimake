@@ -1,4 +1,5 @@
-#pragma once
+#ifndef __GEOMETRY_H__
+#define __GEOMETRY_H__
 
 #ifdef __cplusplus
 extern "C" {
@@ -14,4 +15,5 @@ typedef struct rect_s
 
 #ifdef __cplusplus
 }
+#endif
 #endif
