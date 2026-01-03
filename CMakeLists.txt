@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.10 FATAL_ERROR)
 project(MuziMake LANGUAGES C)
+set(CMAKE_C_STANDARD 11)
 
 option(DEBUG_LOGS "Enable debug logging (defines DEBUG_LOGS)" OFF)
 
@@ -9,9 +10,10 @@ set(VENDOR_DIR
 	${CMAKE_SOURCE_DIR}/vendor/greatest
 )
 set(FONTS_DIR ${CMAKE_SOURCE_DIR}/fonts)
-
+include(cmake/c-standards.cmake)
 include(cmake/StandardProjectSettings.cmake)
 include(GNUInstallDirs)
+c_99()
 
 # Link this "library" to use the warnings specified in CompilerWarnings.cmake.
 add_library(project_warnings INTERFACE)
