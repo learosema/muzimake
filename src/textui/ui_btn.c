@@ -1,10 +1,10 @@
 #include <string.h>
 
 #include "macros.h"
-#include "textmode.h"
+#include "txtbuffer.h"
 #include "ui_btn.h"
 
-void button_render(ui_button_t *button)
+void button_render(textbuffer_t * const buffer, const ui_button_t * const button)
 {
 	uint8_t color = button->color;
 	if (button->active) {
@@ -12,7 +12,7 @@ void button_render(ui_button_t *button)
 	}
 
 	if (button->focused) {
-		textmode_dblrect(
+		txtbuffer_dblrect(buffer,
 			button->bounding_rect.x,
 			button->bounding_rect.y,
 			button->bounding_rect.width,
@@ -20,7 +20,8 @@ void button_render(ui_button_t *button)
 			color
 		);
 	} else {
-		textmode_rect(
+		txtbuffer_rect(
+			buffer,
 			button->bounding_rect.x,
 			button->bounding_rect.y,
 			button->bounding_rect.width,
@@ -43,16 +44,23 @@ void button_render(ui_button_t *button)
 	for (uint8_t j = 0; j < innerHeight; j++) {
 		uint8_t currentY = innerY + j;
 		if (currentY != centerY) {
-			textmode_hline(innerX, currentY, innerWidth, ' ', color);
+			txtbuffer_hline_color(buffer, innerX, currentY, innerWidth, ' ', color);
 		} else {
 			uint8_t leftWidth = labelX - innerX;
-			textmode_hline(innerX, centerY, leftWidth, ' ', color);
-			textmode_hline(labelX + len, centerY, innerWidth - len - leftWidth, ' ', color);
-			textmode_print(button->label, labelX, centerY, color);
+			txtbuffer_hline_color(buffer, innerX, centerY, leftWidth, ' ', color);
+			txtbuffer_hline_color(buffer,labelX + len, centerY, innerWidth - len - leftWidth, ' ', color);
+			txtbuffer_print_color(buffer, button->label, labelX, centerY, color);
 		}
 	}
 }
 
+void button_active(ui_button_t *const button, const bool active)
+{
+	button->active = active;
+	button->paint = true;
+}
+
+/*
 void button_process_events(ui_button_t *button, ui_event_t *event)
 {
 	if (button->event_handler != nullptr) {
@@ -108,3 +116,4 @@ void button_process_events(ui_button_t *button, ui_event_t *event)
 		return;
 	}
 }
+*/

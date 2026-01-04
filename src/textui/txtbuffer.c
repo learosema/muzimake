@@ -8,8 +8,13 @@
 void txtbuffer_init(textbuffer_t * const buffer, const uint16_t width, const uint16_t height)
 {
 	buffer->data = malloc(sizeof(uint8_t) * width * height * 2);
-	buffer->width = width;
-	buffer->height = height;
+	if (buffer->data) {
+		buffer->width = width;
+		buffer->height = height;
+	} else {
+		buffer->width = 0;
+		buffer->height = 0;
+	}
 }
 
 void txtbuffer_dispose(textbuffer_t * const buffer)
@@ -53,7 +58,7 @@ void txtbuffer_print_color(textbuffer_t * const buffer, const char * const str, 
 {
 	int x0 = (MAX(0, x));
 	int len = strlen(str);
-	if ((y < 0) || (y >= buffer->height))
+	if ((buffer == NULL) || (buffer->data == NULL) || (y < 0) || (y >= buffer->height))
 	{
 		return;
 	}
@@ -79,7 +84,7 @@ void txtbuffer_print_color(textbuffer_t * const buffer, const char * const str, 
 int txtbuffer_printn_color(textbuffer_t * const buffer, const char * const str, const int len, const int x, const int y, uint8_t color)
 {
 	int effective_len = MIN(len, strlen(str));
-	if ((y < 0) || (y >= buffer->height))
+	if ((buffer == NULL) || (buffer->data == NULL) || (y < 0) || (y >= buffer->height))
 	{
 		return 0;
 	}
@@ -107,7 +112,7 @@ int txtbuffer_printn_color(textbuffer_t * const buffer, const char * const str, 
 int txtbuffer_printn(textbuffer_t * const buffer, const char * const str, const int len, const int x, const int y)
 {
 	int effective_len = MIN(len, strlen(str));
-	if ((y < 0) || (y >= buffer->height))
+	if ((buffer == NULL) || (buffer->data == NULL) || (y < 0) || (y >= buffer->height))
 	{
 		return 0;
 	}
@@ -130,12 +135,16 @@ int txtbuffer_printn(textbuffer_t * const buffer, const char * const str, const 
 
 void txtbuffer_putchar(textbuffer_t * const buffer, const int x, const int y, const uint8_t ch)
 {
+	if ((buffer == NULL) || (buffer->data == NULL) || (x < 0) || (x >= buffer->width) || (y < 0) || (y >= buffer->height))
+	{
+		return;
+	}
 	buffer->data[(y*buffer->width+x)*2] = ch;
 }
 
 void txtbuffer_putchar_color(textbuffer_t * const buffer, const int x, const int y, const uint8_t ch, const uint8_t color)
 {
-	if ((x < 0) || (x >= buffer->width) || (y < 0) || (y >= buffer->height))
+	if ((buffer == NULL) || (buffer->data == NULL) || (x < 0) || (x >= buffer->width) || (y < 0) || (y >= buffer->height))
 	{
 		return;
 	}
@@ -229,7 +238,7 @@ void txtbuffer_vline(
 {
 	int x0 = MAX(0, x);
 	int y0 = MAX(0, y);
-	if ((x0 >= buffer->width) || (y0 >= buffer->height)) {
+	if ((buffer == NULL) || (x0 >= buffer->width) || (y0 >= buffer->height)) {
 		return;
 	}
 	int clamped_height = MIN((buffer->height - x0), height);
@@ -251,7 +260,7 @@ void txtbuffer_vline_color(
 {
 	int x0 = MAX(0, x);
 	int y0 = MAX(0, y);
-	if ((x0 >= buffer->width) || (y0 >= buffer->height)) {
+	if ((buffer == NULL) || (x0 >= buffer->width) || (y0 >= buffer->height)) {
 		return;
 	}
 	int clamped_height = MIN((buffer->height - x0), height);
@@ -272,7 +281,7 @@ void txtbuffer_colorize_line(
 {
 	int x0 = MAX(0, x);
 	int y0 = MAX(0, y);
-	if ((x0 >= buffer->width) || (y0 >= buffer->height)) {
+	if ((buffer == NULL) || (x0 >= buffer->width) || (y0 >= buffer->height)) {
 		return;
 	}
 	uint8_t clamped_width = MIN((buffer->width - x0), width);
