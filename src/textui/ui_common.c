@@ -1,6 +1,6 @@
 #include "ui_common.h"
 
-bool rect_test_point_in_bounds(rect_t * rect, uint8_t x, uint8_t y)
+bool rect_test_point_in_bounds(const rect_t * const rect, const uint8_t x, const uint8_t y)
 {
 	uint8_t x0 = rect->x;
 	uint8_t x1 = x0 + rect->width - 1;
@@ -11,12 +11,12 @@ bool rect_test_point_in_bounds(rect_t * rect, uint8_t x, uint8_t y)
 	);
 }
 
-bool rect_test_mouse(rect_t * rect, uint16_t mouseX, uint16_t mouseY)
+bool rect_test_mouse(const rect_t * const rect, const uint16_t mouseX, const uint16_t mouseY)
 {
 	return rect_test_point_in_bounds(rect, (uint8_t)(mouseX>>3), (uint8_t)(mouseY>>3));
 }
 
-rect_t get_clientrect(const rect_t *bounding_rect)
+rect_t get_clientrect(const rect_t * const bounding_rect)
 {
 	rect_t clientrect = *bounding_rect;
 	if (clientrect.height > 2 && clientrect.width > 2)
@@ -28,7 +28,7 @@ rect_t get_clientrect(const rect_t *bounding_rect)
 	}
 	return clientrect;
 }
-
+/*
 void ui_handle_mouseup(ui_generic_t *generic, ui_event_t *event)
 {
 	if ((event->type & UI_EVENT_MOUSEUP) == 0) {
@@ -46,7 +46,7 @@ void ui_handle_mouseup(ui_generic_t *generic, ui_event_t *event)
 		}
 		return;
 	}
-	if (generic->event_handler != nullptr) {
+	if (generic->event_handler != NULL) {
 		bool result = generic->event_handler(generic->id, &clickEvent);
 		if (! result) {
 			return;
@@ -55,3 +55,4 @@ void ui_handle_mouseup(ui_generic_t *generic, ui_event_t *event)
 	generic->focused = true;
 	generic->paint = true;
 }
+*/

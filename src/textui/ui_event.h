@@ -5,7 +5,13 @@
 extern "C" {
 #endif
 
+#include <stdbool.h>
 #include <stdint.h>
+#include <stddef.h>
+#include "geometry.h"
+
+
+#define MAX_EVENTS_PER_FRAME 16
 
 #define EVENT_MOUSEMOVE    1
 #define EVENT_MOUSEDOWN_L  2
@@ -77,6 +83,34 @@ typedef struct ui_event_s
 		ui_click_event_t click;
 	} payload;
 } ui_event_t;
+
+typedef struct ui_event_pool_s
+{
+	ui_event_t * events;
+	size_t size;
+	size_t capacity;
+} ui_event_pool_t;
+
+void ui_event_pool_init(ui_event_pool_t * const pool, const size_t capacity);
+void ui_event_pool_dispose(ui_event_pool_t * const pool);
+void ui_event_pool_add_event(ui_event_pool_t * const pool, const ui_event_t * const event);
+
+void ui_event_begin(ui_event_pool_t * const pool);
+void ui_event_click(ui_event_pool_t * const pool);
+void ui_event_mouse_wheel(ui_event_pool_t * const pool, const int delta);
+void ui_event_mouse_press(ui_event_pool_t * const pool, const int button_id);
+void ui_event_mouse_release(ui_event_pool_t * const pool, const int button_id);
+void ui_event_mouse_move(ui_event_pool_t * const pool, const int x, const int y, const int deltaX, const int deltaY);
+void ui_event_key(ui_event_pool_t * const pool, const int keyCode, const bool pressed);
+void ui_event_end(ui_event_pool_t * const pool);
+
+bool ui_event_is_mouse_inside_rect(ui_event_pool_t * const pool, const rect_t * const rect);
+bool ui_event_is_mouse_moved(ui_event_pool_t * const pool);
+bool ui_event_is_mouse_pressed(ui_event_pool_t * const pool, const int button_id);
+bool ui_event_is_mouse_released(ui_event_pool_t * const pool, const int button_id);
+bool ui_event_is_key_pressed(ui_event_pool_t * const pool, const int keyCode);
+bool ui_event_is_key_released(ui_event_pool_t * const pool, const int keyCode);
+
 
 #ifdef __cplusplus
 }

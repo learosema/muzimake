@@ -22,23 +22,10 @@ extern "C" {
 
 typedef bool (*ui_event_handler_t)(uint16_t, ui_event_t *);
 
-
-
-typedef struct ui_generic_s
-{
-	uint16_t id;
-	rect_t bounding_rect;
-	uint8_t color;
-	bool active;
-	bool focused;
-	bool paint;
-	ui_event_handler_t event_handler;
-} ui_generic_t;
-
-bool rect_test_point_in_bounds(rect_t * rect, uint8_t x, uint8_t y);
-bool rect_test_mouse(rect_t * rect, uint16_t mouseX, uint16_t mouseY);
-rect_t get_clientrect(const rect_t *bounding_rect);
-void ui_handle_mouseup(ui_generic_t *generic, ui_event_t *event);
+bool rect_test_point_in_bounds(const rect_t * const rect, const uint8_t x, const uint8_t y);
+bool rect_test_mouse(const rect_t * const rect, const uint16_t mouseX, const uint16_t mouseY);
+rect_t get_clientrect(const rect_t * const bounding_rect);
+// void ui_handle_mouseup(ui_generic_t *generic, ui_event_t *event);
 
 #ifdef __cplusplus
 }

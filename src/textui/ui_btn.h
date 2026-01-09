@@ -9,6 +9,7 @@ extern "C" {
 #include <stdbool.h>
 #include <list.h>
 #include "txtbuffer.h"
+#include "ui_base.h"
 
 typedef struct ui_button_s
 {
@@ -21,6 +22,7 @@ typedef struct ui_button_s
 	bool focused;
 	/** whether button needs repaint */
 	bool paint;
+	event_handler_t event_handler;
 	const char *label;
 } ui_button_t;
 
@@ -34,6 +36,8 @@ void button_focus(ui_button_t * const button, const bool focus);
 
 /** sets the active state of the button */
 void button_active(ui_button_t * const button, const bool active);
+
+void button_behaviour(ui_event_pool_t * const pool, ui_button_t * const button);
 
 #ifdef __cplusplus
 }

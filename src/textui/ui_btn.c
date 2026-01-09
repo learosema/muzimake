@@ -3,6 +3,7 @@
 #include "macros.h"
 #include "txtbuffer.h"
 #include "ui_btn.h"
+#include "ui_event.h"
 
 void button_render(textbuffer_t * const buffer, const ui_button_t * const button)
 {
@@ -60,45 +61,34 @@ void button_active(ui_button_t *const button, const bool active)
 	button->paint = true;
 }
 
-/*
-void button_process_events(ui_button_t *button, ui_event_t *event)
+void button_focus(ui_button_t * const button, const bool focus)
 {
-	if (button->event_handler != nullptr) {
-		bool result = button->event_handler(button->id, event);
-		if (result == false) {
-			return;
-		}
-	}
+	button->focused = focus;
+	button->paint = true;
+}
 
-	if ((event->type & UI_EVENT_MOUSEMOVE) > 0) {
-		if ((button->active)&&
-				(rect_test_mouse(&(button->bounding_rect), event->payload.mouse.x, event->payload.mouse.y)))
-		{
-			button->paint = true;
-		}
-		return;
-	}
-
-	if ((event->type & UI_EVENT_MOUSEDOWN) > 0) {
-		if (rect_test_mouse(&(button->bounding_rect), event->payload.mouse.x, event->payload.mouse.y)) {
+void button_behaviour(ui_event_pool_t * const pool, ui_button_t * const button)
+{
+	if (ui_event_is_mouse_pressed(pool, 1)) {
+		if (rect_test_mouse(&(button->bounding_rect), pool->events[pool->size - 1].payload.mouse.x, pool->events[pool->size - 1].payload.mouse.y)) {
 			button->active = true;
 			button->paint = true;
 			button->focused = true;
 		}
 	}
 
-	if ((event->type & UI_EVENT_MOUSEUP) > 0) {
+	if (ui_event_is_mouse_released(pool, 1)) {
 		button->active = false;
 		button->paint = true;
-		if (rect_test_mouse(&(button->bounding_rect), event->payload.mouse.x, event->payload.mouse.y)) {
-			if (button->event_handler != nullptr) {
-				ui_event_t click = {0};
-				click.type = UI_EVENT_CLICK;
-				click.payload.click.buttons = event->payload.mouse.buttons;
-				click.payload.click.target = button->id;
+		if (rect_test_mouse(&(button->bounding_rect), pool->events[pool->size - 1].payload.mouse.x, pool->events[pool->size - 1].payload.mouse.y)) {
+			ui_event_t click = {0};
+			click.type = UI_EVENT_CLICK;
+			click.payload.click.buttons = 1;
+			click.payload.click.target = button->id;
+			if (button->event_handler != NULL) {
 				button->event_handler(button->id, &click);
-				return;
 			}
+			return;
 		}
 	}
 
@@ -107,13 +97,15 @@ void button_process_events(ui_button_t *button, ui_event_t *event)
 		return;
 	}
 
-	if (((event->type & UI_EVENT_KEY) > 0) && (event->payload.keyboard.keyCode == KEY_ENTER || event->payload.keyboard.keyCode == KEY_SPACE)) {
+	if (ui_event_is_key_pressed(pool, KEY_SCANCODE_ENTER) ||
+	    ui_event_is_key_pressed(pool, KEY_SCANCODE_SPACE)) {
 		ui_event_t click = {0};
 		click.type = UI_EVENT_CLICK;
-		click.payload.click.buttons = event->payload.mouse.buttons;
+		click.payload.click.buttons = 1;
 		click.payload.click.target = button->id;
-		button->event_handler(button->id, &click);
+		if (button->event_handler != NULL) {
+			button->event_handler(button->id, &click);
+		}
 		return;
 	}
 }
-*/
