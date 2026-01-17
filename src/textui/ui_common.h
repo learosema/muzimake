@@ -6,9 +6,9 @@ extern "C" {
 #endif
 
 #include <stdint.h>
+#include <stdbool.h>
 
 #include "geometry.h"
-#include "ui_event.h"
 
 #define COMPONENT_BUTTON  1
 #define COMPONENT_LABEL   2
@@ -20,12 +20,6 @@ extern "C" {
 
 #define INPUT_CURSOR_COLOR 0x3f
 
-typedef bool (*ui_event_handler_t)(uint16_t, ui_event_t *);
-
-bool rect_test_point_in_bounds(const rect_t * const rect, const uint8_t x, const uint8_t y);
-bool rect_test_mouse(const rect_t * const rect, const uint16_t mouseX, const uint16_t mouseY);
-rect_t get_clientrect(const rect_t * const bounding_rect);
-// void ui_handle_mouseup(ui_generic_t *generic, ui_event_t *event);
 
 #ifdef __cplusplus
 }

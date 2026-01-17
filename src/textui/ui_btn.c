@@ -3,7 +3,7 @@
 #include "macros.h"
 #include "txtbuffer.h"
 #include "ui_btn.h"
-#include "ui_event.h"
+#include "ui_ctx.h"
 
 void button_render(textbuffer_t * const buffer, const ui_button_t * const button)
 {
@@ -67,10 +67,10 @@ void button_focus(ui_button_t * const button, const bool focus)
 	button->paint = true;
 }
 
-void button_behaviour(ui_event_pool_t * const pool, ui_button_t * const button)
+void button_behaviour(const ui_context_t * const ctx, ui_button_t * const button)
 {
-	if (ui_event_is_mouse_pressed(pool, 1)) {
-		if (rect_test_mouse(&(button->bounding_rect), pool->events[pool->size - 1].payload.mouse.x, pool->events[pool->size - 1].payload.mouse.y)) {
+	if (ui_context_is_mouse_pressed(ctx, 1)) {
+		if (ui_context_is_mouse_inside_rect(ctx, &(button->bounding_rect))) {
 			button->active = true;
 			button->paint = true;
 			button->focused = true;
