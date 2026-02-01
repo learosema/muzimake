@@ -104,9 +104,9 @@ typedef struct ui_context_s {
 
 void ui_context_init(ui_context_t * const ctx);
 
-void ui_context_input_begin(ui_context_t * const ctx);
+void ui_context_begin_frame(ui_context_t * const ctx);
 
-void ui_context_input_end(ui_context_t * const ctx);
+void ui_context_end_frame(ui_context_t * const ctx);
 
 void ui_context_input_motion(ui_context_t * const ctx, const int x, const int y, const int deltaX, const int deltaY, const uint16_t buttons);
 
