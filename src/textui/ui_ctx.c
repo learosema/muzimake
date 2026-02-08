@@ -25,15 +25,6 @@ void ui_context_end_frame(ui_context_t * const ctx)
 	(void)ctx;
 }
 
-void ui_context_input_motion(ui_context_t * const ctx, const int x, const int y, const int deltaX, const int deltaY, const uint16_t buttons)
-{
-	ctx->input.mouse.x = (uint16_t)x;
-	ctx->input.mouse.y = (uint16_t)y;
-	ctx->input.mouse.deltaX = (int16_t)deltaX;
-	ctx->input.mouse.deltaY = (int16_t)deltaY;
-	ctx->input.mouse.buttons = buttons;
-}
-
 void ui_context_input_key(ui_context_t * const ctx, const int key_enum, const bool pressed)
 {
 	if (key_enum < 0 || key_enum >= UI_KEY_MAX) {
@@ -104,4 +95,14 @@ bool ui_context_is_key_released(ui_context_t * const ctx, const int key_enum)
 		return false;
 	}
 	return !ctx->input.keyboard.keys[key_enum];
+}
+
+bool ui_context_get_input_text(ui_context_t * const ctx, char *buffer, const size_t buffer_size)
+{
+	if (ctx->input.keyboard.text_length == 0) {
+		return false;
+	}
+	strncpy(buffer, ctx->input.keyboard.text, buffer_size - 1);
+	buffer[buffer_size - 1] = '\0';
+	return true;
 }

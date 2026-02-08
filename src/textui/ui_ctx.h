@@ -102,21 +102,39 @@ typedef struct ui_context_s {
 	ui_input_t input;
 }	ui_context_t;
 
+/**  Initialize the UI context. Must be called before using the context. */
 void ui_context_init(ui_context_t * const ctx);
 
+/**
+ * Begin a new frame. This should be called at the start of each frame, before processing any input or events.
+ * It resets the input state for the new frame.
+ */
 void ui_context_begin_frame(ui_context_t * const ctx);
 
+/**
+ * End the current frame.
+ * After ending the frame, no more events
+ * are processed for the current frame.
+ */
 void ui_context_end_frame(ui_context_t * const ctx);
 
-void ui_context_input_motion(ui_context_t * const ctx, const int x, const int y, const int deltaX, const int deltaY, const uint16_t buttons);
-
+/**
+ * Update the context with a key event.
+ * key_enum should be one of the UI_KEY_* values,
+ * and pressed should indicate whether the key is pressed or released.
+ */
 void ui_context_input_key(ui_context_t * const ctx, const int key_enum, const bool pressed);
 
+/**
+ * Update the context with a mouse event.
+ */
 void ui_context_input_mouse(ui_context_t * const ctx, const int x, const int y, const int deltaX, const int deltaY, const int buttons);
 
+/**
+ * Update the context with a character input event.
+ * This is for text input, and should be called when a character is typed.
+ */
 void ui_context_input_char(ui_context_t * const ctx, const char c);
-
-
 
 /**
  * Query helpers

@@ -20,8 +20,7 @@
 #define KBD_INTERRUPT 9
 
 static kbd_state_t g_keystate = {0};
-static interrupt_func_t old_keyboard_interrupt = nullptr;
-
+static interrupt_func_t old_keyboard_interrupt = NULL;
 
 void __interrupt far new_keyboard_interrupt()
 {

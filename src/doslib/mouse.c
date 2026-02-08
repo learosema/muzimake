@@ -204,6 +204,3 @@ mouse_callback_data_t *mouse_get_callback_data()
 {
 	return &g_mouse_data;
 }
-
-
-;;;;

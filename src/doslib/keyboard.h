@@ -6,6 +6,7 @@ extern "C" {
 #endif
 #include <intrhelp.h>
 #include <stdint.h>
+#include <stdbool.h>
 
 typedef struct kbd_state_s {
 	bool has_event;
