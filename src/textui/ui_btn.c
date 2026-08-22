@@ -77,10 +77,10 @@ void button_behaviour(const ui_context_t * const ctx, ui_button_t * const button
 		}
 	}
 
-	if (ui_event_is_mouse_released(pool, 1)) {
+	if (ui_context_is_mouse_released(ctx, 1)) {
 		button->active = false;
 		button->paint = true;
-		if (rect_test_mouse(&(button->bounding_rect), pool->events[pool->size - 1].payload.mouse.x, pool->events[pool->size - 1].payload.mouse.y)) {
+		if (ui_context_is_mouse_inside_rect(ctx, &(button->bounding_rect))) {
 			ui_event_t click = {0};
 			click.type = UI_EVENT_CLICK;
 			click.payload.click.buttons = 1;

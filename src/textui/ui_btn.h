@@ -10,6 +10,7 @@ extern "C" {
 #include <list.h>
 #include "txtbuffer.h"
 #include "ui_base.h"
+#include "ui_ctx.h"
 
 typedef struct ui_button_s
 {
@@ -37,7 +38,7 @@ void button_focus(ui_button_t * const button, const bool focus);
 /** sets the active state of the button */
 void button_active(ui_button_t * const button, const bool active);
 
-void button_behaviour(ui_event_pool_t * const pool, ui_button_t * const button);
+void button_behaviour(const ui_context_t * const ctx, ui_button_t * const button);
 
 #ifdef __cplusplus
 }

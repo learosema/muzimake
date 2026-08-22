@@ -8,12 +8,12 @@ extern "C" {
 /**
  * Initialize the application. This should be called before any other app functions.
  */
-void app_init();
+int app_init();
 
 /**
  * Shutdown the application.
  */
-void app_shutdown();
+int app_shutdown();
 
 /**
  * Main loop of the application. T

@@ -130,6 +130,10 @@ void ui_context_input_key(ui_context_t * const ctx, const int key_enum, const bo
  */
 void ui_context_input_mouse(ui_context_t * const ctx, const int x, const int y, const int deltaX, const int deltaY, const int buttons);
 
+void ui_context_mouse_move();
+
+void ui_context_mouse_click();
+
 /**
  * Update the context with a character input event.
  * This is for text input, and should be called when a character is typed.
