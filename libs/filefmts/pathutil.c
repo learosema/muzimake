@@ -1,4 +1,5 @@
 #include "pathutil.h"
+#include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -12,7 +13,7 @@ path_t *path_create(const char *path_string)
 {
 	path_t *result = (path_t *)malloc(sizeof(path_t));
 	result->len = strlen(path_string);
-	result->str = strdup(path_string);
+	memcpy(result->str, path_string, result->len + 1);
 	return result;
 }
 

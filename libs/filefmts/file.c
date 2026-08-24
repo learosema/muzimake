@@ -14,6 +14,8 @@ struct sound_file_s {
 	const file_func_t* func_ptr;
 };
 
+
+
 file_result_t file_init(sound_file_t * const file, const file_format_t file_format)
 {
 	sound_file_t soundfile = (sound_file_t)calloc(1, sizeof(struct sound_file_s));

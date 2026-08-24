@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "dir.h"
 #include "list.h"
 #include "fileio.h"
 
@@ -159,7 +160,7 @@ dir_entry_t *fileio_dir_entry_create(const char *filename, const bool is_dir)
 		return NULL;
 	}
 	entry->len = strlen(filename);
-	entry->filename = strdup(filename);
+	memcpy(entry->filename, filename, entry->len + 1);
 	entry->is_dir = is_dir;
 	return entry;
 }
@@ -180,11 +181,11 @@ linked_list_t *fileio_list_files(const char * const path)
 	DIRPTR dir = fileio_open_dir(path);
 	DIRENT *entry;
 	while ((entry = fileio_read_dir(dir)) != NULL) {
-		if (DIRENT_IS_FILE(entry)) {
+		if (directory_is_file(path, entry->d_name)) {
 			linked_list_append(list, fileio_dir_entry_create(entry->d_name, false));
 			continue;
 		}
-		if (DIRENT_IS_DIR(entry)) {
+		if (directory_is_dir(path, entry->d_name)) {
 			linked_list_append(list, fileio_dir_entry_create(entry->d_name, true));
 		}
 	}

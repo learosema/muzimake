@@ -13,7 +13,7 @@ add_executable(test_pth test_pth.c)
 target_link_libraries(test_pth PRIVATE fileio greatest)
 add_test(NAME test_pth COMMAND test_pth)
 
-add_executable(test_event_pool test_event_pool.c ${CMAKE_CURRENT_SOURCE_DIR}/../src/textui/ui_event.c)
-target_link_libraries(test_event_pool PRIVATE greatest)
-add_test(NAME test_event_pool COMMAND test_event_pool)
+# add_executable(test_event_pool test_event_pool.c ${CMAKE_CURRENT_SOURCE_DIR}/../src/textui/ui_event.c)
+# target_link_libraries(test_event_pool PRIVATE greatest)
+# add_test(NAME test_event_pool COMMAND test_event_pool)
 

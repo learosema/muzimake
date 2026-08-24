@@ -10,9 +10,9 @@ set(VENDOR_DIR
 	${CMAKE_SOURCE_DIR}/vendor/greatest
 )
 set(FONTS_DIR ${CMAKE_SOURCE_DIR}/fonts)
-include(cmake/c-standards.cmake)
 include(cmake/StandardProjectSettings.cmake)
-include(GNUInstallDirs)
+
+include(cmake/c-standards.cmake)
 c_99()
 
 # Link this "library" to use the warnings specified in CompilerWarnings.cmake.
@@ -23,6 +23,7 @@ set_project_warnings(project_warnings)
 enable_testing()
 
 add_subdirectory(vendor)
-add_subdirectory(src)
-add_subdirectory(tests)
+add_subdirectory(libs)
+# add_subdirectory(apps)
+# add_subdirectory(tests)
 

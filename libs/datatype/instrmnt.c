@@ -1,4 +1,3 @@
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include "instrmnt.h"
@@ -59,11 +58,13 @@ void instrument_map_sort(instrument_map_t * map)
 	qsort(map->entries, map->numItems, sizeof(instrument_map_entry_t), instrument_map_compare);
 }
 
-instrument_map_entry_t * instrument_map_find(instrument_map_t *map, const char name[9])
+instrument_map_entry_t * instrument_map_find(instrument_map_t *map, const char *name)
 {
 	instrument_map_entry_t key;
-	strncpy(key.name, name, 8);
-	key.name[8] = '\0';
+	int n = strlen(name);
+	if (n>8) n=8;
+	memcpy(key.name, name, n);
+	key.name[n] = '\0';
 	void *result = bsearch(&key, map->entries, map->numItems, sizeof(instrument_map_entry_t), instrument_map_compare);
 	return (instrument_map_entry_t *)result;
 }

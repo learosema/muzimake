@@ -3,7 +3,6 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include "ui_ctx.h"
-#include "ui_common.h"
 
 void ui_context_init(ui_context_t * const ctx)
 {
@@ -33,12 +32,19 @@ void ui_context_input_key(ui_context_t * const ctx, const int key_enum, const bo
 	ctx->input.keyboard.keys[key_enum] = pressed;
 }
 
-void ui_context_input_mouse(ui_context_t * const ctx, const int x, const int y, const int deltaX, const int deltaY, const int buttons)
+void ui_context_input_mouse(ui_context_t * const ctx, const uint8_t event_type, const int x, const int y, const int deltaX, const int deltaY, const int buttons)
 {
+	ctx->input.mouse.last_event = event_type;
 	ctx->input.mouse.x = (uint16_t)x;
 	ctx->input.mouse.y = (uint16_t)y;
 	ctx->input.mouse.deltaX = (int16_t)deltaX;
 	ctx->input.mouse.deltaY = (int16_t)deltaY;
+	ctx->input.mouse.buttons = (uint16_t)buttons;
+}
+
+void ui_context_input_click(ui_context_t * const ctx, const uint8_t event_type, const int buttons)
+{
+	ctx->input.mouse.last_event = event_type;
 	ctx->input.mouse.buttons = (uint16_t)buttons;
 }
 

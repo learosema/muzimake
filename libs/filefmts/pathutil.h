@@ -20,6 +20,8 @@ extern "C" {
 #include <dirent.h>
 #endif
 
+#include <stdbool.h>
+
 typedef struct path_s {
 	char *str;
 	size_t len;

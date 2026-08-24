@@ -79,6 +79,7 @@ enum {
 
 typedef struct ui_mouse_state_s
 {
+	uint8_t last_event;
 	uint16_t x;
 	uint16_t y;
 	int16_t deltaX;
@@ -128,11 +129,12 @@ void ui_context_input_key(ui_context_t * const ctx, const int key_enum, const bo
 /**
  * Update the context with a mouse event.
  */
-void ui_context_input_mouse(ui_context_t * const ctx, const int x, const int y, const int deltaX, const int deltaY, const int buttons);
+void ui_context_input_mouse(ui_context_t * const ctx, const uint8_t event_type, const int x, const int y, const int deltaX, const int deltaY, const int buttons);
 
-void ui_context_mouse_move();
-
-void ui_context_mouse_click();
+/**
+ * Update the context with a mouse button event
+ */
+void ui_context_input_click(ui_context_t * const ctx, const uint8_t event_type, const int buttons);
 
 /**
  * Update the context with a character input event.

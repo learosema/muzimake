@@ -81,7 +81,7 @@ bool bnkfile_write(file_data_t* file, const char *filename);
 void bnkfile_free(file_data_t* file);
 void bnkfile_debug(file_data_t* file);
 
-const file_func_t bnkfile_func = {
+static const file_func_t bnkfile_func = {
 	bnkfile_init,
 	bnkfile_read,
 	bnkfile_free,

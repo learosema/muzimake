@@ -5,6 +5,8 @@
 extern "C" {
 #endif
 
+#include <stdbool.h>
+
 typedef struct node_s node_t;
 typedef struct node_s
 {

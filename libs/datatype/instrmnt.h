@@ -6,6 +6,7 @@ extern "C" {
 #endif
 
 #include <stdint.h>
+#include <stdbool.h>
 
 typedef struct __operator {
     bool hasTremolo;
@@ -45,7 +46,7 @@ instrument_map_t instrument_map_create(uint16_t numInstruments);
 void instrument_map_sort(instrument_map_t *map);
 void instrument_map_push(instrument_map_t * map, instrument_map_entry_t entry);
 void instrument_map_resize(instrument_map_t * map, uint16_t numInstruments);
-instrument_map_entry_t * instrument_map_find(instrument_map_t *map, const char name[9]);
+instrument_map_entry_t * instrument_map_find(instrument_map_t *map, const char *name);
 void instrument_map_dispose(instrument_map_t *map);
 
 #ifdef __cplusplus

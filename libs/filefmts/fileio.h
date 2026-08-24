@@ -21,14 +21,19 @@ extern "C" {
 #endif
 #endif
 
-#if defined __DOS__ && defined __WATCOMC__
+#if defined(__DOS__) && defined(__WATCOMC__)
+
 #include <direct.h>
-#define DIRENT_IS_DIR(dirent) ((dirent->d_attr & _A_SUBDIR)>0)
-#define DIRENT_IS_FILE(dirent) ((dirent->d_attr & (_A_SUBDIR | _A_VOLID)) == 0)
+
+#elif defined(_WIN32) && !defined(__MINGW32__)
+
+#include <windows.h>
+
 #else
+
 #include <dirent.h>
-#define DIRENT_IS_DIR(dirent) (dirent->d_type == DT_DIR)
-#define DIRENT_IS_FILE(dirent) (dirent->d_type == DT_REG)
+#include <sys/stat.h>
+
 #endif
 
 #define DIRPTR DIR*
@@ -43,7 +48,7 @@ typedef struct dir_entry_s {
 } dir_entry_t;
 
 FILEPTR fileio_open(const char * const fileName, const char * const mode);
-bool fileio_eof(const FILEPTR fp);
+bool fileio_eof(FILEPTR const fp);
 
 size_t fileio_read(void * const buffer, const size_t size, const size_t nItems, FILEPTR const fp);
 size_t fileio_write(void * const buffer, const size_t size, const size_t nItems, FILEPTR const fp);

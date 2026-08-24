@@ -36,7 +36,7 @@ typedef struct file_opts {
 	bool readonly;
 } file_opts_t;
 
-const file_opts_t default_file_opts = {
+static const file_opts_t default_file_opts = {
 	false // bool readonly
 };
 

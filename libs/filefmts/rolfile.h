@@ -13,7 +13,7 @@ extern "C" {
 #endif
 
 #include <stdint.h>
-
+#include <stdbool.h>
 #include <filedata.h>
 
 #define NUM_VOICE_TRACKS 11
@@ -127,7 +127,7 @@ bool rolfile_write(file_data_t* file, const char *filename);
 void rolfile_free(file_data_t* file);
 void rolfile_debug(file_data_t* file);
 
-const file_func_t rolfile_func = {
+static const file_func_t rolfile_func = {
 	rolfile_init,
 	rolfile_read,
 	rolfile_free,
