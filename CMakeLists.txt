@@ -1,9 +1,29 @@
-cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
-project(MuziMake LANGUAGES CXX)
+cmake_minimum_required(VERSION 3.10 FATAL_ERROR)
+project(MuziMake LANGUAGES C)
+set(CMAKE_C_STANDARD 11)
+
+option(DEBUG_LOGS "Enable debug logging (defines DEBUG_LOGS)" OFF)
 
 set(SRC_DIR ${CMAKE_SOURCE_DIR}/src)
-set(VENDOR_DIR ${CMAKE_SOURCE_DIR}/vendor)
+set(VENDOR_DIR
+	${CMAKE_SOURCE_DIR}/vendor/cp437
+	${CMAKE_SOURCE_DIR}/vendor/greatest
+)
 set(FONTS_DIR ${CMAKE_SOURCE_DIR}/fonts)
+include(cmake/StandardProjectSettings.cmake)
 
-add_subdirectory(src)
-add_subdirectory(tests)
+include(cmake/c-standards.cmake)
+c_99()
+
+# Link this "library" to use the warnings specified in CompilerWarnings.cmake.
+add_library(project_warnings INTERFACE)
+include(cmake/CompilerWarnings.cmake)
+set_project_warnings(project_warnings)
+
+enable_testing()
+
+add_subdirectory(vendor)
+add_subdirectory(libs)
+# add_subdirectory(apps)
+# add_subdirectory(tests)
+

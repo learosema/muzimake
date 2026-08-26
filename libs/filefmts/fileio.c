@@ -1,0 +1,205 @@
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#include "dir.h"
+#include "list.h"
+#include "fileio.h"
+
+uint16_t byteswap_16(const uint16_t in)
+{
+	return ((in & 0xFF) << 8) | (in >> 8);
+}
+
+uint32_t byteswap_32(const uint32_t in)
+{
+	return ((in & 0xFF) << 24) |
+  	((in & 0xFF00) << 8) |
+  	((in & 0xFF0000) >> 8) |
+  	(in >> 24);
+}
+
+FILEPTR fileio_open(const char * const fileName, const char * const mode)
+{
+	return fopen(fileName, mode);
+}
+
+bool fileio_eof(FILEPTR const fp) {
+	return feof(fp) != 0;
+}
+
+bool fileio_close(FILEPTR const fp)
+{
+	return (fclose(fp) == 0);
+}
+
+size_t fileio_write(void * const buffer, const size_t size,  const size_t nItems, FILEPTR const fp)
+{
+	return fwrite(buffer, size, nItems, fp);
+}
+
+size_t fileio_read(void * const buffer, const size_t size, const size_t nItems, FILEPTR const fp)
+{
+	return fread(buffer, size, nItems, fp);
+}
+
+long fileio_get_size(FILEPTR const fp)
+{
+	long len;
+	if (fp == NULL) {
+		return -1;
+	}
+
+	if (fseek(fp, 0L, SEEK_END) != 0) {
+		return -1;
+	}
+
+	len = ftell(fp);
+	if (len == -1) {
+		return -1;
+	}
+
+	if (fseek(fp, 0L, 0) != 0) {
+		return -1;
+	}
+	return len;
+}
+
+size_t fileio_read_chars(FILEPTR const fp, char * const chars, const size_t num_chars)
+{
+	return fileio_read(chars, sizeof(char), num_chars, fp);
+}
+
+uint8_t fileio_read_u8(FILEPTR const fp)
+{
+	uint8_t b = 0;
+	fileio_read(&b, sizeof(uint8_t), 1, fp);
+	return b;
+}
+
+uint16_t fileio_read_u16le(FILEPTR const fp)
+{
+	uint16_t result = 0;
+	fileio_read(&result, sizeof(uint16_t), 1, fp);
+	#if __LITTLE_ENDIAN__ == 0
+	return byteswap16(result);
+	#endif
+	return result;
+}
+
+uint16_t fileio_read_u16be(FILEPTR const fp)
+{
+	uint16_t result = 0;
+	fileio_read(&result, sizeof(uint16_t), 1, fp);
+	#if __LITTLE_ENDIAN__ == 1
+	return byteswap_16(result);
+	#endif
+	return result;
+}
+
+uint32_t fileio_read_u32le(FILEPTR const fp)
+{
+	uint32_t result = 0;
+	fileio_read(&result, sizeof(uint32_t), 1, fp);
+	#if __LITTLE_ENDIAN__ == 0
+	return byteswap32(result);
+	#endif
+	return result;
+}
+
+uint32_t fileio_read_u32be(FILEPTR const fp)
+{
+	uint32_t result = 0;
+	fileio_read(&result, sizeof(uint32_t), 1, fp);
+	#if __LITTLE_ENDIAN__ == 1
+	return byteswap_32(result);
+	#endif
+	return result;
+}
+
+float fileio_read_f32le(FILEPTR const fp)
+{
+	float result = 0;
+	fileio_read(&result, sizeof(float), 1, fp);
+	#if __LITTLE_ENDIAN__ == 0
+	return (uint32_t)byteswap32((uint32_t)result);
+	#endif
+	return result;
+}
+
+float fileio_read_f32be(FILEPTR const fp)
+{
+	float result = 0;
+	fileio_read(&result, sizeof(uint32_t), 1, fp);
+	#if __LITTLE_ENDIAN__ == 1
+	return (float)byteswap_32((uint32_t)result);
+	#endif
+	return result;
+}
+
+DIRPTR fileio_open_dir(const char * const path)
+{
+	return opendir(path);
+}
+
+DIRENTPTR fileio_read_dir(DIRPTR const dir)
+{
+	return readdir(dir);
+}
+
+bool fileio_close_dir(DIRPTR const dir)
+{
+	return (closedir(dir) == 0);
+}
+
+dir_entry_t *fileio_dir_entry_create(const char *filename, const bool is_dir)
+{
+	dir_entry_t * entry = (dir_entry_t *)malloc(sizeof(dir_entry_t));
+	if (! entry) {
+		return NULL;
+	}
+	entry->len = strlen(filename);
+	memcpy(entry->filename, filename, entry->len + 1);
+	entry->is_dir = is_dir;
+	return entry;
+}
+
+void fileio_dir_entry_dispose(dir_entry_t * entry)
+{
+	if (entry == NULL) {
+		return;
+	}
+	if (entry->filename) free(entry->filename);
+	free(entry);
+}
+
+linked_list_t *fileio_list_files(const char * const path)
+{
+	linked_list_t *list = linked_list_new();
+
+	DIRPTR dir = fileio_open_dir(path);
+	DIRENT *entry;
+	while ((entry = fileio_read_dir(dir)) != NULL) {
+		if (directory_is_file(path, entry->d_name)) {
+			linked_list_append(list, fileio_dir_entry_create(entry->d_name, false));
+			continue;
+		}
+		if (directory_is_dir(path, entry->d_name)) {
+			linked_list_append(list, fileio_dir_entry_create(entry->d_name, true));
+		}
+	}
+	fileio_close_dir(dir);
+	return list;
+}
+
+void fileio_list_files_dispose(linked_list_t * const list)
+{
+	for (node_t *iter = list->head; iter != NULL; iter = iter->next)
+	{
+		if (iter->data != NULL) {
+			free(iter->data);
+		}
+	}
+	linked_list_dispose(list);
+}
