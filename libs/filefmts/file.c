@@ -48,9 +48,8 @@ file_result_t file_open(sound_file_t* const file, const char *filename)
 {
 	sound_file_t soundfile = *file;
 
-	soundfile->func_ptr->read_file(&soundfile->file_data, filename);
+	return soundfile->func_ptr->read_file(&soundfile->file_data, filename);
 
-	return SUCCESS;
 }
 
 file_result_t file_open_ext(sound_file_t* const file, const char *filename, const file_opts_t file_opts)

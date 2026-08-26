@@ -76,7 +76,7 @@ instrument_t bnkfile_convert_to_instrument(bnk_instrument_t bnkInstr);
 instrument_map_t bnkfile_convert_to_map(bnk_file_t * bnkFile);
 
 void bnkfile_init(file_data_t* file);
-void bnkfile_read(file_data_t* file, const char* filename);
+file_result_t bnkfile_read(file_data_t* file, const char* filename);
 bool bnkfile_write(file_data_t* file, const char *filename);
 void bnkfile_free(file_data_t* file);
 void bnkfile_debug(file_data_t* file);

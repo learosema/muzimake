@@ -1,3 +1,4 @@
+#include "file.h"
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
@@ -120,20 +121,26 @@ void rolfile_init(file_data_t* file)
 	file->type = MUSIC;
 }
 
-void rolfile_read(file_data_t* file, const char* filename)
+file_result_t rolfile_read(file_data_t* file, const char* filename)
 {
 	FILEPTR fp = fileio_open(filename, "rb");
+	if (fp == NULL) {
+		return ERROR;
+	}
 	long len = fileio_get_size(fp);
 	if (len < sizeof(rol_header_t)) {
-		return;
+		return ERROR;
 	}
 
 	rol_file_t* rolFile = (rol_file_t *)malloc(sizeof(rol_file_t));
+	if (rolFile == NULL) {
+		return ERROR;
+	}
 
 	fileio_read(&(rolFile->header), sizeof(rol_header_t), 1, fp);
 
 	if (strncmp(rolFile->header.signature, "\\roll\\default", 13) != 0) {
-		return;
+		return ERROR;
 	}
 
 	rolfile_read_tempo_track(fp, rolFile);
@@ -148,6 +155,7 @@ void rolfile_read(file_data_t* file, const char* filename)
 	fileio_close(fp);
 
 	file->data = rolFile; // TODO: to be removed, when structure is refactored
+	return SUCCESS;
 }
 
 bool rolfile_write(file_data_t* file, const char *filename)

@@ -2,6 +2,7 @@
 #include <string.h>
 #include <stdbool.h>
 
+#include "file.h"
 #include "fileio.h"
 #include "bnkfile.h"
 
@@ -106,15 +107,23 @@ void bnkfile_init(file_data_t* file)
 	file->type = INSTRUMENT_BANK;
 }
 
-void bnkfile_read(file_data_t* file, const char* filename)
+file_result_t bnkfile_read(file_data_t* file, const char* filename)
 {
 	FILEPTR fp = fileio_open(filename, "rb");
+	if (fp == NULL) {
+		return ERROR;
+	}
 
 	long len = fileio_get_size(fp);
 
 	bnk_file_t* bnkFile = (bnk_file_t *)malloc(sizeof(bnk_file_t));
+	if (bnkFile == NULL) return ERROR;
 	bnkFile->len = len;
 	bnkFile->buffer = (uint8_t *)malloc(len * sizeof(uint8_t));
+	if (bnkFile->buffer == NULL) {
+		free(bnkFile);
+		return ERROR;
+	}
 	fileio_read(bnkFile->buffer, sizeof(uint8_t), len, fp);
 
 	bnkFile->header = (bnk_header_t *)bnkFile->buffer;
@@ -125,6 +134,7 @@ void bnkfile_read(file_data_t* file, const char* filename)
 	fileio_close(fp);
 
 	file->data = bnkFile; // TODO: to be removed, when structure is refactored
+	return SUCCESS;
 }
 
 void bnkfile_debug(file_data_t* file)

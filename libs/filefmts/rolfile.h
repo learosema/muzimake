@@ -8,6 +8,7 @@
 #ifndef __ROLFILE_H__
 #define __ROLFILE_H__
 
+#include "file.h"
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -122,7 +123,7 @@ bool rolfile_read_old(rol_file_t *rolFile, char *filename);
 void rolfile_dispose_old(rol_file_t *rolFile);
 
 void rolfile_init(file_data_t* file);
-void rolfile_read(file_data_t* file, const char* filename);
+file_result_t rolfile_read(file_data_t* file, const char* filename);
 bool rolfile_write(file_data_t* file, const char *filename);
 void rolfile_free(file_data_t* file);
 void rolfile_debug(file_data_t* file);

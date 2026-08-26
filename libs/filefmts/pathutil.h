@@ -30,6 +30,7 @@ typedef struct path_s {
 path_t *path_create(const char *path_string);
 path_t *path_join(path_t *path, const char *path_string);
 path_t *path_normalize(path_t *path);
+path_t *path_getcwd(void);
 void path_dispose(path_t *path);
 bool path_chdir(const char *path_string);
 
