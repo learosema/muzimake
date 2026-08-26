@@ -12,5 +12,7 @@ target_link_libraries(${NAME} PRIVATE datatype)
 
 add_executable(testffmt testinst.c)
 target_link_libraries(testffmt PRIVATE datatype filefmts greatest)
-add_test(NAME testffmt COMMAND testffmt)
+add_test(NAME testffmt COMMAND testffmt ${PROJECT_SOURCE_DIR}/assets)
 
+# target_compile_options(testffmt PRIVATE -fsanitize=address -fno-omit-frame-pointer -g -O0)
+# target_link_options(testffmt PRIVATE -fsanitize=address)

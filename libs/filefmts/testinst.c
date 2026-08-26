@@ -2,20 +2,22 @@
 #include <string.h>
 #include <assert.h>
 #include "file.h"
-
+#include "pathutil.h"
 #include "bnkfile.h" // TODO: to be removed, when structure is refactored
 
 #define EXPECT(str, condition) printf("expect %s: ",str);assert(condition);printf("ok\n");
 
-int main()
+int main(int argc, char** argv)
 {
 	sound_file_t soundfile = NULL;
+	char * dir = argc == 2 ? argv[1] : ".";
+	path_t * bankFilePath = path_create(dir);
+	path_join(bankFilePath, "STANDARD.BNK");
 
 	file_result_t result;
 	result = file_init(&soundfile, FORMAT_BNK);
 
-	result = file_open(&soundfile, "STANDARD.BNK");
-
+	result = file_open(&soundfile, bankFilePath->str);
 	if(result == ERROR){
 		printf("*** Error ***\n");
 		return -1;
@@ -45,5 +47,6 @@ int main()
 	EXPECT("expect the first entry to be 000_test", strcmp(map.entries[0].name, "000_test") == 0);
 
 	file_close(&soundfile);
+	path_dispose(bankFilePath);
 	return 0;
 }

@@ -19,16 +19,24 @@ instrument_map_t instrument_map_create(uint16_t numInstruments)
 	return map;
 }
 
-void instrument_map_resize(instrument_map_t * map, uint16_t numInstruments)
+void instrument_map_resize(instrument_map_t *map, uint16_t numInstruments)
 {
-	uint16_t oldNumItems = map->numItems;
-	map->numItems = numInstruments;
-	map->entries = REALLOC_TYPE(map->entries, instrument_map_entry_t, numInstruments);
-	if (map->numItems > oldNumItems) {
-		uint16_t initCount = map->numItems - oldNumItems;
-		instrument_map_entry_t * start = map->entries + oldNumItems * sizeof(instrument_map_entry_t);
-		memset(start, 0,  initCount * sizeof(instrument_map_entry_t));
-	}
+    uint16_t oldNumItems = map->numItems;
+    instrument_map_entry_t * newEntries = REALLOC_TYPE(map->entries, instrument_map_entry_t, numInstruments);
+
+    if (newEntries == NULL && numInstruments > 0) {
+        /* Fehlerbehandlung: alten Zustand beibehalten, Fehler zurückgeben o. ä. */
+        return;
+    }
+
+    map->entries = newEntries;
+    map->numItems = numInstruments;
+
+    if (map->numItems > oldNumItems) {
+        uint16_t initCount = map->numItems - oldNumItems;
+        instrument_map_entry_t * start = &(map->entries[oldNumItems]);
+        memset(start, 0, initCount * sizeof(instrument_map_entry_t));
+    }
 }
 
 void instrument_map_push(instrument_map_t * map, instrument_map_entry_t entry)
